@@ -1,0 +1,172 @@
+referenceSequence="/Users/d.brown6/Documents/public-datasets/annotationFiles/GATKbundle/human_g1k_v37.fasta"
+referenceSNPs="/Users/d.brown6/Documents/public-datasets/annotationFiles/GATKbundle/1000G_omni2.5.b37.vcf"
+indels="/Users/d.brown6/Documents/public-datasets/annotationFiles/GATKbundle/Mills_and_1000G_gold_standard.indels.b37.vcf"
+GATK="/Users/d.brown6/Bioinformatics/GenomeAnalysisTK-2.3-6-gebbba25/GenomeAnalysisTK.jar"
+intervalList="/Users/d.brown6/Documents/RNAdata/RNAseqAnalysis/121105_trimmomaticReads/CD133n1000readsV2.interval_list"
+COSMICvcf="/Users/d.brown6/Documents/public-datasets/annotationFiles/cosmic_vcfFile/CosmicMutantExport_v56_151111.vcf"
+
+addReadGroupHeader = {
+  doc title: "Any broad institute tools needs a RG group. Treat this merged bam file as a single sample"
+  exec """java -Xmx2g -jar ~/Bioinformatics/picard-tools-1.78/picard-tools-1.78/AddOrReplaceReadGroups.jar
+INPUT=$input.bam OUTPUT=$output.bam SORT_ORDER=coordinate RGID=$input'library' 
+RGLB=RNA RGPL=illumina RGPU=FLOWCELL001 RGSM=$input"""
+}
+
+fixMateInfo = {
+doc title: "Makes sure the mate information for paired reads is in sync"
+  exec """java -Xmx2g -jar ~/Bioinformatics/picard-tools-1.78/picard-tools-1.78/FixMateInformation.jar
+  INPUT=$input.bam OUTPUT=$output.bam SORT_ORDER=null"""
+}
+
+sortReadName = {
+  doc title: "For safety's sake the GATK requires human contigs in karyotypic order"
+  exec """java -Xmx2g -jar ~/Bioinformatics/picard-tools-1.78/picard-tools-1.78/ReorderSam.jar
+  INPUT=$input.bam OUTPUT=$output.bam REFERENCE=$referenceSequence"""
+}
+
+makeIndex = {
+  doc title: "After adding headers and reorder need to index again"
+  exec "samtools index $input.bam"
+}
+
+markDuplicates = {
+doc title: "Mark duplicates before doing realignment"
+ desc: "A PCR duplicate sound not be used as evidence twice for a variant"
+  exec """java -Xmx2g -jar ~/Bioinformatics/picard-tools-1.78/picard-tools-1.78/MarkDuplicates.jar
+  INPUT=$input.bam OUTPUT=$output.bam METRICS_FILE=$output'.txt' ASSUME_SORTED=true"""
+}
+
+callableLoci = {
+  doc title:"what areas of the genome are considered callable"
+    desc:"""Consider the coverage at each locus and emits either a per base state or a summary interval 
+    BED file that partitions the genomic intervals into the following callable states"""
+  exec """java -Xmx2g -jar $GATK -T CallableLoci
+  -I $input.bam 
+  -R $referenceSequence
+  -summary summary.txt
+  -o $output.bed"""  
+}
+
+findIndel = {
+  doc title:"Determine (small) suspicious intervals which are likely in need of realignment"
+    desc:"Use the gold standard Broad bundle indel vcf file from the 1000 genomes"
+  exec"""java -Xmx2g -jar $GATK
+   -I $input.bam -R $referenceSequence
+   -T RealignerTargetCreator
+   -o $output.intervals --known $indels
+   """
+}
+
+localRealign = {
+  doc title:"Run the realigner over those intervals specified by target realigner in the previous step"
+    desc:"""Start with a local realignment around indels as this is where many false positive SNPs occur
+    Added the -rf alignment as Tophat reports multiple reads with the same name in bam file is they 
+    align to multiple locations. It is a read filter suggested by realignment around indels FAQ on GATK"""
+  exec """java -Xmx2g -jar $GATK -I $input.bam -R $referenceSequence
+  -T IndelRealigner
+  -targetIntervals $input.intervals
+  -o $output.bam
+  -rf NotPrimaryAlignment
+  -known $indels -compress 0
+  """  
+}
+
+baseScoreRecalibration = {
+  doc title: "First pass of the base quality score recalibration -- Generates recalibration table"
+    desc: """This walker is designed to work as the first pass in a two-pass processing step. It does a by-locus traversal operating 
+    only at sites that are not in dbSNP. We assume that all reference mismatches we see are therefore errors and indicative of poor base 
+    quality. This walker generates tables based on various user-specified covariates then calculate an empirical probability of error given the particular
+    covariates seen at this site, where p(error) = num mismatches / num observations. Had to use the MateSameStrand filter to get script to work. This removes ~75% of reads."""
+  exec """java -Xmx2g -jar $GATK
+   -T BaseRecalibrator
+   -I $input.bam
+   -R $referenceSequence
+   -knownSites $referenceSNPs
+   -o $output.grp
+   -rf MateSameStrand
+   -plots qualityRecalibration.pdf"""  
+}
+
+recalibrateReads ={
+  doc title: "To create a recalibrated BAM you can use GATK's PrintReads with the engine on-the-fly recalibration capability"
+    desc: """After computing covariates in the initial BAM File, we then walk through the BAM file again and rewrite the quality scores 
+    (in the QUAL field) using the data in the recalibration_report.grp file, into a new BAM file. 
+    This step uses the recalibration table data in recalibration_report.grp produced by BaseRecalibration to recalibrate the quality 
+    scores in input.bam, and writing out a new BAM file output.bam with recalibrated QUAL field values."""
+  exec """java -Xmx2g -jar $GATK
+   -T PrintReads
+   -R $referenceSequence
+   -I $input.bam
+   -BQSR $input.grp
+   -o $output.bam
+  """  
+}
+
+haplotypeCaller = {
+  doc title: "Call SNPs and indels simultaneously via local de-novo assembly of haplotypes in an active region."
+    desc: "Haplotypes are evaluated using an affine gap penalty Pair HMM. The system is under active and continuous development. All outputs, the underlying likelihood model, and command line arguments are likely to change often"
+  exec """java -Xmx4g -jar $GATK
+     -T HaplotypeCaller -R $referenceSequence
+     -I $input.bam -L $intervalList --dbsnp $referenceSNPs
+     -stand_call_conf 30.0 -stand_emit_conf 30.0 --downsampleRegion 500
+     -o $output.vcf
+  """  
+}
+
+unifiedGenotyper = {
+  doc title:"Unified Genotyper is a multiple-sample, technology-aware SNP and indel caller."
+    desc:"""It uses a Bayesian genotype likelihood model to estimate simultaneously the most likely genotypes and allele frequency in a population of N samples,
+     emitting an accurate posterior probability of there being a segregating variant allele at each locus as well as for the genotype of each sample. 
+     The system can either emit just the variant sites or complete genotypes (which includes homozygous reference calls) satisfying some phred-scaled 
+     confidence value. The genotyper can make accurate calls on both single sample data and multi-sample data."""
+  exec """java -Xmx2g -jar $GATK
+   -R $referenceSequence
+   -T UnifiedGenotyper
+   -I $input.bam --dbsnp $referenceSNPs -o $output.vcf
+   --genotype_likelihoods_model SNP --min_base_quality_score 30
+   -dcov 200 -L $intervalList"""
+}
+
+filterCOSMICVariants = {
+  doc title: "Use the cosmic database of somatic mutations to filter the a vcf for overlaps"
+    desc: "Pulled COSMIC vcf file from Keats lab page v56 (database is at v62). Use bedTools to compute overlaps"
+  exec """R /Users/d.brown6/Documents/Rscripts/130111_filterVCFcommand.R $input.vcf $COSMICvcf $output.vcf"""
+}
+
+annotateVariants = {
+  doc title: "Calculate variant effects using snpEff"
+    desc: "Use the ensembl annotation GRCh37.68"
+  exec  """cd ~/Bioinformatics/snpEff_3_1/; 
+  java -Xmx2g -jar snpEff.jar  GRCh37.68 '/Users/d.brown6/Documents/RNAdata/RNAseqAnalysis/121121_TopHatNovelAlignment/gatkAnalysis/'$input.vcf > 
+  '/Users/d.brown6/Documents/RNAdata/RNAseqAnalysis/121121_TopHatNovelAlignment/gatkAnalysis/'$output.vcf;
+  cd /Users/d.brown6/Documents/RNAdata/RNAseqAnalysis/121121_TopHatNovelAlignment/gatkAnalysis/"""
+}
+
+filterAnnotatedVariants = {
+doc title: "Filters variant calls using a number of user-selectable, parameterizable criteria"
+    desc: """VariantFiltration is a GATK tool for hard-filtering variant calls based on certain criteria. 
+    Records are hard-filtered by changing the value in the FILTER field to something other than PASS.""" 
+  exec  """java -Xmx2g -jar $GATK
+   -R $referenceSequence -T VariantFiltration
+   -o $output.vcf --variant $input.vcf
+   --filterName functionalEffect --filterExpression \"EFF != 'NON_SYNONYMOUS_CODING*'\"
+   --filterName isExon --filterExpression \"EFF != 'EXON*'\"
+   --missingValuesInExpressionsShouldEvaluateAsFailing"""
+}
+
+variantRecalibrator = {
+  doc title: "Filters variant calls using a number of user-selectable, parameterizable criteria"
+    desc: """VariantFiltration is a GATK tool for hard-filtering variant calls based on certain criteria. 
+    Records are hard-filtered by changing the value in the FILTER field to something other than PASS. 
+    Try this after filtering for phenotype as it is haed to filter twice once PASS is entered in info""" 
+  exec  """java -Xmx2g -jar $GATK
+   -R $referenceSequence -T VariantFiltration
+   -o $output.vcf --variant $input.vcf
+   --filterName \"QUAL, QD, MQ, FS, HS\"
+   --filterExpression \"QUAL > 100.0 && QD < 2.0 && MQ < 40.0 && FS > 60.0 && HaplotypeScore > 13.0\"
+   """
+}
+
+Bpipe.run {
+filterAnnotatedVariants
+}

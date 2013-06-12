@@ -1,0 +1,36 @@
+refGenome = "/vlsci/VR0002/shared/Reference_Files/Indexed_Ref_Genomes/TuxedoSuite_Ref_Files/Homo_sapiens/Ensembl/GRCh37/Sequence/WholeGenomeFasta/genome.fa"
+refTranscriptome = "/vlsci/VR0002/shared/Reference_Files/Indexed_Ref_Genomes/TuxedoSuite_Ref_Files/Homo_sapiens/Ensembl/GRCh37/Annotation/Genes/genes.gtf"
+CuffTranscriptome = "./merged.gtf"
+rRNA = "./hg19_ribosome_gene_locations.list"
+countScript = "~/dexseq_count.py"
+
+sortReadName = {
+  doc: "Use picard to sort by read name"
+  exec """module load java/1.6.0_25; java -Xmx2g -jar /usr/local/picard/1.69/lib/SortSam.jar INPUT=$input.bam OUTPUT=$output.sam SORT_ORDER=queryname"""
+}
+
+convertAnnotation = {
+  doc: "Convert the gtf file to exon based reference"
+    desc: "Required input to count.py DEXseq script"
+  exec "module load python-gcc/2.6.4; python ~/dexseq_prepare_annotation.py $refTranscriptome $output.gtf"
+}
+
+countExons = {
+  doc: "Use the exon based gtf file from the previous step"
+    desc: "The -s option is required to use the unstranded option for the reference. Otherwise there is an error. Input for DEXseq package in R."
+  exec "module load python-gcc/2.6.4; python $countScript -s no exonAnnotation.gtf $input.sam $output.txt"
+}
+
+makeBED = {
+  doc title: "COnvert to bed file to make it smaller"
+  exec """module load bedtools/2.9.0; module load samtools-gcc/0.1.18;
+  samtools sort -no $input.bam | bamToBed -i stdin -bedpe
+"""
+}
+
+compressFile = {
+  exec "tar -zcvf $ouput.tgz $inputs"
+}
+
+Bpipe.run {
+  "CD133%" * [ sortReadName + countExons  ]

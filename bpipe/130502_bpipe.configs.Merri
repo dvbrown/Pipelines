@@ -1,0 +1,12 @@
+executor="torque"
+walltime="06:00:00"
+queue="smp"
+memory="23gb"
+account="VR0002"
+
+executor="torque"
+walltime="01:00:00"
+queue="batch"
+procs="1"
+memory="16gb"
+account="VR0002"

@@ -1,0 +1,30 @@
+refGenome = "/vlsci/VR0002/shared/Reference_Files/Indexed_Ref_Genomes/TuxedoSuite_Ref_Files/Homo_sapiens/Ensembl/GRCh37/Sequence/BowtieIndex/genome"
+refTranscriptome = "/vlsci/VR0002/shared/Reference_Files/Indexed_Ref_Genomes/TuxedoSuite_Ref_Files/Homo_sapiens/Ensembl/GRCh37/Annotation/Genes/genes.gtf"
+CuffTranscriptome = "./merged.gtf"
+
+concatenateFastq = {
+  doc title: "Put the fastq files together. Remove the newline between files using grep. "
+  exec "cat $inputs | grep -v ^\$  > $output.fq"
+}
+
+alignTopHat = {
+  doc title: "Align using TopHat"
+    desc: """Alignment is able to be split over many cores, Merri has 8 cores per node. As the library had mean size of 270bp set mate inner distance to 70.
+    Use a gene model annotations -G and reuse this annotation index file by storing it in a directory."""   
+  exec """module load tophat/2.0.4; module load bowtie-gcc/2.0.0-b5; module load samtools-gcc/0.1.16;
+  tophat -p 8 -G $CuffTranscriptome -o $input1'_out' --mate-inner-dist 70 --fusion-search $refGenome $input1 $input2"""
+}
+
+filterFusion = {
+  doc title: "Run the fusion post script to remove psuedogenes and the like"
+    desc: """The output folders from tophat aligner must start with tophat_. Must have the reference files and the indexes in the directory. Symbolic links are OK.
+seems to require both bowtie 1 and 2 and their respective indexes."""
+  exec """module load tophat/2.0.4; module load bowtie-gcc/2.0.0-b5; module load samtools-gcc/0.1.16; module load blast+-gcc/2.2.24; module load python-gcc/2.6.4; module load bowtie-gcc/0.12.7;
+tophat-fusion-post -p 1 --num-fusion-reads 1 --num-fusion-pairs 2 --num-fusion-both 5  ./indexes/genome"""
+}
+
+compress = {
+  exec "filterFusion"
+}
+
+Bpipe.run {filterFusion}

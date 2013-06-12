@@ -1,0 +1,49 @@
+refGenome = "reference.ebwt"
+refTranscriptome = "genes.gtf"
+
+@Filter("filter")
+fastQC = {
+  doc title:"Generate quality control report using fastQC"
+  
+  exec "fastqc < $input.fq > $output"
+}
+
+@Filter("deMultiplex")
+deMultiplex = {
+doc title: """Check that CASAVA is able to demultiplex any file and not just TruSeq prepared libraries. 
+Do I need to remove PCR dupliates using picard before alignment?"""
+
+  exec "$input.fq > $output.fq"
+}
+
+@Transform("sam")
+alignment = {
+  doc title: "Align using TopHat"
+    desc: """Alignment is able to be split over many cores, Merri has 8 cores per node.
+    Use a gene model annotations -G and reuse this annotation index file by storing it in a directory. Check where the indexed human genome is on Merri.
+    Output as a sam file for use by HTseq"""
+    
+  exec """tophat -p 8 -G $refTranscriptome --transcriptome-index=$refTranscriptome --no-convert-bam
+  -o ./tophat_out --fusion-search $refGenome
+  < $input.fq > $output.sam"""
+}
+
+@Filter("bai")
+sortIndexBam = {
+  doc title: "Convert from sam to bam then index and sort"
+    desc: "In this pipeline the bam file is only for checking alignment using IGV. HTseq requires the sam file as input"
+  exec "samtools view -bS $input.sam > $output.bam"  
+  exec "samtools sort -o < $input.bam | samtools index > $output.bai"
+}
+
+@Transform("txt")
+countReads = {
+  doc title: "Count/ summarise the reads using the python2.6 module htseq-count"
+    desc: """First download gene/ feature coordinates from (Ensembl or Enterez). Set the strandedness of the bam file to unknown.
+    Check that the chromosome names and coordinate systems from sam file and annotation match."""
+    
+  exec """htseq-count --stranded=no $input.sam $refTranscriptome > $output.txt"""
+}
+
+
+bpipe.run {  }

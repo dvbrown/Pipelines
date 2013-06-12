@@ -1,0 +1,100 @@
+referenceSequence="/Users/d.brown6/Documents/public-datasets/annotationFiles/GATKbundle/human_g1k_v37.fasta"
+varScanJar="/Users/d.brown6/Bioinformatics/varScan.v2.3.4/VarScan.v2.3.4.jar"
+intervalList="/Users/d.brown6/Documents/RNAdata/RNAseqAnalysis/121105_trimmomaticReads/CD133n1000readsV2.interval_list"
+COSMICvcf="/Users/d.brown6/Documents/public-datasets/annotationFiles/cosmic_vcfFile/CosmicMutantExport_v56_151111.vcf"
+GATK="/Users/d.brown6/Bioinformatics/GenomeAnalysisTK-2.3-6-gebbba25/GenomeAnalysisTK.jar"
+annovarDir="/Users/d.brown6/Bioinformatics/annovar/"
+dbSNP = "/Users/d.brown6/Documents"
+
+samToBam = {
+  doc title: "Sort and bam convert"
+  exec "samtools view -bS $input.sam | samtools sort - $output"
+}
+
+view = {
+  exec "samtools view -H $input.bam"
+}
+
+addReadGroupHeader = {
+  doc title: "Any broad institute tools needs a RG group. Treat this merged bam file as a single sample"
+  exec """java -Xmx2g -jar ~/Bioinformatics/picard-tools-1.78/picard-tools-1.78/AddOrReplaceReadGroups.jar
+INPUT=$input.bam OUTPUT=$output.bam SORT_ORDER=unsorted RGID=CD133library 
+RGLB=RNA RGPL=illumina RGPU=FLOWCELL001 RGSM=clone035 VALIDATION_STRINGENCY=LENIENT"""
+}
+
+fixMateInfo = {
+doc title: "Makes sure the mate information for paired reads is in sync"
+  exec """java -Xmx2g -jar ~/Bioinformatics/picard-tools-1.78/picard-tools-1.78/FixMateInformation.jar
+  INPUT=$input.bam OUTPUT=$output.bam SORT_ORDER=null"""
+}
+
+makeIndex = {
+  doc title: "After adding headers and reorder need to index again"
+  exec "samtools index $input.bam"
+}
+
+markDuplicates = {
+doc title: "Mark duplicates before doing realignment"
+ desc: "A PCR duplicate sound not be used as evidence twice for a variant"
+  exec """java -Xmx2g -jar ~/Bioinformatics/picard-tools-1.78/picard-tools-1.78/MarkDuplicates.jar
+  INPUT=$input.bam OUTPUT=$output.bam METRICS_FILE=$output'.txt' ASSUME_SORTED=true"""
+}
+
+mpileup = {
+  doc title: "Generate the pileup of aligned reads for input to Varscan"
+    desc: """Alignment records are grouped by sample identifiers in @RG header lines. If sample identifiers are absent, each input file 
+    is regarded as one sample. Require a minimum mapping quality of 0 and limit the file up to reads with FPKM greater than 50.
+    The interval list is this bed file"""
+  exec """samtools mpileup -Q 13 -q 1 -l $intervalList -f $referenceSequence $input.bam > $output.pileup"""
+}
+
+varScan = {
+  doc title: "VarScan calls somatic variants SNPs and indels using a heuristic method and a statistical test"
+    desc: "This command expects a single mpileup file, although it can be multisample"
+  exec """java -Xmx2g -jar $varScanJar mpileup2snp $input.pileup > $output.vcf
+  --min-coverage 5 --min-avg-qual 30 --p-value 0.05 --min-var-freq 0.1 --output-vcf 1"""  
+}
+fixVcf = {
+  doc title: "Use a python script from Seqtools to fix a vcf file"
+    desc: "Fixes up a varscan generated file so that the ALT column conforms to specifications"
+  exec "~/Bioinformatics/vcftools_0.1.10/varscan.py -v $input.vcf > $output.vcf"  
+}
+filterVarScan = {
+  doc title: "filters variants in a file"
+    desc: "by coverage, supporting reads, variant frequency, or average base quality. It is for use with output from pileup2snp"
+  exec """java -Xmx2g -jar $varScanJar filter $input.vcf 
+  --min-coverage 10 --min-reads2 5 --min-avg-qual 30 --p-value 0.01 --input-vcf 1 --min-var-freq 0.1 --output-file $output.vcf"""
+}
+
+annotateVariants = {
+  doc title: "Calculate variant effects using snpEff"
+    desc: "Use the ensembl annotation GRCh37.68. Had to hardcode the directory as SNPeff must be run from its home directory"
+  exec  """cd ~/Bioinformatics/snpEff_3_1/; 
+  java -Xmx2g -jar snpEff.jar  GRCh37.68 '/Users/d.brown6/Documents/RNAdata/RNAseqAnalysis/121121_TopHatNovelAlignment/varScanAnalysis/130211_reAnnotate/'$input.vcf > 
+  '/Users/d.brown6/Documents/RNAdata/RNAseqAnalysis/121121_TopHatNovelAlignment/varScanAnalysis/130211_reAnnotate/'$output.vcf;
+  cd /Users/d.brown6/Documents/RNAdata/RNAseqAnalysis/121121_TopHatNovelAlignment/varScanAnalysis/130211_reAnnotate/"""
+}
+
+annotateDbSNP = {
+  doc title: "SnpSift is able to annotate the info field of the vcf with known SNPs from dbSNP"
+    desc: "This is separate from Varscan as we are able to filter based on annotations"
+  exec """java -Xmx2g -jar ~/Bioinformatics/snpEff_3_1/SnpSift.jar annotate ~/Documents/public-datasets/annotationFiles/00-All.vcf 
+  $input.vcf > $output.vcf"""  
+}
+
+snpSiftFilter = {
+  doc title: "Using SnpSift filter you can filter using arbitrary expressions"
+    desc: "ANY effect is NON_SYNONYMOUS, the variant is in the protein coding reigon."
+  exec """cat $input.vcf | java -Xmx2g -jar ~/Bioinformatics/snpEff_3_1/SnpSift.jar filter 
+  "( EFF[*].EFFECT = 'NON_SYNONYMOUS_CODING') & ( EFF[*].BIOTYPE = 'protein_coding')" > $output.vcf"""  
+}
+
+snpSiftExtract = {
+  doc title: "Extract fields from a VCF file to a TXT tab separated format"
+    desc: " You can also use sub-fields and genotype fields / sub-fields such as"
+  exec """java -Xmx2g -jar ~/Bioinformatics/snpEff_3_1/SnpSift.jar extractFields $input.vcf
+  CHROM POS ID REF ALT ADP GEN[0].GT GEN[0].GQ GEN[0].FREQ GEN[0].PVAL EFF[0].GENE EFF[0].BIOTYPE 
+  EFF[0].CODING EFF[0].EXID EFF[0].EFFECT EFF[0].FUNCLASS EFF[0].CODON EFF[*].AA EFF[*].IMPACT > $output.txt"""  
+}
+
+Bpipe.run { snpSiftExtract }

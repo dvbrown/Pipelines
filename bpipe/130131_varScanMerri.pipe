@@ -1,0 +1,86 @@
+referenceGenome = "/vlsci/VR0002/shared/Reference_Files/Indexed_Ref_Genomes/bowtie_Indexed/human_g1k_v37"
+refGenome = "/vlsci/VR0002/shared/Reference_Files/Indexed_Ref_Genomes/TuxedoSuite_Ref_Files/Homo_sapiens/Ensembl/GRCh37/Sequence/WholeGenomeFasta/genome.fa"
+referenceSNPs="/Users/d.brown6/Documents/public-datasets/annotationFiles/GATKbundle/1000G_omni2.5.b37.vcf"
+indels="/Users/d.brown6/Documents/public-datasets/annotationFiles/GATKbundle/Mills_and_1000G_gold_standard.indels.b37.vcf"
+intervalList="/vlsci/VR0238/shared/rawData/gatk/varScan/CD133n1000readsV2.interval_list"
+COSMICvcf="/Users/d.brown6/Documents/public-datasets/annotationFiles/cosmic_vcfFile/CosmicMutantExport_v56_151111.vcf"
+
+bowtie = {
+  doc title: "Use version 2 on RNA-seq reads"
+    desc: "Tophat seems to break varScan try bowtie"
+  exec """module load bowtie-gcc/2-2.0.2; module load samtools-gcc/0.1.18;
+  bowtie2 --local --rg-id CD133n -p 8 -x $referenceGenome -1 $input1 -2 $input2 -S $output
+  """
+}
+
+samtoBam = {
+  doc title: "bowtie outputs in sam format, convert to bam to save disk space"
+  exec "module load samtools-gcc/0.1.18; samtools view -Sb $input.sam | samtools sort - $output"
+}
+
+addReadGroupHeader = {
+  doc title: "Any broad institute tools needs a RG group. Treat this merged bam file as a single sample"
+  exec """module load java/1.6.0_25;
+java -Xmx2g -jar /usr/local/picard/1.69/lib/AddOrReplaceReadGroups.jar
+INPUT=$input.bam OUTPUT=$output.bam SORT_ORDER=unsorted RGID=s_4_CD133p_Blibrary
+RGLB=CD133p_B RGPL=illumina RGPU=FLOWCELL001 RGSM=CD133p VALIDATION_STRINGENCY=LENIENT"""
+}
+
+fixMateInfo = {
+doc title: "Makes sure the mate information for paired reads is in sync"
+  exec """java -Xmx2g -jar /usr/local/picard/1.69/lib/FixMateInformation.jar
+  INPUT=$input.bam OUTPUT=$output.bam SORT_ORDER=null"""
+}
+
+sortSamPicard = {
+  doc title: "The picard sort"
+  exec """module load java/1.6.0_25; java -Xmx2g -jar /usr/local/picard/1.69/lib/SortSam.jar INPUT=$input.bam OUTPUT=$output.bam
+SORT_ORDER=coordinate"""
+}
+reorderSam = {
+  doc title: "The picard version of sorting"
+    desc: "This program updates the flag in the sam header to being sorted"
+  exec """module load java/1.6.0_25; java -Xmx2g -jar /usr/local/picard/1.69/lib/ReorderSam.jar INPUT=$input.bam OUTPUT=$output.bam
+REFERENCE=$refGenome"""
+}
+
+makeIndex = {
+  doc title: "After adding headers and reorder need to index again"
+  exec "module load samtools-gcc/0.1.18; samtools index $input.bam"
+}
+
+markDuplicates = {
+doc title: "Mark duplicates before doing realignment"
+ desc: "A PCR duplicate sound not be used as evidence twice for a variant"
+  exec """module load java/1.6.0_25; java -Xmx2g -jar /usr/local/picard/1.69/lib/MarkDuplicates.jar
+  INPUT=$input.bam OUTPUT=$output.bam METRICS_FILE=$output'.txt' ASSUME_SORTED=true"""
+}
+
+mpileup = {
+  doc title: "Generate the pileup of aligned reads for input to Varscan"
+    desc: """Alignment records are grouped by sample identifiers in @RG header lines. If sample identifiers are absent, each input file
+    is regarded as one sample. Require a minimum mapping quality of 0 and limit the file up to reads with FPKM greater than 50.
+    The interval list is this bed file"""
+  exec """module load samtools-gcc/0.1.18;
+  samtools mpileup -Q 13 -f $refGenome $input.bam > $output.pileup"""
+}
+
+varScan = {
+  doc title: "VarScan calls somatic variants (SNPs and indels) using a heuristic method and a statistical test"
+    desc: """This command expects both a normal and a tumor file in SAMtools pileup format. 
+    Varscan 2.2.11 in vcf mode only prints SNPs and doesn't give a p-value"""
+  exec """module load java; module load varscan/2.2.11;
+  java -Xmx2g -jar /usr/local/varscan/2.2.11/VarScan.v2.2.11.jar mpileup2snp $input.pileup > $output
+  --min-coverage 5 --min-avg-qual 30 --p-value 0.05 --output-vcf 1"""
+}
+
+filterVarScan = {
+  doc title: "filters variants in a file"
+    desc: "by coverage, supporting reads, variant frequency, or average base quality. It is for use with output from pileup2snp"
+  exec """module load java; module load varscan/2.2.11; java -Xmx2g -jar /usr/local/varscan/2.2.11/VarScan.v2.2.11.jar filter $input.vcf 
+  --min-coverage 10 --min-reads2 5 --min-avg-qual 30 --p-value 0.01 --output-file $output.vcf"""
+}
+
+Bpipe.run {
+ varScan
+}

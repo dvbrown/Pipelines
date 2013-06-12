@@ -1,0 +1,12 @@
+gsea="/Users/d.brown6/Bioinformatics/gseaJava/gsea2-2.0.12.jar"
+
+geneSetEnrichent = {
+  doc title: """Gene Set Enrichment Analysis (GSEA) is a computational method that determines whether an a priori defined set of genes shows statistically 
+  significant,concordant differences between two biological states"""
+    desc: """Writing the bpipe script seems like a fair bit of work. Haven'tgotten around to it yet."""
+  exec """java -cp $gsea -Xmx1024m xtools.gsea.Gsea
+
+  """
+}
+
+Bpipe.run { "wgEncodeHaibTfbs%" * [intersectPromoter] }

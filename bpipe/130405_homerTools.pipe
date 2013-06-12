@@ -1,0 +1,48 @@
+makeTagDir = {
+  doc title: "Split BED files up by chromosome"
+    desc: """makeTagDirectory basically parses through the alignment file and splits the tags into 
+    separate files based on their chromosome.  As a result, several *.tags.tsv files are created in the 
+    output directory.  These are made to very efficiently return to the data during downstream analysis.  
+    This also helps speed up the analysis of very large data sets without running out of memory."""
+  exec """
+  makeTagDirectory A549/ -format bed $input1 $input2;
+  makeTagDirectory Ecc1/ -format bed $input3 $input4;
+  makeTagDirectory Gm12878/ -format bed $input5 $input6;
+  makeTagDirectory hESC/ -format bed $input7 $input8;
+  makeTagDirectory Hepg2/ -format bed $input9 $input10;
+  makeTagDirectory K562/ -format bed $input11 $input12;
+  """
+}
+
+fixNewLine = {
+  doc title: "Fix the Mac new line character and turn it into windows style"
+    desc: "Insert the appropriate description"
+  exec  "changeNewLine.pl $inputs"
+}
+
+annotateOneExpt = {
+  doc title: "Associate peaks with nearby genes"
+    desc: """The first two argument, the <peak file> and <genome>, are required, and must be the first 
+    two arguments.  Other optional command line arguments can be placed in any order after the first two.  
+    By default, annotatePeaks.pl prints the program output to stdout, which can be captured in a file by 
+    appending  > filename to the command."""
+  exec  "annotatePeaks.pl $input hg19 -noann -m creb.motif > $output.txt"
+}
+
+annotateDiffExpt = {
+  doc title: "Associate peaks with nearby genes"
+    desc: """The first two argument, the <peak file> and <genome>, are required, and must be the first 
+    two arguments.  Other optional command line arguments can be placed in any order after the first two.  
+    By default, annotatePeaks.pl prints the program output to stdout, which can be captured in a file by 
+    appending  > filename to the command."""
+  exec  """annotatePeaks.pl $input hg19 -noann -m creb.motif -size 500 
+  -d A549/ Ecc1/ Gm12878/ hESC/ Hepg2/ K562/
+  > $output.txt"""
+}
+
+moveDirectory = {
+  doc title: "Move the output to the desired directory"
+  exec "mv *.annotateOneExpt.txt ./annotateIndividual"
+}
+
+Bpipe.run { "%PkRep*" * [annotateOneExpt] }

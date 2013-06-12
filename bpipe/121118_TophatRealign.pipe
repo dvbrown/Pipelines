@@ -1,0 +1,61 @@
+refGenome = "/vlsci/VR0002/shared/Reference_Files/Indexed_Ref_Genomes/TuxedoSuite_Ref_Files/Homo_sapiens/Ensembl/GRCh37/Sequence/Bowtie2Index/genome"
+refTranscriptome = "/vlsci/VR0002/shared/Reference_Files/Indexed_Ref_Genomes/TuxedoSuite_Ref_Files/Homo_sapiens/Ensembl/GRCh37/Annotation/Genes/genes.gtf"
+CuffTranscriptome = "./merged.gtf"
+rRNA = "./hg19_rRNA.list"
+
+concatenateFastq = {
+  doc title:  "Merge the fastq files from different lanes before alignment"
+  exec "cat $input1 $input2 $input3 > $output1"
+  exec "cat $input4 $input5 $input6 > $output2"
+}
+
+alignTopHat = {
+  doc title: "Align using TopHat"
+    desc: """Alignment is able to be split over many cores, Merri has 8 cores per node. As the library had mean size of 270bp set mate inner distance to 70.
+    Use a gene model annotations -G and reuse this annotation index file by storing it in a directory."""
+    
+  exec """module load tophat/2.0.4; module load bowtie-gcc/2.0.0-b5; module load samtools-gcc/0.1.16;
+  tophat -p 8 --GTF $CuffTranscriptome --transcriptome-index=/vlsci/VR0238/shared/rawData/rawFastq/transcriptome_data/known 
+  -o $input1'_out' --mate-inner-dist 70 $refGenome $input1 $input2"""ls
+}
+
+@Filter("bam")
+mergeBam = {
+  doc title: "Merge aligned bam files that are the same sample but where generated in different lanes"
+    desc: "Use picard to merge by chromosomal coordinates and output as uncompressed bam"
+  exec """module load java/1.6.0_25; java -Xmx2g -jar /usr/local/picard/1.69/lib/MergeSamFiles.jar 
+  INPUT=$input1'/accepted_hits.bam' INPUT=$input2'/accepted_hits.bam' INPUT=$input3'/accepted_hits.bam' 
+  INPUT=$input4'/accepted_hits.bam' INPUT=$input5'/accepted_hits.bam' INPUT=$input6'/accepted_hits.bam' 
+  INPUT=$input7'/accepted_hits.bam' INPUT=$input8'/accepted_hits.bam' INPUT=$input9'/accepted_hits.bam' 
+  OUTPUT=$output.bam"""
+}
+
+sortSamtools = {
+  doc title: "Sort the bam file"
+    desc: """Sort the bam file for the alignment QC programs"""
+  exec  "module load samtools-gcc/0.1.18; samtools sort -m 4000000000 $input'/accepted_hits.bam' $output.bam"
+}
+
+@Transform("bai")
+indexSamtools = {
+  doc title:"Index Bam file"
+    desc: "Index the bam file"
+  exec "samtools index $input.bam $output.bai"
+}  
+
+RNA-seQC = {
+  doc title: "Use the broad QC program"
+  exec """module load java/1.6.0_20; module load rnaseqc/1.1.7; 
+  java -jar RNA-SeQC.jar -o $output -r refGenome'.fa' -rRNA $rRNA -s $input'|'$input.bam'|Notes' -t $refTranscriptome 
+  -transcriptDetails"""
+}
+
+bamStats = {
+  doc title: "This program is used to calculate reads mapping statistics from provided BAM or SAM file"
+    desc: "This script determines “uniquely mapped reads” from the “NH” tag in BAM/SAM file (please note “NH” is an optional tag, bam_stat.py may fail if aligner does NOT provide this tag)"
+  exec "bam_stat.py  -i $input.bam > $output.txt"  
+}
+
+Bpipe.run {
+  "CD133p_%_R*." * [concatenateFastq + alignTopHat + sortSamtools + indexSamtools + RNA-seQC] 
+}

@@ -1,0 +1,76 @@
+barcodeFile = "./barcode.txt"
+refGenome = """/vlsci/VR0002/shared/Reference_Files/Indexed_Ref_Genomes"""
+refTranscriptome = """/vlsci/VR0002/shared/Reference_Files/Indexed_Ref_Genomes/TuxedoSuite_Ref_Files/Homo_sapiens/Ensembl/GRCh37/Annotation/Genes/genes.gtf"""
+genomeFasta = "/vlsci/VR0002/shared/Reference_Files/GATK_bundle_Refs/hg19/ucsc.hg19.fasta"
+
+@Filter("fq")
+TrimReads = {
+  doc title: "Demultiplex and trim ends off reads using Trimmomatic"
+    desc: """Check that CASAVA is able to demultiplex any file and not just TruSeq prepared libraries. 
+  Do I need to trim the adapter sequence and barcode from the reads or will TopHat do this?
+  Do I need to remove PCR dupliates using picard before alignment? Using fastxToolKit -q is the minimum quality score and -p the
+  minimum percentage of bases that must have quality defined in q.
+  Pipe output to fastx barcode splitter. Search 5' end allow 1 mismatch. Append fq the file extension. """
+
+  exec """module load java/1.6.0_20; java -classpath /vlsci/VR0002/shared/Trimmomatic-0.22/trimmomatic-0.22.jar
+  org.usadellab.trimmomatic.TrimmomaticPE -threads 1 -phred33 -trimlog $input'_trimLog.txt' $inputs $outputs
+  ILLUMINACLIP:illuminaClipping.fa:2:40:15 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36'"""
+}
+
+alignTopHat = {
+  doc title: "Align using TopHat"
+    desc: """Alignment is able to be split over many cores, Merri has 8 cores per node. As the library had mean size of 270bp set mate inner distance to 70.
+    Use a gene model annotations -G and reuse this annotation index file by storing it in a directory."""
+    
+exec """module load tophat/2.0.4; module load bowtie-gcc/2.0.0-b5; module load samtools-gcc/0.1.16;
+  tophat -p 8 --GTF $refTranscriptome --transcriptome-index=/vlsci/VR0238/shared/rawData/rawFastq/transcriptome_data/known 
+  -o $input1'_out' --mate-inner-dist 70 $refGenome $inputs"""
+}
+
+@Filter("bam")
+mergeBam = {
+  doc title: "Merge aligned bam files that are the same sample but where generated in different lanes"
+    desc: "Use picard to merge by chromosomal coordinates and output as uncompressed bam"
+  exec """module load java/1.6.0_25; java -Xmx2g -jar /usr/local/picard/1.69/lib/MergeSamFiles.jar 
+  INPUT=$input1'/accepted_hits.bam' INPUT=$input2'/accepted_hits.bam' INPUT=$input3'/accepted_hits.bam' 
+  OUTPUT=$output.bam"""
+}
+
+sortSamtools = {
+  doc title: "Sort the bam file"
+    desc: """In this pipeline the bam file is only for checking alignment using IGV. HTseq requires the sam file as input
+    Increase the memory at this step using -m argument to $Gb"""
+  exec  "module load samtools-gcc/0.1.18; samtools sort -m 4000000000 $input.bam $output"
+}
+q
+@Transform("bai")
+indexSamtools = {
+  doc title:"Index Bam file"
+    desc: "Index the bam file"
+  exec "samtools index $input.bam $output.bai"
+}  
+
+  RNAseQC = {
+    doc title: "Generate various QC statistics post-alignment"
+    exec """module load rnaseqc/1.1.7; module load module load java/1.6.0_20;
+    java -jar RNA-SeQc.jar -t $refTranscriptome -o $output -r $genomeFasta -s Sample ID|$input|Notes"""
+  }
+
+  compressBam = {
+    doc title:"Compress bam and bai for copying"
+    exec "tar -zcvf $output.tgz $inputs"
+  }
+
+@Transform("txt")
+countHTSeq = {
+  doc title: "Count/ summarise the reads using the python2.6 module htseq-count"
+    desc: """First download gene or feature coordinates from (Ensembl or Enterez). Set the strandedness of the bam file to unknown.
+    The example below is the reference transcriptome but can easily do isoforms, chromosomes etc by changing the parameter.
+    Check that the chromosome names and coordinate systems from sam file and annotation match."""
+  exec """module load samtools-gcc/0.1.18; module load python-gcc/2.6.4;
+  samtools sort -no $input.bam - | samtools view -h - |
+  python -m HTSeq.scripts.count --stranded=no -m intersection-nonempty -
+  $refTranscriptome > $output.txt"""
+}
+
+Bpipe.run { "_CD133n_%" * [TrimReads + alignTopHat + sortSamtools + indexSamtools + RNAseQC + countHTSeq ] }

@@ -1,0 +1,20 @@
+proximalPromoters="/Users/d.brown6/Documents/public-datasets/annotationFiles/ENCODE/proximalPromoterModules_Yip2013GenBiol_PRM_All_merged/mergedPRM.bed"
+proximalPromotersThousand="/Users/d.brown6/Documents/public-datasets/annotationFiles/ENCODE/proximalPromoterModules_Yip2013GenBiol_PRM_All_merged/newMergedPRM.bed"
+
+coveragePromoter = {
+  doc title: "Use bedtools to count the overlaps in the peak file with active proximal promoter elements defined by ENCODE"
+    desc: """ClosestBed searches for overlapping features in A and B. In the event that no feature in B overlaps the current feature in A, 
+    closestBed will report the closest (that is, least genomic distance from the start or end of A) feature in B"""
+  exec """coverageBed -a $input.broadPeak -b $proximalPromoters
+  > $output.bed"""
+}
+
+intersectPromoter = {
+  doc title: "Use bedtools to count the overlaps in the peak file with active proximal promoter elements defined by ENCODE"
+    desc: """For each entry in A, report the number of hits in B while restricting to -f. 
+    Reports 0 for A entries that have no overlap with B. There must be a 1bp overlap. This is to normalise the chipSeq data by promoter"""
+  exec """intersectBed -c -a $proximalPromotersThousand -b $input.broadPeak
+  > $output.bed"""
+}
+
+Bpipe.run { "wgEncodeHaibTfbs%" * [intersectPromoter] }

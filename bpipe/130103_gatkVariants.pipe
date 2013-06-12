@@ -1,0 +1,86 @@
+referenceSequence="/Users/d.brown6/Documents/public-datasets/annotationFiles/GATKbundle/human_g1k_v37.fasta"
+indels="/Users/d.brown6/Documents/public-datasets/annotationFiles/GATKbundle/Mills_and_1000G_gold_standard.indels.b37.vcf"
+GATK="/Users/d.brown6/Bioinformatics/GenomeAnalysisTK-2.3-4-g57ea19f/GenomeAnalysisTK.jar"
+
+addReadGroupHeader = {
+  doc title: "Any broad institute tools needs a RG group. Treat this merged bam file as a single sample"
+  exec """java -Xmx2g -jar ~/Bioinformatics/picard-tools-1.78/picard-tools-1.78/AddOrReplaceReadGroups.jar
+INPUT=$input.bam OUTPUT=$output.bam SORT_ORDER=coordinate RGID=$input'library' 
+RGLB=RNA RGPL=illumina RGPU=FLOWCELL001 RGSM=$input"""
+}
+
+fixMateInfo = {
+doc title: "Makes sure the mate information for paired reads is in sync"
+  exec """java -Xmx2g -jar ~/Bioinformatics/picard-tools-1.78/picard-tools-1.78/FixMateInformation.jar
+  INPUT=$input.bam OUTPUT=$output.bam SORT_ORDER=coordinate"""
+}
+
+sortReadName = {
+  doc title: "For safety's sake the GATK requires human contigs in karyotypic order"
+  exec """java -Xmx2g -jar ~/Bioinformatics/picard-tools-1.78/picard-tools-1.78/ReorderSam.jar
+  INPUT=$input.bam OUTPUT=$output.bam REFERENCE=$referenceSequence"""
+}
+
+makeIndex = {
+  doc title: "After adding headers and reorder need to index again"
+  exec "samtools index $input.bam"
+}
+
+markDuplicates = {
+doc title: "Mark duplicates before doing realignment"
+ desc: "A PCR duplicate sound not be used as evidence twice for a variant"
+  exec """java -Xmx2g -jar ~/Bioinformatics/picard-tools-1.78/picard-tools-1.78/MarkDuplicates.jar
+  INPUT=$input.bam OUTPUT=$output.bam METRICS_FILE=$output'.txt' ASSUME_SORTED=true"""
+}
+
+callableLoci = {
+  doc title:"what areas of the genome are considered callable"
+    desc:"""Consider the coverage at each locus and emits either a per base state or a summary interval 
+    BED file that partitions the genomic intervals into the following callable states"""
+  exec """java -Xmx2g -jar $GATK -T CallableLoci
+  -I $input.bam 
+  -R $referenceSequence
+  -summary summary.txt
+  -o $output.bed"""  
+}
+
+findIndel = {
+  doc title:"Determine (small) suspicious intervals which are likely in need of realignment"
+    desc:"Use the gold standard Broad bundle indel vcf file from the 1000 genomes"
+  exec"""java -Xmx2g -jar $GATK
+   -I $input.bam -R $referenceSequence
+   -T RealignerTargetCreator
+   -o $output.intervals --known $indels
+   """
+}
+
+localRealign = {
+  doc title:"Run the realigner over those interval"
+    desc:"""Start with a local realignment around indels as this is where many false positive SNPs occur
+    Added the -rf alignment as Tophat reports multiple reads with the same name in bam file is they 
+    align to multiple locations. It is a read filter suggested by realignment around indels FQAQ on GATK"""
+  exec """java -Xmx2g -jar $GATK -I $input.bam -R $referenceSequence
+  -T IndelRealigner
+  -targetIntervals $input.intervals
+  -o $output.bam
+  -rf NotPrimaryAlignment
+  -known $indels -compress 0
+  """  
+}
+
+
+baseScoreRecalibration = {
+
+}
+
+haplotypeCaller = {
+
+}
+
+filterVariants = {
+
+}
+
+Bpipe.run {
+fixMateInfo + addReadGroupHeader + sortReadName  + markDuplicates + makeIndex + findIndel + localRealign
+}

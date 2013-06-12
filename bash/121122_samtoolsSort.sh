@@ -1,0 +1,19 @@
+#!/bin/bash
+samtools sort -n s_4_ACAGTG_CD133p_B.bam.bamToFastq_R1.fq_out/accepted_hits.bam s_4_CD133p_B.bam.sorted;
+samtools sort -n s_4_ATCACG_CD133n_A.bam.bamToFastq_R1.fq_out/accepted_hits.bam s_4_CD133n_A.bam.sorted;
+samtools sort -n s_4_CGATGT_CD133n_B.bam.bamToFastq_R1.fq_out/accepted_hits.bam s_4_CD133n_B.bam.sorted;
+samtools sort -n s_4_GCCAAT_CD133p_C.bam.bamToFastq_R1.fq_out/accepted_hits.bam s_4_CD133p_C.bam.sorted;
+samtools sort -n s_4_TGACCA_CD133p_A.bam.bamToFastq_R1.fq_out/accepted_hits.bam s_4_CD133p_A.bam.sorted;
+samtools sort -n s_4_TTAGGC_CD133n_C.bam.bamToFastq_R1.fq_out/accepted_hits.bam s_4_CD133n_C.bam.sorted;
+samtools sort -n s_5_ACAGTG_CD133p_B.bam.bamToFastq_R1.fq_out/accepted_hits.bam s_5_CD133p_B.bam.sorted;
+samtools sort -n s_5_ATCACG_CD133n_A.bam.bamToFastq_R1.fq_out/accepted_hits.bam s_5_CD133n_A.bam.sorted;
+samtools sort -n s_5_CGATGT_CD133n_B.bam.bamToFastq_R1.fq_out/accepted_hits.bam s_5_CD133n_B.bam.sorted;
+samtools sort -n s_5_GCCAAT_CD133p_C.bam.bamToFastq_R1.fq_out/accepted_hits.bam s_5_CD133p_C.bam.sorted;
+samtools sort -n s_5_TGACCA_CD133p_A.bam.bamToFastq_R1.fq_out/accepted_hits.bam s_5_CD133p_A.bam.sorted;
+samtools sort -n s_5_TTAGGC_CD133n_C.bam.bamToFastq_R1.fq_out/accepted_hits.bam s_5_CD133n_C.bam.sorted;
+samtools sort -n s_6_ACAGTG_CD133p_B.bam.bamToFastq_R1.fq_out/accepted_hits.bam s_6_CD133p_B.bam.sorted;
+samtools sort -n s_6_ATCACG_CD133n_A.bam.bamToFastq_R1.fq_out/accepted_hits.bam s_6_CD133n_A.bam.sorted;
+samtools sort -n s_6_CGATGT_CD133n_B.bam.bamToFastq_R1.fq_out/accepted_hits.bam s_6_CD133n_B.bam.sorted;
+samtools sort -n s_6_GCCAAT_CD133p_C.bam.bamToFastq_R1.fq_out/accepted_hits.bam s_6_CD133p_C.bam.sorted;
+samtools sort -n s_6_TGACCA_CD133p_A.bam.bamToFastq_R1.fq_out/accepted_hits.bam s_6_CD133p_A.bam.sorted;
+samtools sort -n s_6_TTAGGC_CD133n_C.bam.bamToFastq_R1.fq_out/accepted_hits.bam s_6_CD133n_C.bam.sorted;

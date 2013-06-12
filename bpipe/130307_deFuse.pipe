@@ -1,0 +1,29 @@
+refGenome = "/vlsci/VR0002/shared/Reference_Files/Indexed_Ref_Genomes/TuxedoSuite_Ref_Files/Homo_sapiens/Ensembl/GRCh37/Sequence/Bowtie2Index/genome"
+refTranscriptome = "/vlsci/VR0002/shared/Reference_Files/Indexed_Ref_Genomes/TuxedoSuite_Ref_Files/Homo_sapiens/Ensembl/GRCh37/Annotation/Genes/genes.gtf"
+CuffTranscriptome = "./merged.gtf"
+
+trimReads = {
+  doc title: "Demultiplex and trim ends off reads using Trimmomatic"
+    desc: """Use trimmomatic to cut the 5' end of the reads to improve alignment using a quality score cutoff of 20."""
+  exec """module load java/1.6.0_20; java -Xmx512m -classpath /vlsci/VR0002/shared/Trimmomatic-0.22/trimmomatic-0.22.jar
+ org.usadellab.trimmomatic.TrimmomaticPE -threads 1 -phred33 -trimlog $input'_trimLog.txt' $input1 $input2 $output1'1.fq' $input1'unpair' 
+ $input2'.trimReads2.fq' $input2'unpair'
+  ILLUMINACLIP:IlluminaAdapters.fa:2:40:15 LEADING:20 TRAILING:20 MINLEN:50"""
+}
+
+deFuse = {
+  doc title: "try out deFuse"
+    desc: """Set the bowtie_bin, bowtie_build_bin, blat entries, rscript.bin and r_bin in config.txt to the fully qualified paths 
+    of the bowtie and bowtie-build binaries. Note that running deFuse again causes the program to continue where it left off
+    You need to delete all the files in the output directory to make it completley restart. The annotate fusions subscript 
+    crashes because the genome reference is given as the basebase in the config file (genome). I had to change this after 
+    annotation crashed to (genome.fa). None of the R packages had the ada package. I had to install it in my home folder
+    and create a R environmental variable echo 'R_LIBS_USER=~/R/x86_64-unknown-linux-gnu-library/2.15' >  $HOME/.Renviron
+    """   
+  exec """module load defuse/0.6.1; module load samtools-gcc/0.1.18;module load perl/5.10.1; module load R-gcc/2.15.0;
+  /usr/local/defuse/0.6.1/scripts/defuse.pl -c config.txt --1fastq $input1 --2fastq $input2
+  -o /vlsci/VR0238/shared/rawData/rawFastq/deFuse -p 1
+"""
+}
+
+Bpipe.run {trimReads + deFuse}

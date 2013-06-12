@@ -1,0 +1,32 @@
+barcodeFile = "./barcode.txt"
+refGenome = """/vlsci/VR0002/shared/Reference_Files/Indexed_Ref_Genomes"""
+refTranscriptome = """/vlsci/VR0002/shared/Reference_Files/Indexed_Ref_Genomes/TuxedoSuite_Ref_Files/Homo_sapiens/Ensembl/GRCh37/Annotation/Genes/genes.gtf"""
+genomeFasta = "/vlsci/VR0002/shared/Reference_Files/GATK_bundle_Refs/hg19/ucsc.hg19.fasta"
+
+@Transform("rep")
+fastQC = {
+  doc title:"Generate quality control report using fastQC. Add extension rep to signify report"
+  
+  exec "fastqc $inputs.fq > $output.rep"
+}
+
+@Transform("bed")
+  bedConvert = {
+    doc title: "Create bed file for various QC steps"
+      desc: ""
+    exec """module load bedtools/2.16.2;
+    """  
+  }
+
+  RNAseQC = {
+    doc title: "Generate various QC statistics post-alignment"
+    exec """module load rnaseqc/1.1.7; module load module load java/1.6.0_20;
+    java -jar RNA-SeQc.jar -t $refTranscriptome -o $output -r $genomeFasta -s Sample ID|$input|Notes"""
+  }
+
+  compressOutput = {
+    doc title:"Compress bam and bai for copying"
+    exec "tar -zcvf $output.tgz $inputs"
+  }
+
+Bpipe.run { "_CD133n_%" * [RNAseQC] }

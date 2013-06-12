@@ -1,0 +1,65 @@
+refGenome = """/vlsci/VR0002/shared/Reference_Files/Indexed_Ref_Genomes"""
+refTranscriptome = """/vlsci/VR0002/shared/Reference_Files/Indexed_Ref_Genomes/TuxedoSuite_Ref_Files/Homo_sapiens/Ensembl/GRCh37/Annotation/Genes/genes.gtf"""
+
+bamToFastq = {
+  doc title:"Convert unaligned bam into fastq files for analysis"
+    desc:"Take unaligned bam files and return the fastq files. Include all reads that did not pass filter"
+  exec """java -Xmx2g -jar /usr/local/picard/1.69/lib/SamToFastq.jar 
+  INPUT=$inputs FASTQ=$output'_R1.fq' SECOND_END_FASTQ=$output'_R2.fq' INCLUDE_NON_PF_READS=true 
+  INCLUDE_NON_PRIMARY_ALIGNMENTS=Boolean"""  
+}
+
+@Transform("rep")
+fastQC = {
+  doc title:"Generate quality control report using fastQC. Add extension rep to signify report"
+  
+  exec "fastqc $inputs.fq > $output.rep"
+}
+
+@Filter("fq")
+TrimReads = {
+  doc title: "Demultiplex and trim ends off reads using Trimmomatic"
+    desc: """Use trimmomatic to cut the 5' end of the reads to improve alignment using a quality score cutoff of 20."""
+
+  exec """module load java/1.6.0_20; java -classpath /vlsci/VR0002/shared/Trimmomatic-0.22/trimmomatic-0.22.jar
+  org.usadellab.trimmomatic.TrimmomaticPE -threads 1 -phred33 -trimlog $input'_trimLog.txt' $inputs $outputs
+  ILLUMINACLIP:IlluminaAdapters.fa:2:40:15 LEADING:20 TRAILING:20 SLIDINGWINDOW:5:20 MINLEN:50"""
+}
+
+alignTopHat = {
+  doc title: "Align using TopHat"
+    desc: """Alignment is able to be split over many cores, Merri has 8 cores per node. As the library had mean size of 270bp set mate inner distance to 70.
+    Use a gene model annotations -G and reuse this annotation index file by storing it in a directory."""
+    
+exec """module load tophat/2.0.4; module load bowtie-gcc/2.0.0-b5; module load samtools-gcc/0.1.16;
+  tophat -p 8 --GTF $refTranscriptome --transcriptome-index=/vlsci/VR0238/shared/rawData/rawFastq/transcriptome_data/known 
+  -o $input1'_out' --mate-inner-dist 70 $refGenome $inputs"""
+}
+
+
+sortSamtools = {
+  doc title: "Convert from sam to bam then index and sort"
+    desc: """In this pipeline the bam file is only for checking alignment using IGV. HTseq requires the sam file as input
+    Increase the memory at this step using -m argument to $Gb"""
+  exec  "module load samtools-gcc/0.1.16; samtools sort $input.rep'_out'/accepted_hits.bam  $output"
+}
+
+@Transform("bai")
+indexSamtools = {
+  doc title:"Index Bam file"
+    desc: "Index the bam file"
+  exec "samtools index $input.bam $output.bai"
+}  
+
+@Transform("txt")
+countHTSeq = {
+  doc title: "Count/ summarise the reads using the python2.6 module htseq-count"
+    desc: """First download gene or feature coordinates from (Ensembl or Enterez). Set the strandedness of the bam file to unknown. 
+    The example below is the reference transcriptome but can easily do isoforms, chromosomes etc by changing the parameter. 
+    Check that the chromosome names and coordinate systems from sam file and annotation match."""
+    
+  exec """ samtools view -h $input.bam |
+  python -m HTSeq.scripts.count --stranded=no -m intersection-nonempty - $refTranscriptome > $output.txt"""
+}
+
+Bpipe.run { "s_4_%.bam.bamToFastq_R*.fq" * [TrimReads + fastQC ] }

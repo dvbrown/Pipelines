@@ -1,0 +1,41 @@
+refGenome = "/vlsci/VR0002/shared/Reference_Files/Indexed_Ref_Genomes/TuxedoSuite_Ref_Files/Homo_sapiens/Ensembl/GRCh37/Sequence/Bowtie2Index/genome.fa"
+refTranscriptome = "/vlsci/VR0002/shared/Reference_Files/Indexed_Ref_Genomes/TuxedoSuite_Ref_Files/Homo_sapiens/Ensembl/GRCh37/Annotation/Genes/genes.gtf"
+assemblies = "./assemblies.txt"
+
+@Transform("rep")
+fastQC = {
+  doc title:"Generate quality control report using fastQC. Add extension rep to signify report"
+  exec "fastqc $inputs.fq > $output.rep"
+
+assembleCufflinks = {
+  doc title:"Cufflinks transcript assembly"
+    desc: """Cufflinks using reference transcripts. Use the upper quartile of mapped reads in the FPKM calculation.
+    Discard transcripts with less than 5% of the most abundant isoform. Use a multi-read correction"""
+  exec """module load cufflinks/2.0.2; cufflinks -p 1 -g $refTranscriptome -u --upperquartile-norm 
+  --min-isoform-fraction 0.05 -o $output'_cuffOut' $input.bam """
+}
+
+mergeCuffmerge = {
+  doc title:"Merge the individual samples."
+    desc:"""Make sure to create the assemblies.txt file manually. This lists the input files in the form of Directory/transcripts.gtf. 
+    This program creates a merged transcript assembly for cuff diff to use."""
+  exec "module load cufflinks/2.0.2; cuffmerge -g $refTranscriptome -s $refGenome -p 1 -o $output.txt $assemblies"  
+}
+
+compareCuffCompare = {
+  doc title:"Compare reference annotation to data to observe novel transcripts"
+    desc:"Not nesscary if calling cuffmerge"
+  exec "module load cufflinks/2.0.2; "  
+}
+
+diffCuffDiff = {
+  doc title:"Test for differential expression"
+    desc:"Need to work out how to group replicates by sample at this step"
+  exec """module load cufflinks/2.0.2; 
+  cuffdiff -o $input'diff_out' -b genome $input/merged.gtf -p 1 --upper-quartile-norm --min-alignment-count 10 
+  $input'/accepted_hits.bam'"""
+}
+
+Bpipe.run {
+  "C%_R" * [assembleCufflinks + mergeCuffmerge] 
+}

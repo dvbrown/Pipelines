@@ -1,0 +1,24 @@
+#!/bin/bash
+# Created by the VLSCI job script generator
+# Sat Oct 27 2012 12:28:21 GMT+1100 (EST)
+
+# Queue for the job:
+#PBS -q batch
+
+# The name of the job:
+#PBS -N compress
+
+# Maximum number of CPU cores used by the job:
+#PBS -l procs=1
+
+# The amount of memory in gigabytes per process in the job:
+#PBS -l pvmem=4gb
+
+# The maximum running time of the job in days:hours:mins:secs
+#PBS -l walltime=0:1:0:0
+
+# Run the job from the directory where it was launched:
+cd $PBS_O_WORKDIR
+
+# The job command(s):
+tar -zcvf 121026_mergedBam.tgz *

@@ -1,0 +1,42 @@
+@Filter("fastQC")
+fastQC = {
+  doc title:"Generate quality control report using fastQC"
+  exec "fastqc < $input.fastq > $output"
+}
+
+@Filter("deMultiplex")
+deMultiplex = {
+doc title: """Check that CASAVA is able to demultiplex any file and not just TruSeq prepared libraries. 
+Do I need to remove PCR dupliates using picard before alignment?"""
+
+  exec "$input.fastq > $output.fastq"
+}
+
+@Transform("alignment")
+alignment = {
+  doc title: "Align using TopHat"
+    desc: """Alignment is able to be split over many cores, Merri has 8 cores per node.
+    Use a gene model annotations -G and reuse this annotation index file by storing it in a directory. Check where the indexed human genome is on Merri.
+    Do I need to sort and index the bam file after alignment by piping to samTools?"""
+    
+  exec """tophat -p 8 -G referenceTranscriptome.gtf --transcriptome-index=refTranscriptome/built
+  -o ./tophat_out --fusion-search indexedRefGenome.bai
+  < $input.fastq > $output.bam"""
+}
+
+@Filter("sortIndexBam")
+sortIndexBam = {
+  doc title: "Sort and index the bam file for use in summarisation"
+  exec "samtools sort -o < $input.bam | samtools index > $output.bai"
+}
+
+@Transform("countReads")
+countReads = {
+  doc title: "Count/ summarise the reads using the python2.6 module htseq-count"
+    desc: """First download gene/ feature coordinates from (Ensembl or Enterez). Set the strandedness of the bam file to unknown.
+    Check that the chromosome names and coordinate systems from bam file and annotation match. Convert to sam format as this is what HTSeq needs"""
+  exec """samtools -b -S < $input.bam | htseq-count -s no - referenceTranscriptome.gtf > $output.txt"""
+}
+
+
+bpipe.run {  }

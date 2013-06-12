@@ -1,0 +1,56 @@
+refGenome = "reference.ebw"
+refTranscriptome = "genes.gtf"
+
+@Transform("rep")
+fastQC = {
+  doc title:"Generate quality control report using fastQC. Add extension rep to signify report"
+  
+  exec "fastqc $input.fq > $output.rep"
+}
+
+@Filter("deMultiplex")
+deMultiplexTrim = {
+doc title: "Demultiplex and trim ends off reads?"
+  desc: """Check that CASAVA is able to demultiplex any file and not just TruSeq prepared libraries. 
+  Do I need to trim the adapter sequence and barcode from the reads or will TopHat do this?
+  Do I need to remove PCR dupliates using picard before alignment?"""
+
+  exec "$input.fq > $output.fq"
+}
+
+@Transform("sam")
+alignment = {
+  doc title: "Align using TopHat"
+    desc: """Alignment is able to be split over many cores, Merri has 8 cores per node.
+    Use a gene model annotations -G and reuse this annotation index file by storing it in a directory. Check where the indexed human genome is on Merri.
+    Output as a sam file for use by HTseq"""
+    
+  exec """tophat -p 8 -G $refTranscriptome --no-convert-bam
+  -o $input.rep'_out' --fusion-search $refGenome
+  < $input.fq > $output.sam"""
+}
+
+@Filter("bai")
+sortIndexBam = {
+  doc title: "Convert from sam to bam then sort"
+    desc: "In this pipeline the bam file is only for checking alignment using IGV. HTseq requires the sam file as input"
+  exec  "samtools view -bS $input.rep'_out'/accepted_hits.sam | samtools sort -  $output"
+}
+
+index = {
+  doc title:"Index the bam file so it can be viewed in IGV"
+    desc: "Index the bam file using samtools. A bam.bai file will be created."
+  exec "samtools index $input.bam"
+}  
+
+@Transform("txt")
+countReads = {
+  doc title: "Count/ summarise the reads using the python2.6 module htseq-count"
+    desc: """First download gene/ feature coordinates from (Ensembl or Enterez). Set the strandedness of the bam file to unknown.
+    Check that the chromosome names and coordinate systems from sam file and annotation match."""
+    
+  exec "python -m HTSeq.scripts.count --stranded=no -m intersection-nonempty $input.rep'_out'/accepted_hits.sam $refTranscriptome > $output.txt"
+}
+
+
+Bpipe.run { fastQC + alignment + sortIndexBam + countReads }

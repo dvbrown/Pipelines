@@ -1,0 +1,48 @@
+Hello Daniel Brown,
+
+Your VLSCI computer account has been approved and you are now a member of the project "VR0002 - High Throughput Genomics activities within the Life Sciences Computation Centre".
+
+You can log into the VLSCI account management tool to see the status of your account by going to https://help.vlsci.unimelb.edu.au/user/profile/.
+
+For your records, your username is: dvbrown
+
+To learn about accessing any of the VLSCI systems please read:
+http://www.vlsci.org.au/documentation/logging-or-connecting
+
+If your project uses the Intel clusters (called Bruce and Merri), please read:
+http://www.vlsci.org.au/documentation/x86-queueing-systems
+
+If you will be using the IBM Blue Gene/Q (called Avoca), please read:
+http://www.vlsci.org.au/documentation/bluegene-queuing-system
+
+Our records indicate that you are now in more that one project.  To manage disk quota and CPU accounting between projects, we recommend that you use the VLSCI website to change your default project.
+To change your default project, login to the VLSCI website:  select "My Projects" and click "Make default" next to the project you want to login under.
+You need to do this the first time you login to a new project so a new home directory will be set-up for you.
+
+For more information see: http://www.vlsci.org.au/documentation/pcffaqs under "I am in two (or more) different projects. How do I handle that ?"
+
+For more information please visit http://www.vlsci.org.au
+
+Thanks,
+
+The VLSCI administration team
+
+	Hi Dan
+	
+	I've created a new project on merri 'VR0238' with 10TB data storage
+	for the neuroblastoma transcriptomics project, and made you a member
+	(the only member at this stage).
+	
+	To run jobs you'll need to specific the project group 'VR0002' in your
+	PBS scripts as VR0238 is a subproject of VR0002. See the VLSCI docs on
+	running jobs for more info:
+	http://www.vlsci.org.au/documentation/x86-queueing-systems
+	
+	Specify the VR0002 quota in a PBS script like this:
+	#PBS -A VR0002
+	
+	Also use the terri queue if you can - this is a dedicated LSCC 32 core
+	machine so your jobs should run quicker, and if terri is full then
+	jobs automatically get pushed to merri anyway.
+	Specify the terri queue in a PBS script like this:
+	#PBS -q terri

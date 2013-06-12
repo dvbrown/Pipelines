@@ -1,0 +1,62 @@
+refGenome = "/vlsci/VR0002/shared/Reference_Files/Indexed_Ref_Genomes/TuxedoSuite_Ref_Files/Homo_sapiens/Ensembl/GRCh37/Sequence/Bowtie2Index/genome.fa"
+refTranscriptome = "~/Documents/public-datasets/annotationFiles/hg19_GRCh37_Feb2009_Ensembl.bed"
+rRNA = "~/Documents/public-datasets/annotationFiles/hg19_rRNA.bed"
+
+bamStats = {
+  doc title: "This program is used to calculate reads mapping statistics from provided BAM or SAM file"
+    desc: "This script determines “uniquely mapped reads” from the “NH” tag in BAM/SAM file (please note “NH” is an optional tag, bam_stat.py may fail if aligner does NOT provide this tag)"
+  exec "bam_stat.py  -i $input.bam"  
+}
+
+alignrRNA = {
+  doc title: "this module will split the original BAM file into 3 small BAM files"
+    desc: " The input gene list is ribosomal RNA, in this situation, user can estimate how many reads are originated from ribosomal RNA"
+  exec "split_bam.py -i $input.bam  -r $rRNA -o $output"  
+}
+
+clipProfile = {
+  doc title: "This program is used to estimate clipping profile of RNA-seq reads from BAM or SAM file"
+    desc: "Note that to use this funciton, CIGAR strings within SAM/BAM file should have ‘S’ operation (This means your reads aligner should support clipped mapping)."
+  exec "clipping_profile.py -i $input.bam -o $output"  
+}
+
+geneBodyCoverage = {
+  doc title: "Read coverage over gene body."
+    desc: 
+    
+}
+
+junctionAnnotation = {
+  doc title: "For a given alignment file this program will compare detected splice junctions to reference gene model"
+    desc: "splicing annotation is performed in two levels: splice event level and splice junction level."
+  exec "junction_annotation.py -i $input.bam -o $output -r $refTranscriptome"  
+  }
+  
+junctionSaturation = {
+  doc title: "It’s very important to check if current sequencing depth is deep enough to perform alternative splicing analyses"
+    desc: """or a well annotated organism, the number of expressed genes in particular tissue is almost fixed so the number of splice 
+    junctions is also fixed. The fixed splice junctions can be predetermined from reference gene model. All (annotated) splice junctions should be rediscovered from a saturated RNA-seq data, otherwise, downstream alternative splicing analysis is 
+    problematic because low abundance splice junctions are missing. This module checks for saturation by resampling 5%, 10%, 15%, ..., 95% of 
+    total alignments from BAM or SAM file, and then detects splice junctions from each subset and compares them to reference gene model."""
+  exec "junction_saturation.py -i $input.bam -r $refTranscriptome -o $output"  
+}  
+
+readDistribution = {
+  doc title: "Provided a BAM/SAM file and reference gene model, this module will calculate how mapped reads were distributed over genome feature"
+    desc: """RSeQC cannot assign those reads that: hit to intergenic regions that beyond region starting from TSS upstream 10Kb to TES downstream 10Kb.
+    hit to regions covered by both 5’UTR and 3’ UTR. This is possible when two head-to-tail transcripts are overlapped in UTR regions.
+    hit to regions covered by both TSS upstream 10Kb and TES downstream 10Kb."""
+  exec "read_distribution.py -i $input.bam -r $refTranscriptome"
+}
+
+rpkmSaturation = {
+  doc title: "This module will resample a series of subsets from total RNA reads and then calculate RPKM value using each subset"
+    desc: """By doing this we are able to check if the current sequencing depth was saturated or not (or if the RPKM values were stable or not) 
+    in terms of genes’ expression estimation. If sequencing depth was saturated, the estimated RPKM value will be stationary or reproducible. 
+    By default, this module will calculate 20 RPKM values (using 5%, 10%, ... , 95%,100% of total reads) for each transcripts."""
+  exec "RPKM_saturation.py -r $refTranscriptome -i $input.bam -o output"  
+}
+
+Bpipe.run {
+  "C%_R" * [assembleCufflinks + mergeCuffmerge] 
+}

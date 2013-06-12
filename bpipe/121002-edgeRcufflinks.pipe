@@ -1,0 +1,74 @@
+refGenome = "./genome"
+refTranscriptome = "./genes.gtf"
+assemblies = "./assemblies.txt"
+
+@Transform("rep")
+fastQC = {
+  doc title:"Generate quality control report using fastQC. Add extension rep to signify report"
+  
+  exec "fastqc $inputs.fq > $output.rep"
+}
+
+@Filter("deMultiplex")
+deMultiplexTrim = {
+doc title: "Demultiplex and trim ends off reads?"
+  desc: """Check that CASAVA is able to demultiplex any file and not just TruSeq prepared libraries. 
+  Do I need to trim the adapter sequence and barcode from the reads or will TopHat do this?
+  Do I need to remove PCR dupliates using picard before alignment?"""
+
+  exec "$input.fq > $output.fq"
+}
+
+alignTopHat = {
+  doc title: "Align using TopHat"
+    desc: """Alignment is able to be split over many cores, Merri has 8 cores per node.
+    Use a gene model annotations -G and reuse this annotation index file by storing it in a directory. Check where the indexed human genome is on Merri."""
+    
+  exec """tophat -p 2 -o $input.rep'_out'
+  -G $refTranscriptome --transcriptome-index=transcriptome_data/known
+  $refGenome $inputs.fq"""
+}
+
+
+sortSamtools = {
+  doc title: "Sort the bam file"
+    desc: "In this pipeline the bam file is only for checking alignment using IGV. HTseq requires the sam file as input"
+  exec  "samtools sort $input.rep'_out'/accepted_hits.bam $output"
+}
+
+@Transform("bai")
+indexSamtools = {
+  doc title:"Index for viewing"
+    desc: "Index the bam file"
+  exec "samtools index $input.bam $output.bai"
+}  
+
+assembleCufflinks = {
+  doc title:"Cufflinks transcript assembly"
+    desc: """Cufflinks using reference transcripts. Use the upper quartile of mapped reads in the FPKM calculation.
+    Discard transcripts with less than 5% of the most abundant isoform. """
+  exec """cufflinks -p 8 -g $refTranscriptome --upperquartile-norm 
+  --min-isoform-fraction 0.05 -o $output'_cuffOut' $input.rep'_out'/accepted_hits.bam """
+}
+
+mergeCuffmerge = {
+  doc title:"Merge the individual samples"
+    desc:"Make sure to create the assemblies.txt file manually. This lists the input files in the form of Directory/transcripts.gtf"
+  exec "cuffmerge -g $refTranscriptome -s $refGenome -p 8 $assemblies"  
+}
+
+compareCuffCompare = {
+  doc title:"Compare reference annotation to data to observe novel transcripts"
+    desc:"Cuffcompare"
+  exec ""  
+}
+
+diffCuffDiff = {
+  doc title:"Test for differential expression"
+    desc:"Need to work out how to group replicates by sample at this step"
+  exec "cuffdiff -o $input'diff_out' -b genome merged_asm/merged.gtf -p 8 --upper-quartile-norm --min-alignment-count 5 $input.rep_out'/accepted_hits.bam'"  
+}
+
+Bpipe.run {
+  "C%_R" * fastQC + alignTopHat + assembleCufflinks + mergeCuffmerge + diffCuffDiff 
+}

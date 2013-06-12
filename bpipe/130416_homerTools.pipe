@@ -1,0 +1,57 @@
+crebMotif="~/Documents/CREB/ChIPseqENCODE/creb.motif"
+
+makeTagDir = {
+  doc title: "Split BED files up by chromosome"
+    desc: """makeTagDirectory basically parses through the alignment file and splits the tags into 
+    separate files based on their chromosome.  As a result, several *.tags.tsv files are created in the 
+    output directory.  These are made to very efficiently return to the data during downstream analysis.  
+    This also helps speed up the analysis of very large data sets without running out of memory.
+    For some reason bpipe only goes up to 10 inputs. Had to do the K562 manually afterewards."""
+  exec """
+  makeTagDirectory A549_1/ -format bed $input1;
+  makeTagDirectory A549_2/ -format bed $input2;
+  makeTagDirectory Ecc1_1/ -format bed $input3;
+  makeTagDirectory Ecc1_2/ -format bed $input4;
+  makeTagDirectory Gm12878_1/ -format bed $input5;
+  makeTagDirectory Gm12878_2/ -format bed $input6;
+  makeTagDirectory hESC_1/ -format bed $input7;
+  makeTagDirectory hESC_2/ -format bed $input8;
+  makeTagDirectory Hepg2_1/ -format bed $input9;
+  makeTagDirectory Hepg2_2/ -format bed $input10;
+  makeTagDirectory K562_1/ -format bed $input11;
+  makeTagDirectory K562_2/ -format bed $input12;
+  """
+}
+
+fixNewLine = {
+  doc title: "Fix the Mac new line character and turn it into windows style"
+    desc: "Insert the appropriate description"
+  exec  "windowsToUnix $input $output"
+}
+
+annotateOneExpt = {
+  doc title: "Associate peaks with nearby genes"
+    desc: """The first two argument, the <peak file> and <genome>, are required, and must be the first 
+    two arguments.  Other optional command line arguments can be placed in any order after the first two.  
+    By default, annotatePeaks.pl prints the program output to stdout, which can be captured in a file by 
+    appending  > filename to the command."""
+  exec  "annotatePeaks.pl $input hg19 -noann -m $crebMotif > $output.txt"
+}
+
+annotateDiffExpt = {
+  doc title: "Associate peaks with nearby genes"
+    desc: """The first two argument, the <peak file> and <genome>, are required, and must be the first 
+    two arguments.  Other optional command line arguments can be placed in any order after the first two.  
+    By default, annotatePeaks.pl prints the program output to stdout, which can be captured in a file by 
+    appending  > filename to the command."""
+  exec  """annotatePeaks.pl $input hg19 -noann -m $crebMotif -size 1000 -fragLength 150
+  -d A549_1/ A549_2/ Ecc1_1/ Ecc1_2/ Gm12878_1/ Gm12878_2/ hESC_1/ hESC_2/ Hepg2_1/ Hepg2_2/ K562_1/ K562_2/
+  > $output.txt"""
+}
+
+moveDirectory = {
+  doc title: "Move the output to the desired directory"
+  exec "mv *.annotateOneExpt.txt ./annotateIndividual"
+}
+
+Bpipe.run { annotateOneExpt }
