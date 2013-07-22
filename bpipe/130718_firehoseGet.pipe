@@ -1,0 +1,13 @@
+gsea="/Users/d.brown6/Bioinformatics/gseaJava/gsea2-2.0.12.jar"
+
+getFirehoseData = {
+  doc title: """Retrieve open-access results of Broad Institute TCGA GDAC runs"""
+    desc: """
+    Extract from the standardise data mutation calls, RNA-seq and clinical information. To get analyses (ie ranked and filtered data) type in analyses.
+    Could get the mutation data (MAFS) programmatically. Resprted to downloading using https://confluence.broadinstitute.org/display/GDAC/MAF+Dashboard"""
+  exec """
+  firehose_get -e -o maf mRNAseq clinical stddata 2013_07_15 GBM
+  """
+}
+
+Bpipe.run { getFirehoseData }
