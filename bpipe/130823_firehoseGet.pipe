@@ -1,0 +1,37 @@
+getFirehoseData = {
+  doc title: """Retrieve open-access results of Broad Institute TCGA GDAC runs"""
+    desc: """
+    Extract from the standardise data mutation calls, RNA-seq and clinical information. To get analyses (ie ranked and filtered data) type in analyses.
+    Could get the mutation data (MAFS) programmatically. Resprted to downloading using https://confluence.broadinstitute.org/display/GDAC/MAF+Dashboard"""
+  exec """
+  firehose_get -e -o maf mRNAseq clinical stddata 2013_07_15 GBM
+  """
+}
+
+filterMaf = {
+  doc title:"A script to filter the maf file into a vcf file? Some file that is good for the tools."
+    desc:"An Rscript"
+  exec """~/Documents/Rscripts/130724_filterMafFile.R -m $input -o $output.txt"""  
+}
+
+mafToSNP = {
+  doc title: """Go from the TCGA mutation annotation format to something amenable to matrix eQTL"""
+    desc:"""Simple python script"""
+  exec """mafToSnp.py $input.txt > $output.txt"""  
+}
+
+fixPatientNames = {
+  doc title: """Take the somatic mutation names which is the longer code and strip it back to match the gene expression data"""
+    desc:"""Simple python script"""
+exec """fixPatientNames.py $input.txt > $output.txt"""
+}
+
+matchPatientNames = {
+  doc title: """An Rscript to that matches the column names in a mutation SNP like file with a gene expression matrix"""
+    desc:"""An R srcipt this time"""
+  exec """~/Documents/Rscripts/130823_subsetGeneExpMutFiles.R --mutationFile $input1 
+  --geneExpressionMatrix $input2 
+  --snpFiltered $output1 --outGene $output2"""  
+}
+
+Bpipe.run { matchPatientNames}
