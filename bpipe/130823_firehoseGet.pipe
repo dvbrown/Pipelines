@@ -31,7 +31,7 @@ matchPatientNames = {
     desc:"""An R srcipt this time"""
   exec """~/Documents/Rscripts/130823_subsetGeneExpMutFiles.R --mutationFile $input1 
   --geneExpressionMatrix $input2 
-  --snpFiltered $output1 --outGene $output2"""  
+  --snpFiltered $output1'.txt' --outGene $input2'.matchPatientNames.txt'"""  
 }
 
 Bpipe.run { matchPatientNames}
