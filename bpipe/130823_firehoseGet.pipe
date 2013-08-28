@@ -2,9 +2,10 @@ getFirehoseData = {
   doc title: """Retrieve open-access results of Broad Institute TCGA GDAC runs"""
     desc: """
     Extract from the standardise data mutation calls, RNA-seq and clinical information. To get analyses (ie ranked and filtered data) type in analyses.
-    Could get the mutation data (MAFS) programmatically. Resprted to downloading using https://confluence.broadinstitute.org/display/GDAC/MAF+Dashboard"""
+    Could't get the mutation data (MAFS) programmatically. Resorted to downloading using https://confluence.broadinstitute.org/display/GDAC/MAF+Dashboard
+    -b refers to a batch mode that will NOT be run programmatically. Need to specify the array name to get microarray"""
   exec """
-  firehose_get -e -o maf mRNAseq clinical stddata 2013_07_15 GBM
+  firehose_get -b -o MAF mRNAseq Agilent U133A clinical stddata 2013_08_09 GBM
   """
 }
 
@@ -31,7 +32,7 @@ matchPatientNames = {
     desc:"""An R srcipt this time"""
   exec """~/Documents/Rscripts/130823_subsetGeneExpMutFiles.R --mutationFile $input1 
   --geneExpressionMatrix $input2 
-  --snpFiltered $output1'.txt' --outGene $input2'.matchPatientNames.txt'"""  
+  --snpFiltered $output1'.txt' --outGene $input2'.matchPatientNames.txt'"""
 }
 
-Bpipe.run { matchPatientNames}
+Bpipe.run { getFirehoseData }
