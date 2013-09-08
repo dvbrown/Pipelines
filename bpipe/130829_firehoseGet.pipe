@@ -22,18 +22,29 @@ mafToSNP = {
   exec """mafToSnp.py $input.txt > $output.txt"""  
 }
 
-fixPatientNames = {
+fixNames = {
   doc title: """Take the somatic mutation names which is the longer code and strip it back to match the gene expression data"""
     desc:"""Simple python script"""
-exec """fixPatientNames.py $input.txt > $output.txt"""
+exec """fixPatientNames.py --mutationfile $input1 > $output1"""
+exec """fixPatientNames.py --hiseqGeneFile $input2 > $input2'fixPatientNames'"""
 }
 
-matchPatientNames = {
+matchNames = {
   doc title: """An Rscript to that matches the column names in a mutation SNP like file with a gene expression matrix"""
     desc:"""An R srcipt this time"""
   exec """~/Documents/Rscripts/130823_subsetGeneExpMutFiles.R --mutationFile $input1 
   --geneExpressionMatrix $input2 
-  --snpFiltered $output1'.txt' --outGene $input2'.matchPatientNames.txt'"""
+  --snpFiltered $output1 --outGene $input2'.matchPatientNames.txt'"""
 }
 
-Bpipe.run { getFirehoseData }
+eQTLinput = {
+  doc title: """Remove mutated genes with low prevalance and genes that are not expressed"""
+    desc:"""Take the overlapped snp file and gene expression matrix 
+    and filter each contents to make matrix eQTL more efficient"""
+  exec """~/Documents/Rscripts/130826_filterContentseQTL.R 
+  --mutationFile $input1 --geneExpressionMatrix $input2 
+  --cuttoffMut 0.05 --cuttoffGene 0.2
+  --outGene $output1 --outMut $input2'.filtereQTLinput'"""
+}
+
+Bpipe.run { eQTLinput }
