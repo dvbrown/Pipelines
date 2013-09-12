@@ -34,4 +34,4 @@ module load trimmomatic/0.30
 module load python-gcc/2.7.5
 
 # The job command(s):
-./trimmomatic.py -i Sample_GIC_035/GIC_035_GCCAAT_L001_R1_001.fastq.gz -i Sample_GIC_035/GIC_035_GCCAAT_L001_R1_002.fastq.gz -i Sample_GIC_035/GIC_035_GCCAAT_L002_R1_001.fastq.gz -i Sample_GIC_035/GIC_035_GCCAAT_L002_R1_002.fastq.gz -j 4
+./trimmomatic.py -i Sample_GIC_041/GIC_041_CTTGTA_L001_R1_001.fastq.gz -i Sample_GIC_041/GIC_041_CTTGTA_L001_R1_002.fastq.gz -i Sample_GIC_041/GIC_041_CTTGTA_L002_R1_001.fastq.gz -i Sample_GIC_041/GIC_041_CTTGTA_L002_R1_002.fastq.gz -j 4
