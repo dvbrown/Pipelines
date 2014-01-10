@@ -6,8 +6,13 @@ getFirehoseData = {
     -b refers to a batch mode that will NOT be run programmatically. Need to specify the array name to get microarray.
     Can't get pooled maf information, only individual to each patient."""
   exec """
-  firehose_get -b -o MAF mRNAseq Agilent U133A clinical stddata 2013_08_09 GBM
+  firehose_get -b -o MAF Agilent U133A clinical stddata 2013_12_10 GBM
   """
+}
+
+unarchiveAndDecompress = {
+  doc title: "Take some kind of input and decompress it"
+  exec "tar -zxvf $input.tar.gz"
 }
 
 filterMaf = {

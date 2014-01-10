@@ -1,0 +1,57 @@
+filePathPython = '~/Documents/Eclipseworkspace/Bioinformatics/Filtering/'
+
+getFirehoseData = {
+  doc title: """Retrieve open-access results of Broad Institute TCGA GDAC runs"""
+    desc: """
+    Extract from the standardise data mutation calls, RNA-seq and clinical information. To get analyses (ie ranked and filtered data) type in analyses.
+    Could't get the mutation data (MAFS) programmatically. Resorted to downloading using https://confluence.broadinstitute.org/display/GDAC/MAF+Dashboard
+    -b refers to a batch mode that will NOT be run programmatically. Need to specify the array name to get microarray.
+    Can't get pooled maf information, only individual to each patient."""
+  exec """
+  firehose_get -b -o MAF Agilent U133A clinical stddata 2013_12_10 GBM
+  """
+}
+
+unarchiveAndDecompress = {
+  doc title: "Take some kind of input and decompress it"
+  exec "tar -zxvf $input.tar.gz"
+}
+
+formatClinicalData = {
+  doc title: "Take the raw TCGA clinical data and reformat it for R"
+  exec '$filePathPython"meltTCGAfiles" gdac.broadinstitute.org_GBM.Merge_Clinical.Level_1.2013121000.0.0/GBM.merged_only_clin_data.txt > $output.txt'
+}
+
+formatAgilentData = {
+  doc title: "Take the raw TCGA agilent data data and reformat it for R"
+    desc: 'The 2 parts of the whole are then rbinded in R'
+  exec '''$filePathPython"meltTCGAGenefiles" 
+  gdac.broadinstitute.org_GBM.Merge_transcriptome__agilentg4502a_07_1__unc_edu__Level_3__unc_lowess_normalization_gene_level__data.Level_3.2013121000.0.0/GBM.transcriptome__agilentg4502a_07_1__unc_edu__Level_3__unc_lowess_normalization_gene_level__data.data.txt
+  > $output.txt'''
+  
+  exec '''$filePathPython"meltTCGAGenefiles" 
+  gdac.broadinstitute.org_GBM.Merge_transcriptome__agilentg4502a_07_1__unc_edu__Level_3__unc_lowess_normalization_gene_level__data.Level_3.2013121000.0.0\ 2/GBM.transcriptome__agilentg4502a_07_1__unc_edu__Level_3__unc_lowess_normalization_gene_level__data.data.txt
+  > $output.txt'''
+}
+
+formatAffyData = {
+  doc title: "Take the raw TCGA affy data and reformat it for R"
+    desc: '''There is only 1 version of this data.
+    Take the 4 (total) data and use the Rscript 140109_tcgaDataRearranging.R in its own folder 140109_tcgaShortLongTerm to mung it
+    '''
+  exec '$filePathPython"meltTCGAfiles" gdac.broadinstitute.org_GBM.Merge_Clinical.Level_1.2013121000.0.0/GBM.merged_only_clin_data.txt > $output.txt'
+}
+
+convertNull2NA = {
+  doc title: 'The stupid TCGA uses null instead of NA to describe missing data. Need to do it in python'
+    desc: 'The input is the result (output) of the reformatting files on Agilent and affyMetrix'
+  exec '''$filePathPython"changeEmties2NA" -i $input.txt -v null -r NA - o $output.txt
+  '''
+}
+
+Instructions = {
+  exec '''echo Take the 4 (total) data and use the Rscript 140109_tcgaDataRearranging.R in its own folder 140109_tcgaShortLongTerm to mung it
+  This script generates the design matrix \n Use the script 140109_tcgaDataLimma to perform the differential expression analysis'''
+}
+
+Bpipe.run { eQTLinput }
