@@ -51,7 +51,8 @@ convertNull2NA = {
 
 Instructions = {
   exec '''echo Take the 4 (total) data and use the Rscript 140109_tcgaDataRearranging.R in its own folder 140109_tcgaShortLongTerm to mung it
-  This script generates the design matrix \n Use the script 140109_tcgaDataLimma to perform the differential expression analysis'''
+  This script generates the design matrix \n Use the script 140109_tcgaDataLimma to perform the differential expression analysis
+  After the differential expression tests use 140111_compareDEresults to compare the results to ny RNA-seq batch1'''
 }
 
 Bpipe.run { eQTLinput }

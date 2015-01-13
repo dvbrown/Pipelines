@@ -1,0 +1,32 @@
+referenceBED="/Users/d.brown6/Documents/public-datasets/annotationFiles/genesChr.bed"
+
+ChIPseqToGene = {
+  doc title: "Use bedtools to find the nearest gene to the ChIPseq peaks"
+    desc: """ClosestBed searches for overlapping features in A and B. In the event that no feature in B overlaps the current feature in A, 
+    closestBed will report the closest (that is, least genomic distance from the start or end of A) feature in B"""
+  exec """closestBed -t all
+  -a $input.broadPeak
+  -b $referenceBED
+  > $output.bed"""
+}
+
+subsetBam  = {
+  doc title: "Subset a bam file for a set of genomic reigons."
+    desc: """You may specify one or more space-separated region specifications after the input filename to restrict output to only those alignments which overlap the specified region(s). Use of region specifications requires a coordinate-sorted and indexed input file (in BAM or CRAM format). 
+    
+    Regions can be specified as: RNAME[:STARTPOS[-ENDPOS]] and all position coordinates are 1-based. 
+	Examples of region specifications: `chr2:1000000'
+"""
+  exec """/Users/d.brown6/Documents/Rscripts/transcriptionFactorMotif/130403_mainAnnotateIDs.R
+  -i $input.bed
+  -o $output.bed
+  -k ensembl_transcript_id
+"""
+}
+
+  indexBam = {
+  
+  exec """samtools index $s"""
+  }
+
+Bpipe.run { "wgEncodeHaibTfbs%" * [AnnotateBED] }
