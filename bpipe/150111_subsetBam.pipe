@@ -8,17 +8,22 @@ subsetBam  = {
     Regions can be specified as: RNAME[:STARTPOS[-ENDPOS]] and all position coordinates are 1-based. 
 	Examples of region specifications: `chr2:1000000'
 """
-  exec """samtools view -h1 $input.bam $lociSubset > $output.bam
+  exec """samtools view -hb $input.bam $lociSubset > $output.bam
 """
 }
 
   sortBam = {
     doc title: "Sort the bam file by coordinate"
-    exec "exec samtools sort $input.subsetBam.bam > $output.bam"
+    exec "exec samtools sort -T temp -O bam $input.bam > $output.bam"
   }
 
   indexBam = {
-  exec """samtools index $input.subsetBam.sortBam.bam"""
+  exec """samtools index $input.bam"""
+  }
+  
+  copyBam = {
+  doc title: "Copy the bam file and index to my harddrive"
+  exec """cp $input.bam* /Users/d.brown6/Documents/RNAdata/danBatch1/subsetInterestingGenes"""
   }
 
-Bpipe.run { "test.bam" * [subsetBam + sortBam + indexBam] }
+Bpipe.run { subsetBam + sortBam + indexBam + copyBam}
