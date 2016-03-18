@@ -51,8 +51,10 @@ if __name__ == '__main__':
                         default = list(),
                         metavar="FILE",
                         type="string",
-                        help="""The file(s) to use as input. If there are multiple 
-                        files use the -i argument multiple times""")
+                        help="""The pindel configuration file that describes the bam files.
+                        Per line: path and file name of bam, insert size and sample tag. For example: 
+                        /data/sample_1.bam  500  sample_1 \n
+                        /data/sample_2.bam  300  sample_2""")
     parser.add_option("-t", "--target_tasks", dest="target_tasks",
                         action="append",
                         default = list(),
@@ -182,14 +184,20 @@ if options.verbose:
 # Assign the input specifed from the command line to a variable
 inputFile = options.input_file
         
-@transform(inputFile, suffix(".bam"), ['.platypus', 'plat.txt'])
+@transform(inputFile, suffix(".txt"), ['.pindel', 'pin.txt'])
 def runPindel(inputFile, output):
     'Run the pindel tool'
     indelTools.pindel(inputFile, output)
     
+# Check that this works
+@transform(runPindel, prefix(".vcf"), ['outputPindel', "pin2vcf.txt"])
+def runVcfToTable(inputFile, output):
+    'Convert the raw pindel output to vcf'
+    indelTools.vcfToTable(inputFile, output)
+    
 @transform(inputFile, suffix(".vcf"), ['.csv', "success.txt"])
 def runVcfToTable(inputFile, output):
-    'extract fields from the VCF to a table format that is more convenient to work with in downstream analyses.'
+    'Extract fields from the VCF and convert to a table format that is more convenient to work with in downstream analyses.'
     indelTools.vcfToTable(inputFile, output)
     
 
