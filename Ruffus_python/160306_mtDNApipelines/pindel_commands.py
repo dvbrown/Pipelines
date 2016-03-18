@@ -37,10 +37,11 @@ def pindel2vcf(inputFile, outputFile):
     -R NC_012920.1 \
     -d 31-OCT-2014 \
     -v {3} -G'''.format(pindelPath, inputFile, referenceGenomePath, outputFile)
-    runJob(comm, 'pindel2vcf to parse raw pindel file')
+    runJob(comm, 'PINDEL TO VCF')
     
 def subsetVcf(inputFile, outputFile):
-    '''Filter the vcf file for high confidence variants'''
+    '''Filter the vcf file for high confidence variants.
+    Select only deletions and deletions greater than 150bp.'''
     comm = ''' java -jar {0} \
    -R {1} \
    -T VariantFiltration \
@@ -48,7 +49,7 @@ def subsetVcf(inputFile, outputFile):
    --filterExpression "SVTYPE != 'DEL' || SVLEN > -150" \
    --filterName "Not_Deleted \
    invertFilterExpression"'''.format(gatkPath, referenceGenomePath, inputFile, outputFile)
-    runJob(comm, 'selectVariants from GATK to subset variants')
+    runJob(comm, 'SELECT VARIANTS')
 
 def vcfToTable(inputFile, outputFile):
     'Convert a vcf file to a table for more human readability'
@@ -58,7 +59,7 @@ def vcfToTable(inputFile, outputFile):
      -F CHROM -F POS -F END -F REF -F ALT -F SVTYPE -F SVLEN \
      -GF GT -GF AD \
      -o {3}'''.format(gatkPath, referenceGenomePath, inputFile, outputFile)
-    runJob(comm, "convert a vcf file to a table")
+    runJob(comm, "CONVERT vcf TO TABLE")
     
 def calculateAlleleFreq():
     'Calculate the allele frequency based on reference and variant allele counts'

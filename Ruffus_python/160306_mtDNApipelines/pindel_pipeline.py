@@ -48,10 +48,11 @@ if __name__ == '__main__':
                         default = list(),
                         metavar="FILE",
                         type="string",
-                        help="""The pindel configuration file that describes the bam files.
+                        help="""The pindel configuration file that describes the bam files. \n
                         Per line: path and file name of bam, insert size and sample tag. For example: 
                         /data/sample_1.bam  500  sample_1 \n
-                        /data/sample_2.bam  300  sample_2""")
+                        /data/sample_2.bam  300  sample_2 \n
+                        and so forth""")
     parser.add_option("-t", "--target_tasks", dest="target_tasks",
                         action="append",
                         default = list(),
