@@ -184,18 +184,18 @@ if options.verbose:
 # Assign the input specifed from the command line to a variable
 inputFile = options.input_file
         
-@transform(inputFile, suffix(".txt"), ['.pindel', 'pin.txt'])
-def runPindel(inputFile, output):
+@transform(inputFile, suffix('.txt'), ouput)
+def runPindel(inputFile):
     'Run the pindel tool'
     indelTools.pindel(inputFile, output)
     
 # Check that this works
-@transform(runPindel, prefix(".vcf"), ['outputPindel', "pin2vcf.txt"])
+@transform(runPindel, prefix(".vcf"), 'outputPindel')
 def runVcfToTable(inputFile, output):
     'Convert the raw pindel output to vcf'
     indelTools.vcfToTable(inputFile, output)
     
-@transform(inputFile, suffix(".vcf"), ['.csv', "success.txt"])
+@transform(inputFile, suffix(".vcf"), '.csv')
 def runVcfToTable(inputFile, output):
     'Extract fields from the VCF and convert to a table format that is more convenient to work with in downstream analyses.'
     indelTools.vcfToTable(inputFile, output)
