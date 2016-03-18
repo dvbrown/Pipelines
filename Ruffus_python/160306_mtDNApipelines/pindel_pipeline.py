@@ -196,6 +196,9 @@ def pindel2vcf(inputFile, outputFile):
 def variantFiltration(inputFile, outputFile):
     pindel_commands.subsetVcf(inputFile, outputFile) 
     
+@transform(variantFiltration, suffix('.vcf'), '.txt')
+def vcf2table(inputFile, outputFile):
+    pindel_commands.vcfToTable(inputFile, outputFile)
 
 #################################    END PIPELINE    #####################################
 
