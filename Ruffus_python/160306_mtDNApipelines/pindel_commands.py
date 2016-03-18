@@ -4,7 +4,7 @@ import os, csv, time
 
 picardPath = '/Users/u0107775/Bioinformatics/picard-tools-2.0.1/'
 referenceGenomePath = '/Users/u0107775/Bioinformatics/resources/rCS.fa'
-pindelPath = '/Users/u0107775/Bioinformatics/pindel/pindel'
+pindelPath = '/Users/u0107775/Bioinformatics/pindel/'
 gatkPath = '/Users/u0107775/Bioinformatics/GenomeAnalysisTK.jar'
 
 #################################    BEGIN COMMANDS    #####################################
@@ -19,19 +19,24 @@ def runJob(comm, taskName):
     #run the command
     os.system(comm)
     
-def pindel(pindelConfig):
+def pindel(pindelConfig, outputFile):
     'Run the pindel tool for calling indels. The pindel config file is specified at the commandline'
     # Use string formatting to populate the the commands that will be run in the shell
-    comm = '{0} -f {1} -o outputPindel -i {2}'.format(pindelPath, referenceGenomePath, pindelConfig)
-    os.system(comm)
+    comm = '{0}pindel -f {1} -o {2} -i {3}'.format(pindelPath, referenceGenomePath, outputFile, pindelConfig)
+    runJob(comm, 'PINDEL')
+    # Write and empty file to signify that this step successfully completed
+    f = open(outputFile, 'w')
+    f.close()
 
-def pindel2vcf(inputFile):
+def pindel2vcf(inputFile, outputFile):
     'Convert the pindel output to vcf which contains all different types of variants'
     # Provide the name and date of the reference genome The 'G' gives the genotypes in GATK format
-    comm = '''/Users/u0107775/Bioinformatics/pindel/pindel2vcf -P {0} \
-    -r {1} -R NC_012920.1 \
+    comm = '''{0}pindel2vcf \
+    -P {1} \
+    -r {2} \
+    -R NC_012920.1 \
     -d 31-OCT-2014 \
-    -v {2} -G'''.format(inputFile, referenceGenomePath, output)
+    -v {3} -G'''.format(pindelPath, inputFile, referenceGenomePath, outputFile)
     runJob(comm, 'pindel2vcf to parse raw pindel file')
     
 def subsetVcf(inputFile, output):

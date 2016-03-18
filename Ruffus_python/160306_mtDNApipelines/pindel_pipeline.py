@@ -13,10 +13,7 @@
 
 """
 import sys, os
-import tasks
-import postAlign
-import mtDNA_deletion
-import indelTools
+import pindel_commands
 
 #88888888888888888888888888888888888888888888888888888888888888888888888888888888888888888
 
@@ -181,24 +178,23 @@ if options.verbose:
 #   End preamble, begin pipeline
 
 #################################    PIPELINE CODE GOES HERE    #####################################
+
 # Assign the input specifed from the command line to a variable
 inputFile = options.input_file
-        
-@transform(inputFile, suffix('.txt'), ouput)
-def runPindel(inputFile):
+
+@transform(inputFile, suffix('.txt'), '')        
+def runPindel(inputFile, outputFile):
     'Run the pindel tool'
-    indelTools.pindel(inputFile, output)
+    pindel_commands.pindel(inputFile, outputFile)
     
-# Check that this works
-@transform(runPindel, prefix(".vcf"), 'outputPindel')
-def runVcfToTable(inputFile, output):
-    'Convert the raw pindel output to vcf'
-    indelTools.vcfToTable(inputFile, output)
-    
-@transform(inputFile, suffix(".vcf"), '.csv')
-def runVcfToTable(inputFile, output):
+@transform(runPindel, suffix(''), '.vcf')
+def pindel2vcf(inputFile, outputFile):
     'Extract fields from the VCF and convert to a table format that is more convenient to work with in downstream analyses.'
-    indelTools.vcfToTable(inputFile, output)
+    pindel_commands.pindel2vcf(inputFile, outputFile)
+    
+@transform(pindel2vcf, suffix('.vcf'), '.filter.vcf')
+def variantFiltration(inputFile, outputFile):
+    pindel_commands.subsetVcf(inputFile, outputFile) 
     
 
 #################################    END PIPELINE    #####################################
