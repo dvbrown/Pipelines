@@ -176,61 +176,24 @@ if options.verbose:
 
 #88888888888888888888888888888888888888888888888888888888888888888888888888888888888888888
 
-
-#   Pipeline
-
+#   End preamble, begin pipeline
 
 #################################    PIPELINE CODE GOES HERE    #####################################
-
+# Assign the input specifed from the command line to a variable
 inputFile = options.input_file
-     
-#@transform(inputFile, suffix(".bam"), ['.bcf', 'del.txt'])
-#def runDelly(inputFile, output):
-#    'Align the cleaned files to the mitochondira DNA genome'
-#    indelTools.delly(inputFile[0], output)
-#    
-#@transform(runDelly, suffix(".bcf"), ['.delly.vcf', 'view.txt'])
-#def convertBcf(inputFile, output):
-#    'Convert the bcf file to be human readable'
-#    indelTools.viewVcfFile(inputFile[0], output)
-#    
-#@transform(inputFile, suffix(".bam"), ['.platypus', 'plat.txt'])
-#def runPltypusy(inputFile, output):
-#    'Run the playpus tool'
-#    indelTools.platypus(inputFile, output) 
-#    
-#@transform(inputFile, suffix(".bam"), ['.platypus', 'plat.txt'])
-#def runPindel(inputFile, output):
-#    'Run the pindel tool'
-#    indelTools.pindel(inputFile, output)
-#    
-#@transform(inputFile, suffix(".vcf"), ['.csv', "success.txt"])
-#def runVcfToTable(inputFile, output):
-#    'extract fields from the VCF to a table format that is more convenient to work with in downstream analyses.'
-#    indelTools.vcfToTable(inputFile, output)
+        
+@transform(inputFile, suffix(".bam"), ['.platypus', 'plat.txt'])
+def runPindel(inputFile, output):
+    'Run the pindel tool'
+    indelTools.pindel(inputFile, output)
     
-@transform(inputFile, suffix(".bam"), ['.SA.sam', ".extractSA.txt"])
-def getSecAlignment(inputFile, outFiles):
-    'Extract reads with secondary alignment flag in Sam'
-    mtDNA_deletion.extractSecondaryAlignments(inputFile, outFiles)
+@transform(inputFile, suffix(".vcf"), ['.csv', "success.txt"])
+def runVcfToTable(inputFile, output):
+    'extract fields from the VCF to a table format that is more convenient to work with in downstream analyses.'
+    indelTools.vcfToTable(inputFile, output)
     
-@transform(getSecAlignment, suffix(".sam"), ['.bam', ".catHeader.txt"])
-def catHeader(inputFile, outFiles):
-    'Extract reads with secondary alignment flag in Sam'
-    # Because the output of the previous step is an array of 2 take only the first element (ie not the touchfile)
-    mtDNA_deletion.addSamHeader(inputFile[0], outFiles)
 
-@transform(inputFile, suffix(".bam"), ['.bed', ".bam2Bed.txt"])
-def convertBed(inputFile, outFiles):
-    'Convert bam to Bed'
-    mtDNA_deletion.convertToBed(inputFile, outFiles)
-    
-@transform(inputFile, suffix(".bed"), ['.split.bed', 'splitRead.txt'])
-def castSplitReads(inputFile, output):
-    'Extract the secondary split read from bed file and append as columns next to the first split read entry'
-    mtDNA_deletion.collapseSplitReads(inputFile, output)
-
-#88888888888888888888888888888888888888888888888888888888888888888888888888888888888888888
+#################################    END PIPELINE    #####################################
 
 #   Print list of tasks
 
