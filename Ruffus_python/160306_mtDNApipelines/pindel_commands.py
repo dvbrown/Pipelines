@@ -1,4 +1,5 @@
-import os, csv, time
+import os, time
+import pandas as pd
 
 #################################    GLOBAL PARAMETERS    #####################################
 
@@ -57,11 +58,36 @@ def vcfToTable(inputFile, outputFile):
      -R {1} -T VariantsToTable \
      -V {2} \
      -F CHROM -F POS -F END -F REF -F ALT -F SVTYPE -F SVLEN \
-     -GF GT -GF AD \
+     -GF AD \
      -o {3}'''.format(gatkPath, referenceGenomePath, inputFile, outputFile)
     runJob(comm, "CONVERT vcf TO TABLE")
     
-def calculateAlleleFreq():
-    'Calculate the allele frequency based on reference and variant allele counts'
-    # Write a python program here that uses pandas
-    pass
+def calculateAlleleFreq(inputFile, outputFile):
+    '''Calculate the allele frequency based on reference and variant allele counts'''
+
+    # Read in the vcf to table file using both the tab and comma delimiters to split the allele counts
+    df = pd.read_csv(inputFile, sep='\t|,')
+    # Pandas only counts the number of columns that are tab delimited. Therefore write immediately to file and reload table later
+    df.to_csv(outputFile, sep='\t')
+    
+    # Extract the general column names and then extract the sample specific column names
+    colHeader = list(df.columns.values)[0:7]
+    sampleNames = list(df.columns.values)[7:]
+    
+    # Initialize a new column header and for each sample append reference and deletion names
+    sampleCounts = []
+    for name in sampleNames:
+        newName = name[:-3]
+        refCounts = newName + '.REF'
+        delCounts = newName + '.DEL'
+        sampleCounts.append(refCounts)
+        sampleCounts.append(delCounts)
+    
+    # Cncatenate the general and sample-specific column names
+    newHeader = colHeader + sampleCounts
+    
+    # Read in the freshly written file that should have the correct number of columns.
+    df2 = pd.read_csv(outputFile, sep='\t', skiprows=1, header=None, index_col=False)
+    # Replace with the new column headers and write to file
+    df2.columns = newHeader
+    df2.to_csv(outputFile, sep='\t')

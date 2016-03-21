@@ -200,6 +200,10 @@ def variantFiltration(inputFile, outputFile):
 @transform(variantFiltration, suffix('.vcf'), '.txt')
 def vcf2table(inputFile, outputFile):
     pindel_commands.vcfToTable(inputFile, outputFile)
+    
+@transform(vcf2table, suffix('.txt'), 'counts.txt')
+def countDeletions(inputFile, outputFile):
+    pindel_commands.calculateAlleleFreq(inputFile, outputFile)
 
 #################################    END PIPELINE    #####################################
 
