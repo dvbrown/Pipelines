@@ -3,7 +3,6 @@ import pandas as pd
 
 #################################    GLOBAL PARAMETERS    #####################################
 
-picardPath = '/Users/u0107775/Bioinformatics/picard-tools-2.0.1/'
 referenceGenomePath = '/Users/u0107775/Bioinformatics/resources/rCS.fa'
 pindelPath = '/Users/u0107775/Bioinformatics/pindel/'
 gatkPath = '/Users/u0107775/Bioinformatics/GenomeAnalysisTK.jar'
