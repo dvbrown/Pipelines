@@ -12,28 +12,33 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisities
 
 You will need:
-```
+
 A python installation. This pipeline has been designed with python 2.7.
+
+The ruffus pipeline library for python 
 ```
+http://www.ruffus.org.uk/
 ```
-The ruffus pipeline library for python "http://www.ruffus.org.uk/"
+The pandas library for manipulating tables in python 
 ```
+http://pandas.pydata.org/
 ```
-The pandas library for manipulating tables in python "http://pandas.pydata.org/"
+I personally use the Anaconda distribution of python which comes with these modules already installed. https://www.continuum.io/downloads
+
+Pindel
 ```
-I personally use the Anaconda distribution of python which comes with these modules already installed.  https://www.continuum.io/downloads
+http://gmt.genome.wustl.edu/packages/pindel/
 ```
-Pindel "http://gmt.genome.wustl.edu/packages/pindel/"
+GATK
 ```
-```
-GATK "https://www.broadinstitute.org/gatk/"
+https://www.broadinstitute.org/gatk/
 ```
 
 ### Installing
 
 The pipeline code is available from github. Copy and paste this command if you have github command line tool installed: 
 ```
-"git clone https://github.com/dvbrown/Pipelines/tree/master/Ruffus_python/160306_mtDNApipelines"
+git clone https://github.com/dvbrown/Pipelines/tree/master/Ruffus_python/160306_mtDNApipelines
 ```
 Alternatively you can use the github website and clone to your computer using a graphical user interface.
 
@@ -71,8 +76,10 @@ samtools faidx ref.fasta
 The pindel config file is a tab delimited file describing the bam files to be analysed by pindel. Per line: path and file name of bam, insert size and sample tag. 
 For example: 
 
-```/data/sample_1.bam  500  sample_1
+```
+/data/sample_1.bam  500  sample_1
 /data/sample_2.bam  300  sample_2
+/data/sample_3.bam  450  sample_3
 and so forth...
 ```
 
