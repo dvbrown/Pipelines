@@ -68,52 +68,39 @@ Preparing a fasta index
 samtools faidx ref.fasta 
 ```
 
+The pindel config file is a tab delimited file describing the bam files to be analysed by pindel. Per line: path and file name of bam, insert size and sample tag. 
+For example: 
+
+```/data/sample_1.bam  500  sample_1
+/data/sample_2.bam  300  sample_2
+and so forth...
+```
+
 ### Running the pipeline
 
-Explain what these tests test and why
+The package consists of 2 files: The pindel_commands.py files which describes the commands run and the pindel_pipeline.py which describes the pipeline itself. The python decorator '@transform' are what control the flow of execution and file naming. Please read http://www.ruffus.org.uk/decorators/transform.html for more information.
+
+To easily run the pipeline it is convenient to put the location of the pindel_pipeline.py file in your PATH. The pipeline can be run with the command:
 
 ```
-Give an example
+python  pindel_pipeline.py -i pindelconfig.txt
 ```
 
-### And coding style tests
-
-Explain what these tests test and why
-
+Based on the timestamp of the output files, only outdated steps will be run. For an overview of the commands that will be run without running the pipeline use:
 ```
-Give an example
+python  pindel_pipeline.py -i pindelconfig.txt -n
 ```
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
-
-## Built With
-
-* Dropwizard - Bla bla bla
-* Maven - Maybe
-* Atom - ergaerga
 
 ## Contributing
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
-
 ## Authors
 
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+* **Daniel Brown, Thierry Voet** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
 ## Acknowledgments
-
-* Hat tip to anyone who's code was used
-* Inspiration
-* etc
