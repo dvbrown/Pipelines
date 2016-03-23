@@ -95,19 +95,14 @@ python  pindel_pipeline.py -i pindelconfig.txt
 
 Based on the timestamp of the output files, only outdated steps will be run. For an overview of the commands that will be run without running the pipeline use:
 ```
-python  pindel_pipeline.py -i pindelconfig.txt -n
+python pindel_pipeline.py -i pindelconfig.txt -n
 ```
-
-## Contributing
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## Authors
 
-* **Daniel Brown, Thierry Voet** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-
+* ** Insert authors here ** - *Initial work* - 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the GNU GPL License.
 
 ## Acknowledgments
