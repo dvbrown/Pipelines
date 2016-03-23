@@ -12,28 +12,33 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisities
 
 You will need:
-```
+
 A python installation. This pipeline has been designed with python 2.7.
+
+The ruffus pipeline library for python 
 ```
+http://www.ruffus.org.uk/
 ```
-The ruffus pipeline library for python "http://www.ruffus.org.uk/"
+The pandas library for manipulating tables in python 
 ```
+http://pandas.pydata.org/
 ```
-The pandas library for manipulating tables in python "http://pandas.pydata.org/"
+I personally use the Anaconda distribution of python which comes with these modules already installed. https://www.continuum.io/downloads
+
+Pindel
 ```
-I personally use the Anaconda distribution of python which comes with these modules already installed.  https://www.continuum.io/downloads
+http://gmt.genome.wustl.edu/packages/pindel/
 ```
-Pindel "http://gmt.genome.wustl.edu/packages/pindel/"
+GATK
 ```
-```
-GATK "https://www.broadinstitute.org/gatk/"
+https://www.broadinstitute.org/gatk/
 ```
 
 ### Installing
 
 The pipeline code is available from github. Copy and paste this command if you have github command line tool installed: 
 ```
-"git clone https://github.com/dvbrown/Pipelines/tree/master/Ruffus_python/160306_mtDNApipelines"
+git clone https://github.com/dvbrown/Pipelines/tree/master/Ruffus_python/160306_mtDNApipelines
 ```
 Alternatively you can use the github website and clone to your computer using a graphical user interface.
 
@@ -71,8 +76,10 @@ samtools faidx ref.fasta
 The pindel config file is a tab delimited file describing the bam files to be analysed by pindel. Per line: path and file name of bam, insert size and sample tag. 
 For example: 
 
-```/data/sample_1.bam  500  sample_1
+```
+/data/sample_1.bam  500  sample_1
 /data/sample_2.bam  300  sample_2
+/data/sample_3.bam  450  sample_3
 and so forth...
 ```
 
@@ -88,19 +95,14 @@ python  pindel_pipeline.py -i pindelconfig.txt
 
 Based on the timestamp of the output files, only outdated steps will be run. For an overview of the commands that will be run without running the pipeline use:
 ```
-python  pindel_pipeline.py -i pindelconfig.txt -n
+python pindel_pipeline.py -i pindelconfig.txt -n
 ```
-
-## Contributing
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## Authors
 
-* **Daniel Brown, Thierry Voet** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-
+* ** Insert authors here ** - *Initial work* - 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the GNU GPL License.
 
 ## Acknowledgments
