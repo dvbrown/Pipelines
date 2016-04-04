@@ -35,4 +35,26 @@ df2 = pd.read_csv(output, sep='\t', skiprows=1, header=None, index_col=False)
 # Replace with the new column headers and write to file
 df2.columns = newHeader
 
+
+#### Get the allele frequency
+def alleleFreq(series, sampleName):
+    'Doc string'
+    refReads = '{}.REF'.format(sampleName)
+    delReads = '{}.DEL'.format(sampleName)
+    denominator = series[refReads] + series[delReads]
+    numerator = float(series[delReads])
+    return numerator / denominator * 100
+    
+for column in df2:
+    if '.REF' in column:
+        sampleName = column[:-4]
+        print sampleName
+        df2[sampleName] = df2.apply(lambda x: alleleFreq(sampleName), axis=1)
+    
+#for column in df2:
+#    if '.REF' in column:
+#        sampleName = column[:-3]
+#        df2[sampleName] = df2.apply(alleleFreq, sampleName, axis=1)
+
+
 df2.to_csv(output, sep='\t')

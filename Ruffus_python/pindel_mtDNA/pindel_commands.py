@@ -64,7 +64,7 @@ def vcfToTable(inputFile, outputFile):
 def calculateAlleleFreq(inputFile, outputFile):
     '''Calculate the allele frequency based on reference and variant allele counts'''
 
-    # Read in the vcf to table file using both the tab and comma delimiters to split the allele counts
+    # Read in the vcf to table file using both the tab and comma delimiters to split the allele counts into 2 columns
     df = pd.read_csv(inputFile, sep='\t|,')
     # Pandas only counts the number of columns that are tab delimited. Therefore write immediately to file and reload table later
     df.to_csv(outputFile, sep='\t')
