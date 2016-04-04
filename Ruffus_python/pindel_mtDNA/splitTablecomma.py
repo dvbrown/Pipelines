@@ -36,7 +36,7 @@ df2 = pd.read_csv(output, sep='\t', skiprows=1, header=None, index_col=False)
 df2.columns = newHeader
 
 
-#### Get the allele frequency
+# Calculate the allele frequency
 for column in df2:
     # Extract columns containing reference read counts
     if '.REF' in column:
@@ -47,9 +47,11 @@ for column in df2:
         delReads = '{}.DEL'.format(sampleName)
         # Convert the deletions to floating point number, otherwise integer division is performed
         numerator = df2[delReads].apply(float)
+        denominator = (df2[refReads].apply(float)) + numerator
         # Write new column label
         columnLabel = sampleName + '_freq'
         # Perform allele frequency calculation
         df2[columnLabel] = (numerator / (numerator + df2[refReads])) * 100
-    
+        
+print df2    
 df2.to_csv(output, sep='\t')
