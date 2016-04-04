@@ -1,13 +1,13 @@
 # Idenitfying deletions from mitochondrial DNA
 
-Mitochondrial DNA is different ot genomic DNA in many respects. An individual cell can have many mitochondiral genomes with different genotypes.  This makes tradiitional structural variant tools less than ideal.
+Mitochondrial DNA is different to genomic DNA in many respects. An individual cell can have many mitochondiral genomes with different genotypes.  This makes tradiitional structural variant tools less than ideal.
 
 The input for this pipeline is a pindel configuration file listing the filenames of the bamfiles to be analysed in the current directory.
 The output of the pipeline is a tab delimited text file describing the deleted mitochondrial DNA segments in each sample.
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
 ### Prerequisities
 
@@ -42,8 +42,6 @@ git clone https://github.com/dvbrown/Pipelines/tree/master/Ruffus_python/160306_
 ```
 Alternatively you can use the github website and clone to your computer using a graphical user interface.
 
-End with an example of getting some data out of the system or using it for a little demo
-
 ## Configuring global parameters for the pipeline
 The paths to various software need to be set at the very top of the pindel_commands.py file.
 
@@ -63,12 +61,12 @@ The bamfiles used in the pipeline should be processed with an aligner that can a
 Preprocessing of these bamfiles by GATK local realignment is recommended.
 The reference genome file also needs to be prepared so GATK can utilize it.
 
-Preparing a fasta sequence dictionary
+Preparing a fasta sequence dictionary using picard tools
 ```
 java -jar CreateSequenceDictionary.jar R= ref.fasta O= ref.dict
 ```
 
-Preparing a fasta index
+Preparing a fasta index using samtools
 ```
 samtools faidx ref.fasta 
 ```
