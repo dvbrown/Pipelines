@@ -7,7 +7,7 @@ Created on Mon Mar 21 11:25:21 2016
 import pandas as pd
 
 table = '/Users/u0107775/Data/Mitochondria_Deletion/Fastq/Fastq_files/pindel/testPipeline/testConfig.filter.txt'
-output = '/Users/u0107775/Data/Mitochondria_Deletion/Fastq/Fastq_files/pindel/testPipeline/testConfig.comma.txt'
+output = '/Users/u0107775/Data/Mitochondria_Deletion/Fastq/Fastq_files/pindel/testPipeline/testConfig.calc.txt'
 
 # Read in the vcf to table file using both the tab and comma delimiters to split the allele counts
 df = pd.read_csv(table, sep='\t|,')
@@ -37,24 +37,19 @@ df2.columns = newHeader
 
 
 #### Get the allele frequency
-def alleleFreq(series, sampleName):
-    'Doc string'
-    refReads = '{}.REF'.format(sampleName)
-    delReads = '{}.DEL'.format(sampleName)
-    denominator = series[refReads] + series[delReads]
-    numerator = float(series[delReads])
-    return numerator / denominator * 100
-    
 for column in df2:
+    # Extract columns containing reference read counts
     if '.REF' in column:
+        # Extract sample names
         sampleName = column[:-4]
-        print sampleName
-        df2[sampleName] = df2.apply(lambda x: alleleFreq(sampleName), axis=1)
+        # Generate column headers for indexing based on sample name
+        refReads = '{}.REF'.format(sampleName)
+        delReads = '{}.DEL'.format(sampleName)
+        # Convert the deletions to floating point number, otherwise integer division is performed
+        numerator = df2[delReads].apply(float)
+        # Write new column label
+        columnLabel = sampleName + '_freq'
+        # Perform allele frequency calculation
+        df2[columnLabel] = (numerator / (numerator + df2[refReads])) * 100
     
-#for column in df2:
-#    if '.REF' in column:
-#        sampleName = column[:-3]
-#        df2[sampleName] = df2.apply(alleleFreq, sampleName, axis=1)
-
-
 df2.to_csv(output, sep='\t')
