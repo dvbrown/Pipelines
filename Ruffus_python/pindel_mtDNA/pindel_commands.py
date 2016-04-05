@@ -103,6 +103,6 @@ def calculateAlleleFreq(inputFile, outputFile):
             # Write new column label
             columnLabel = sampleName + '.FREQ'
             # Perform allele frequency calculation
-            df2[columnLabel] = (numerator / (numerator + df2[refReads])) * 100    
+            df2[columnLabel] = (numerator / (numerator + df2[refReads]))    
     
     df2.to_csv(outputFile, sep='\t')
