@@ -10,7 +10,7 @@ table = '/Users/u0107775/Data/Mitochondria_Deletion/Fastq/Fastq_files/pindel/tes
 output = '/Users/u0107775/Data/Mitochondria_Deletion/Fastq/Fastq_files/pindel/testPipeline/testConfig.calc.txt'
 
 # Read in the vcf to table file using both the tab and comma delimiters to split the allele counts
-df = pd.read_csv(table, sep='\t|,')
+df = pd.read_csv(table, sep='\t|,', engine='python')
 # Pandas only counts the number of columns that are tab delimited. Therefore write immediately to file and reload table
 df.to_csv(output, sep='\t')
 
@@ -51,7 +51,6 @@ for column in df2:
         # Write new column label
         columnLabel = sampleName + '_freq'
         # Perform allele frequency calculation
-        df2[columnLabel] = (numerator / (numerator + df2[refReads])) * 100
-        
-print df2    
+        df2[columnLabel] = (numerator / (numerator + df2[refReads]))
+
 df2.to_csv(output, sep='\t')
