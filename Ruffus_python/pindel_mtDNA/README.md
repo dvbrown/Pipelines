@@ -57,6 +57,7 @@ Path to GATK jar file
 
 ## Preparing files prior to running the pipeline
 
+The bam files need to be sorted by coordinate and indexed.
 The bamfiles used in the pipeline should be processed with an aligner that can assign secondary alignments. BWA or MOSAIK are the best choices.
 Preprocessing of these bamfiles by GATK local realignment is recommended.
 The reference genome file also needs to be prepared so GATK can utilize it.
@@ -72,6 +73,7 @@ samtools faidx ref.fasta
 ```
 
 The pindel config file is a tab delimited file describing the bam files to be analysed by pindel. Per line: path and file name of bam, insert size and sample tag. 
+The insert size can be estimated based on bwa output
 For example: 
 
 ```

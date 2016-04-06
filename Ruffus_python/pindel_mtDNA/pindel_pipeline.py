@@ -185,12 +185,10 @@ inputFile = options.input_file
 
 @transform(inputFile, suffix('.txt'), '')        
 def runPindel(inputFile, outputFile):
-    'Run the pindel tool'
     pindel_commands.pindel(inputFile, outputFile)
     
 @transform(runPindel, suffix(''), '.vcf')
 def pindel2vcf(inputFile, outputFile):
-    'Extract fields from the VCF and convert to a table format that is more convenient to work with in downstream analyses.'
     pindel_commands.pindel2vcf(inputFile, outputFile)
     
 @transform(pindel2vcf, suffix('.vcf'), '.filter.vcf')
@@ -201,7 +199,7 @@ def variantFiltration(inputFile, outputFile):
 def vcf2table(inputFile, outputFile):
     pindel_commands.vcfToTable(inputFile, outputFile)
     
-@transform(vcf2table, suffix('.txt'), 'counts.txt')
+@transform(vcf2table, suffix('.txt'), '.deletion.txt')
 def countDeletions(inputFile, outputFile):
     pindel_commands.calculateAlleleFreq(inputFile, outputFile)
 
