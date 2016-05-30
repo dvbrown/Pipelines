@@ -1,6 +1,6 @@
 # Idenitfying deletions from mitochondrial DNA
 
-Mitochondrial DNA is different to genomic DNA in many respects. An individual cell can have many mitochondiral genomes with different genotypes.  This makes tradiitional structural variant tools less than ideal.
+Mitochondrial DNA is different to genomic DNA in many respects. An individual cell can have many mitochondrial genomes with different genotypes.  This makes tradiitional structural variant tools less than ideal.
 
 The input for this pipeline is a pindel configuration file listing the filenames of the bamfiles to be analysed in the current directory.
 The output of the pipeline is a tab delimited text file describing the deleted mitochondrial DNA segments in each sample.
@@ -57,7 +57,7 @@ Path to GATK jar file
 
 ## Preparing files prior to running the pipeline
 
-The bam files need to be sorted by coordinate and indexed.
+The bam files need to be sorted by coordinate and indexed. The sorting and indexing should be performed using samtools.
 The bamfiles used in the pipeline should be processed with an aligner that can assign secondary alignments. BWA or MOSAIK are the best choices.
 Preprocessing of these bamfiles by GATK local realignment is recommended.
 The reference genome file also needs to be prepared so GATK can utilize it.
