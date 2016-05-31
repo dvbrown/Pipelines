@@ -1,13 +1,12 @@
-import os, time
-import pandas as pd
+import os, time, re
 
 #################################    GLOBAL PARAMETERS    #####################################
 
 # The reference genome is version 19 from Josien. The chr prefix is included
-referenceGenomePath = '/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/humangenome/fasta/hg19Mt.fa'
+refGenome = '/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/humangenome/fasta/hg19Mt.fa'
 binaryPath = '/cm/shared/apps/'
-
-# Get this fastqc file /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/gcpu/samples/GC031537_AAGAGGCA-GTAAGGAG/runs/run.160506.HiSeq2000.FCB.lane2/current/fastqc/current/result/GC031537_AAGAGGCA-GTAAGGAG.160428_Tn5_HCC38.160506.HiSeq2000.FCB.lane2.gcap_16_04.R1_fastqc
+picardPath = '/cm/shared/apps/'
+tmpDir = ''
 
 #################################    BEGIN COMMANDS    #####################################
 
@@ -24,8 +23,8 @@ def runJob(comm, taskName):
     
 def trimReads(inputFile, outputFile):
     'Take the raw sequencing reads and trim off the adpaters'
-    comm = '''
-    '''
+    comm = '''{0}cutadapt/1.4.1/
+    '''.format(binaryPath)
     runJob(comm, 'TRIMMING READS')
     
 
@@ -33,40 +32,32 @@ def alignReads(inputFile, outputFile):
     '''Align the fastq reads using bwa or bowtie or something.  
     Paired-end reads were aligned to hg19 or mm10 using BOWTIE2 using the parameter –X2000 allowing fragments of up to 2 kb to align.
     Duplicates were removed and library size was estimated using PICARD tools'''
-    comm = '''
-    '''
-    
-    headParams = 'bowtie2 --local -p 8 --rg-id ' + rgID
-    midParams = ' -x ' + refGenome + ' -1 ' + read1 + ' -2 ' + read2
-    tailParams = ' | samtools view -bS -o ' + output + ' -'
-    comm = headParams + midParams + tailParams    
-    
+    read1 = ''
+    read2 = ''
+    rgID = ''
+    comm = '''{0}bowtie2 --local -p 8 --rg-id {1} -x {2} -1 {3} -2 {4}
+    | samtools view -bS -o '{5} -
+    '''.format(binaryPath, rgID, refGenome, read1, read2, outputFile)
     runJob(comm, 'ALIGNING READS')
     
     
-def mergeBams(bamFile, outFiles):
+def mergeBams(inputFile, outputFile):
     'As some samples are split over multiple lanes of sequencing combine the aligned files'
-    comm = '''
-    '''
+    bam2 = re.sub('_L001_','_L002_', inputFile)
+    bam3 = re.sub('_001.','_002.', inputFile)
+    bam4 = re.sub('_001.','_002.', bam2)
     
-    output, flagFile = outFiles
-    sample2 = re.sub('_L001_','_L002_', bamFile)
-    sample3 = re.sub('_001.','_002.', bamFile)
-    sample4 = re.sub('_001.','_002.', sample2)
-    #------------------------------build shell command--------------------------------------
-    headParams = 'java -Xmx10g -jar /usr/local/picard/1.96/lib/MergeSamFiles.jar'
-    midParams = ' INPUT=' + bamFile + ' INPUT=' + sample2 + ' INPUT=' + sample3 + ' INPUT=' + sample4
-    tailParams = ' CREATE_INDEX=true MAX_RECORDS_IN_RAM=750000 TMP_DIR=/vlsci/VR0238/shared/tmp'
-    comm = headParams + midParams + ' OUTPUT=' + output + tailParams
-    #---------------------------------------------------------------------------------------
-    
+    comm = '''java -Xmx10g -jar {0}MergeSamFiles.jar 
+    INPUT= {1} + INPUT= {2} ' INPUT= {3} + INPUT= {4} OUTPUT= {5}
+    CREATE_INDEX=true MAX_RECORDS_IN_RAM=750000 TMP_DIR={6}
+    '''.format(picardPath, inputFile, bam2, bam3, bam4, outputFile, tmpDir)
+
     runJob(comm, 'MERGING BAM FILES')
     
     
 def sortSamtools(inputFile, outputFile):
-    com = "samtools sort {} > {}".format(bamFile, output)
-    print com + "\n"
-    runJob(com, "SORTING ALIGNMENTS")
+    comm = "samtools sort {0} > {1}".format(inputFile, outputFile)
+    runJob(comm, "SORTING ALIGNMENTS")
     
 
 def indexSamtools(inputFile):
