@@ -176,7 +176,9 @@ if options.verbose:
 
 #88888888888888888888888888888888888888888888888888888888888888888888888888888888888888888
 
-#   End preamble, begin pipeline
+#   End preamble, begin pipeline 
+#   The code below is from Josien sge batch
+#   sge batch -e errorfiles/qc1 -o outputfiles/qc1 -N QC1 sh shfiles/qc1.sh\
 
 #################################    PIPELINE CODE GOES HERE    #####################################
 
