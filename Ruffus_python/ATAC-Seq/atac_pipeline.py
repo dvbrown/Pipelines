@@ -186,9 +186,9 @@ if options.verbose:
 # Assign the input specifed from the command line to a variable
 inputFile = options.input_file
 
-@transform(inputFile, suffix('.gz'), 'trim.gz')        
-def runPindel(inputFile, outputFile):
-    pindel_commands.pindel(inputFile, outputFile)
+@transform(inputFile, suffix('.gz'), 'r"/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/dbrown0/Data/ATAC-Seq/160526.NextSeq.FCA/\trim.gz')    
+def runTrimming(inputFile, outputFile):
+    atac_commands.trimReads(inputFile, outputFile)
     
 
 #################################    END PIPELINE    #####################################
