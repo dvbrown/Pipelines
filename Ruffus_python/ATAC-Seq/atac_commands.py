@@ -28,7 +28,7 @@ def trimReads(inputFile, outputFile):
     'Take the raw sequencing reads and trim off the adpaters'
     read2 = re.sub('', '', inputFile)
     outputFile2 = re.sub('', '', outputFile)
-    comm = '''{0}cutadapt/1.4.1/scripts-2.6/cutadapt -q 15,15 --minimum-length 35 
+    comm = '''/home/dbrown0/.local/bin/cutadapt -q 15,15 --minimum-length 35 
     -a CTGTCTCTTATA -A CTGTCTCTTATA 
     -o {3} -p {4} {1} {2}
     '''.format(binaryPath, inputFile, read2, outputFile, outputFile2)
@@ -39,9 +39,9 @@ def alignReads(inputFile, outputFile):
     '''Align the fastq reads using bwa or bowtie or something'''
     read2 = re.sub('', '', inputFile) # Put the regular expression in the first position
     rgID = ''
-    comm = '''{0}bowtie2 --local -p 8 --rg-id {1} -x {2} -1 {3} -2 {4}
+    comm = '''{0}bowtie2/current/bowtie2 --local -p 8 --rg-id {1} -x {2} -1 {3} -2 {4}
     | samtools view -bS -o '{5} -
-    '''.format(binaryPath, rgID, refGenome, read1, read2, outputFile)
+    '''.format(binaryPath, rgID, refGenome, inputFile, read2, outputFile)
     runJob(comm, 'ALIGNING READS')
     
     
