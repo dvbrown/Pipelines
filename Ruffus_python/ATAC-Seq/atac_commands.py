@@ -36,9 +36,7 @@ def trimReads(inputFile, outputFile):
     
 
 def alignReads(inputFile, outputFile):
-    '''Align the fastq reads using bwa or bowtie or something.  
-    Paired-end reads were aligned to hg19 or mm10 using BOWTIE2 using the parameter –X2000 allowing fragments of up to 2 kb to align.
-    Duplicates were removed and library size was estimated using PICARD tools'''
+    '''Align the fastq reads using bwa or bowtie or something'''
     read2 = re.sub('', '', inputFile) # Put the regular expression in the first position
     rgID = ''
     comm = '''{0}bowtie2 --local -p 8 --rg-id {1} -x {2} -1 {3} -2 {4}
