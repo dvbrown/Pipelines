@@ -26,8 +26,12 @@ def runJob(comm, taskName):
     
 def trimReads(inputFile, outputFile):
     'Take the raw sequencing reads and trim off the adpaters'
-    comm = '''{0}cutadapt/1.4.1/
-    '''.format(binaryPath)
+    read2 = re.sub('', '', inputFile)
+    outputFile2 = re.sub('', '', outputFile)
+    comm = '''{0}cutadapt/1.4.1/scripts-2.6/cutadapt -q 15,15 --minimum-length 35 
+    -a CTGTCTCTTATA -A CTGTCTCTTATA 
+    -o {3} -p {4} {1} {2}
+    '''.format(binaryPath, inputFile, read2, outputFile, outputFile2)
     runJob(comm, 'TRIMMING READS')
     
 

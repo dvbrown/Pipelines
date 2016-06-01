@@ -52,7 +52,7 @@ if __name__ == '__main__':
                         Per line: path and file name of bam, insert size and sample tag. For example: 
                         /data/sample_1.bam  500  sample_1 \n
                         /data/sample_2.bam  300  sample_2 \n
-                        and so forth""")
+                        and so forth""")                                    
     parser.add_option("-t", "--target_tasks", dest="target_tasks",
                         action="append",
                         default = list(),
@@ -179,31 +179,17 @@ if options.verbose:
 #   End preamble, begin pipeline 
 #   The code below is from Josien sge batch
 #   sge batch -e errorfiles/qc1 -o outputfiles/qc1 -N QC1 sh shfiles/qc1.sh\
+#   output /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/dbrown0/Data/ATAC-Seq
 
 #################################    PIPELINE CODE GOES HERE    #####################################
 
 # Assign the input specifed from the command line to a variable
 inputFile = options.input_file
 
-@transform(inputFile, suffix('.txt'), '')        
+@transform(inputFile, suffix('.gz'), 'trim.gz')        
 def runPindel(inputFile, outputFile):
     pindel_commands.pindel(inputFile, outputFile)
     
-@transform(runPindel, suffix(''), '.vcf')
-def pindel2vcf(inputFile, outputFile):
-    pindel_commands.pindel2vcf(inputFile, outputFile)
-    
-@transform(pindel2vcf, suffix('.vcf'), '.filter.vcf')
-def variantFiltration(inputFile, outputFile):
-    pindel_commands.subsetVcf(inputFile, outputFile) 
-    
-@transform(variantFiltration, suffix('.vcf'), '.txt')
-def vcf2table(inputFile, outputFile):
-    pindel_commands.vcfToTable(inputFile, outputFile)
-    
-@transform(vcf2table, suffix('.txt'), '.deletion.txt')
-def countDeletions(inputFile, outputFile):
-    pindel_commands.calculateAlleleFreq(inputFile, outputFile)
 
 #################################    END PIPELINE    #####################################
 
