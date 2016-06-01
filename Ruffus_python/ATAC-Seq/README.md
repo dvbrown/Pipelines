@@ -1,9 +1,6 @@
 # Idenitfying deletions from mitochondrial DNA
 
-Mitochondrial DNA is different to genomic DNA in many respects. An individual cell can have many mitochondrial genomes with different genotypes.  This makes tradiitional structural variant tools less than ideal.
 
-The input for this pipeline is a pindel configuration file listing the filenames of the bamfiles to be analysed in the current directory.
-The output of the pipeline is a tab delimited text file describing the deleted mitochondrial DNA segments in each sample.
 
 ## Getting Started
 
@@ -13,25 +10,20 @@ These instructions will get you a copy of the project up and running on your loc
 
 You will need:
 
-A python installation. This pipeline has been designed with python 2.7.
+A python installation. This pipeline has been designed with python 2.7. 
+The python binary is located in
 
-The ruffus pipeline library for python 
 ```
-http://www.ruffus.org.uk/
+/cm/shared/apps/python/2.7.3/bin/python2.7
 ```
-The pandas library for manipulating tables in python 
+You will need to install the ruffus python module. To do this you need to install it in your local folder.
 ```
-http://pandas.pydata.org/
-```
-I personally use the Anaconda distribution of python which comes with these modules already installed. https://www.continuum.io/downloads
+mkdir /home/dbrown0/local/lib/python2.7/site-packages
+easy_install --prefix=$HOME/local ruffus --upgrade
 
-Pindel
 ```
-http://gmt.genome.wustl.edu/packages/pindel/
-```
-GATK
-```
-https://www.broadinstitute.org/gatk/
+When you launch python2.7 ruffus should be installed
+
 ```
 
 ### Installing
@@ -57,46 +49,6 @@ Path to GATK jar file
 
 ## Preparing files prior to running the pipeline
 
-The bam files need to be sorted by coordinate and indexed. The sorting and indexing should be performed using samtools.
-The bamfiles used in the pipeline should be processed with an aligner that can assign secondary alignments. BWA or MOSAIK are the best choices.
-Preprocessing of these bamfiles by GATK local realignment is recommended.
-The reference genome file also needs to be prepared so GATK can utilize it.
-
-Preparing a fasta sequence dictionary using picard tools
-```
-java -jar CreateSequenceDictionary.jar R= ref.fasta O= ref.dict
-```
-
-Preparing a fasta index using samtools
-```
-samtools faidx ref.fasta 
-```
-
-The pindel config file is a tab delimited file describing the bam files to be analysed by pindel. Per line: path and file name of bam, insert size and sample tag. 
-The insert size can be estimated based on bwa output
-For example: 
-
-```
-/data/sample_1.bam  500  sample_1
-/data/sample_2.bam  300  sample_2
-/data/sample_3.bam  450  sample_3
-and so forth...
-```
-
-### Running the pipeline
-
-The package consists of 2 files: The pindel_commands.py files which describes the commands run and the pindel_pipeline.py which describes the pipeline itself. The python decorator '@transform' are what control the flow of execution and file naming. Please read http://www.ruffus.org.uk/decorators/transform.html for more information.
-
-To easily run the pipeline it is convenient to put the location of the pindel_pipeline.py file in your PATH. The pipeline can be run with the command:
-
-```
-python  pindel_pipeline.py -i pindelconfig.txt
-```
-
-Based on the timestamp of the output files, only outdated steps will be run. For an overview of the commands that will be run without running the pipeline use:
-```
-python pindel_pipeline.py -i pindelconfig.txt -n
-```
 
 ## Authors
 
