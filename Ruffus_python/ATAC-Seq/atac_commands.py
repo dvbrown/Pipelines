@@ -2,7 +2,7 @@ import os, time, re
 
 #################################    GLOBAL PARAMETERS    #####################################
 
-# The reference genome is version 19 from Josien. The chr prefix and mitochondrail DNA is included
+#   The reference genome is version 19 from Josien. The chr prefix and mitochondrail DNA is included
 refGenome = '/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/humangenome/fasta/hg19Mt.fa'
 binaryPath = '/cm/shared/apps/'
 javaPath = '/cm/shared/apps/jdk/1.7.0/bin/java'
@@ -28,8 +28,8 @@ def trimReads(inputFile, outputFile):
     'Take the raw sequencing reads and trim off the adpaters'
     read2 = re.sub('', '', inputFile)
     outputFile2 = re.sub('', '', outputFile)
-    comm = '''/home/dbrown0/.local/bin/cutadapt -q 15,15 --minimum-length 35 
-    -a CTGTCTCTTATA -A CTGTCTCTTATA 
+    comm = '''/home/dbrown0/.local/bin/cutadapt -q 15,15 --minimum-length 35 \
+    -a CTGTCTCTTATA -A CTGTCTCTTATA \
     -o {3} -p {4} {1} {2}
     '''.format(binaryPath, inputFile, read2, outputFile, outputFile2)
     runJob(comm, 'TRIMMING READS')
@@ -39,7 +39,7 @@ def alignReads(inputFile, outputFile):
     '''Align the fastq reads using bwa or bowtie or something'''
     read2 = re.sub('', '', inputFile) # Put the regular expression in the first position
     rgID = ''
-    comm = '''{0}bowtie2/current/bowtie2 --local -p 8 --rg-id {1} -x {2} -1 {3} -2 {4}
+    comm = '''{0}bowtie2/current/bowtie2 --local -p 8 --rg-id {1} -x {2} -1 {3} -2 {4} \
     | samtools view -bS -o '{5} -
     '''.format(binaryPath, rgID, refGenome, inputFile, read2, outputFile)
     runJob(comm, 'ALIGNING READS')
@@ -51,8 +51,8 @@ def mergeBams(inputFile, outputFile):
     bam3 = re.sub('_001.','_002.', inputFile)
     bam4 = re.sub('_001.','_002.', bam2)
     
-    comm = '''java -Xmx10g -jar {0}MergeSamFiles.jar 
-    INPUT= {1} + INPUT= {2} ' INPUT= {3} + INPUT= {4} OUTPUT= {5}
+    comm = '''java -Xmx10g -jar {0}MergeSamFiles.jar \
+    INPUT= {1} + INPUT= {2} ' INPUT= {3} + INPUT= {4} OUTPUT= {5} \
     CREATE_INDEX=true MAX_RECORDS_IN_RAM=750000 TMP_DIR={6}
     '''.format(picardPath, inputFile, bam2, bam3, bam4, outputFile, tmpDir)
 
@@ -72,10 +72,9 @@ def indexSamtools(inputFile):
     
 def removeDuplicates(inputFile, outputFile):
     'Remove duplicates using Picard'
-    comm = '''MarkDuplicates.jar 
-    REMOVE_DUPLICATES=true AS=true VALIDATION_STRINGENCY=LENIENT 
-    MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=50 
-    '''
+    comm = '''MarkDuplicates.jar \
+    REMOVE_DUPLICATES=true AS=true VALIDATION_STRINGENCY=LENIENT \
+    MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=50 '''
     runJob(comm, 'REMOVING DUPLICATES')
     
     

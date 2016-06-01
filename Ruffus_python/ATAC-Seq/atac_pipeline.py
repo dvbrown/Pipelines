@@ -52,7 +52,13 @@ if __name__ == '__main__':
                         Per line: path and file name of bam, insert size and sample tag. For example: 
                         /data/sample_1.bam  500  sample_1 \n
                         /data/sample_2.bam  300  sample_2 \n
-                        and so forth""")                                    
+                        and so forth""")     
+    parser.add_option("-0", "--output_directory", dest="output_directory",
+                        action="append",
+                        default = list(),
+                        metavar="FILE",
+                        type="string",
+                        help="""The directory where the output should go to.""")                           
     parser.add_option("-t", "--target_tasks", dest="target_tasks",
                         action="append",
                         default = list(),
@@ -185,9 +191,10 @@ if options.verbose:
 
 # Assign the input specifed from the command line to a variable
 inputFile = options.input_file
+outputDir = options.output_directory
 
 @transform(inputFile, suffix('.gz'), 'r"/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/dbrown0/Data/ATAC-Seq/160526.NextSeq.FCA/\trim.gz')    
-def runTrimming(inputFile, outputFile):
+def runTrimming(inputFile, outputDir, outputFile):
     atac_commands.trimReads(inputFile, outputFile)
     
 
