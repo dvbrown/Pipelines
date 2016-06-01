@@ -12,7 +12,7 @@ gatkPath = '/Users/u0107775/Bioinformatics/GenomeAnalysisTK.jar'
 def runJob(comm, taskName):
     '''An internal function used by the rest of the functions to spawn a process in the shell, 
     run a command based on the value of the string "comm" and capture the standard output.
-    Also generates a touch file. Throws an exception when failure occurs'''
+    Throws an exception when failure occurs'''
     started = time.strftime('%X %x %Z')
     print '\n##############################################    RUNNNG TASK ' + taskName + ' at {0}'.format(started) +   '    ###############################################'
     print comm + '\n'

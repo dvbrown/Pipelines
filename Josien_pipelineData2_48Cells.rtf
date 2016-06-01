@@ -1,0 +1,1254 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1265\cocoasubrtf210
+{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;\f1\fswiss\fcharset0 Helvetica;\f2\fmodern\fcharset0 Courier;
+\f3\fswiss\fcharset0 ArialMT;\f4\froman\fcharset0 TimesNewRomanPSMT;\f5\froman\fcharset0 Times-Roman;
+\f6\fnil\fcharset0 Cambria;}
+{\colortbl;\red255\green255\blue255;\red252\green33\blue24;\red180\green36\blue25;\red200\green20\blue201;
+\red46\green174\blue187;\red26\green26\blue26;\red6\green0\blue135;\red158\green0\blue3;\red47\green189\blue29;
+\red181\green118\blue12;\red11\green66\blue19;\red60\green95\blue255;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww21060\viewh18160\viewkind0
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs22 \cf0 \CocoaLigature0 cd /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/dataKoen2/\
+\
+\
+####################\
+/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/gcpu/samples/GC031537*/runs/run.160506.HiSeq2000.FCB.lane2/current/result/*fastq.gz\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+
+\f1\fs24 \cf0 \CocoaLigature1 \
+#Fastq Quality:\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs22 \cf0 \CocoaLigature0 ### fastqc\
+/cm/shared/apps/fastqc/current/fastqc -o /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/dataKoen2/qc -f fastq /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/gcpu/samples/GC031537*/runs/run.160506.HiSeq2000.FCB.lane2/current/result/*R1.fastq.gz\
+\
+sge batch -e errorfiles/qc1 -o outputfiles/qc1 -N QC1 sh shfiles/qc1.sh\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+
+\f1\fs24 \cf0 \CocoaLigature1 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs22 \cf0 \CocoaLigature0 /cm/shared/apps/fastqc/current/fastqc -o /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/dataKoen2/qc -f fastq /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/gcpu/samples/GC031537*/runs/run.160506.HiSeq2000.FCB.lane2/current/result/*R2.fastq.gz\
+\
+sge batch -e errorfiles/qc2 -o outputfiles/qc2 -N QC2 sh shfiles/qc2.sh\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+
+\f1\fs24 \cf0 \CocoaLigature1 \
+############## Trimming 12 nucleotides\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs22 \cf0 \CocoaLigature0 \
+\
+Trimming:\
+#awk 'NR % 2 == 0 \{ print substr($1, 40) \} NR % 2 == 1' fastqfiles/160315_human_HCC38_Tn5/.fq > trimmedfastqfiles/.fq\
+gzip -c -d /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/gcpu/samples/GC031537_TCCTGAGC-GTAAGGAG/runs/run.160506.HiSeq2000.FCB.lane2/current/result/GC031537_TCCTGAGC-GTAAGGAG.160428_Tn5_HCC38.160506.HiSeq2000.FCB.lane2.gcap_16_04.R1.fastq.gz | awk 'NR % 2 == 0 \{ print substr($1, 13) \} NR % 2 == 1' | head\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f1\fs24 \cf0 \CocoaLigature1 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+\cf0 ## Rscript ##\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs22 \cf0 \CocoaLigature0 l<-system("ls /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/gcpu/samples/GC031537*/runs/run.160506.HiSeq2000.FCB.lane2/current/result/*.fastq.gz",intern=T)\
+\
+for(j in l)\{\
+\
+temp2<-c(paste("gzip -c -d " ,j," | awk 'NR % 2 == 0 \{ print substr($1, 13) \} NR % 2 == 1' > trimmedfastqfiles/trimmed.",gsub("/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/gcpu/samples/.*/runs/run.160506.HiSeq2000.FCB.lane2/current/result/|.160428_Tn5_HCC38.160506.HiSeq2000.FCB.lane2.gcap_16_04|.gz","",j),sep=""),paste("echo ",gsub("/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/gcpu/samples/.*/runs/run.160506.HiSeq2000.FCB.lane2/current/result/|.160428_Tn5_HCC38.160506.HiSeq2000.FCB.lane2.gcap_16_04","",j),sep=""))\
+write.table(temp2,paste("shfiles/trim12n",gsub("/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/gcpu/samples/.*/runs/run.160506.HiSeq2000.FCB.lane2/current/result/|.160428_Tn5_HCC38.160506.HiSeq2000.FCB.lane2.gcap_16_04|.fastq.gz","",j),".sh",sep=""), col.names=F, row.names=F, quote=F)\
+\}\
+\
+l2<-list.files("shfiles")\
+l2<-grep("trim12.*.sh", l2,value=T)\
+\
+for(i in l2[1])\{\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("rim12nGC031537_|.fastq.gz.sh|_S[0-9]_|00|_","",i), " sh ",paste("shfiles/",i,sep=""),sep="") \
+system(temp)
+\f1\fs24 \CocoaLigature1 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+\cf0 \}
+\f0\fs22 \CocoaLigature0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+\cf0 for(i in l2[-1])\{\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("rim12nGC031537_|.fastq.gz.sh|_S[0-9]_|00|_","",i), " sh ",paste("shfiles/",i,sep=""),sep="") \
+system(temp)
+\f1\fs24 \CocoaLigature1 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+\cf0 \}\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs22 \cf0 \CocoaLigature0 \
+######################\
+\
+### Index genome ###\
+(indexHG19.sh)\
+\
+/cm/shared/apps/bwa/0.6.2/bwa index -a bwtsw -p /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/humangenome/hg19Mt_indexBWA/hg19MT /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/humangenome/fasta/hg19Mt.fa >> logfile\
+\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+
+\f1\fs24 \cf0 \CocoaLigature1 ################ Align Samples ###################################\
+\pard\pardeftab720
+
+\f0\fs22 \cf0 -align:\
+/cm/shared/apps/bwa/0.6.2/bwa aln -l 32 genome \cf2 sample.lane1.R1.fastq.gz\cf0  > sample.lane1.R1.sai\
+/cm/shared/apps/bwa/0.6.2/bwa aln -l 32 genome\'a0\cf2 sample.lane1.R2.fastq.gz\cf0 \'a0> sample.lane1.R2.sai\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+
+\f1\fs24 \cf0 \
+## R script ##
+\f0\fs22 \CocoaLigature0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+\cf0 l<-list.files("trimmedfastqfiles")\
+\
+for(i in l)\{\
+temp<-paste("\CocoaLigature1 /cm/shared/apps/bwa/0.6.2/
+\f1\fs24 bwa aln -l 32 
+\f0\fs22 \CocoaLigature0 /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/humangenome/hg19Mt_indexBWA/hg19MT trimmedfastqfiles/",i," > saifiles/",gsub("fastq","sai",i),"\
+echo ",i , " done",sep="")\
+write.table(temp,paste("shfiles/align_",gsub(".fastq","",i),".sh",sep=""), col.names=F, row.names=F, quote=F)\
+\}\
+\
+l2<-list.files("shfiles")\
+l2<-grep("align_.*.sh", l2,value=T)\
+\
+i<-l2[1]\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("lign_trimmed.GC031537|.fastq.gz.sh|_S[0-9]_|00|_","",i), " sh shfiles/",i,sep="")\
+system(temp)
+\f1\fs24 \CocoaLigature1 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+\cf0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs22 \cf0 \CocoaLigature0 i<-l2[2]\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("lign_trimmed.GC031537|.fastq.gz.sh|_S[0-9]_|00|_","",i), " sh shfiles/",i,sep="")\
+system(temp)\
+\
+for(i in l2[-c(1,2)])\{\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("lign_trimmed.GC031537|.fastq.gz.sh|_S[0-9]_|00|_","",i), " sh shfiles/",i,sep="")\
+system(temp)\
+\}\
+\
+\pard\pardeftab720
+\cf0 \CocoaLigature1 ############ SAM and BAM ################################\
+\
+-samfile:
+\f1\fs24 \
+
+\f0\fs22 /cm/shared/apps/bwa/0.6.2/
+\f1\fs24 bwa sampe -P 
+\f0\fs22 -r '@RG\\tID:GC008537\\tSM:GC008537\\tPL:ILLUMINA\\tCN:GC_KUL_UZ' 
+\f1\fs24 -s genome\'a0
+\f0\fs22 sample.lane1.R1.sai
+\f1\fs24 \'a0
+\f0\fs22 sample.lane1.R2.sai\'a0sample.lane1\cf2 .R1.fastq.gz\'a0\cf0 sample.lane1\cf2 .R1.fastq.gz >\'a0
+\f1\fs24 \cf0 sample.lane1.sam\
+\
+-bamfile:\
+samtools view -hbS -o sample.lane1.bam sample.lane1.sam\
+\pard\pardeftab720
+
+\f0\fs22 \cf3 \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab720\pardirnatural
+
+\f1\fs24 \cf0 ## R script ##
+\f0\fs22 \CocoaLigature0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 l<-list.files("trimmedfastqfiles")\
+l2<-gsub(".fastq|trimmed.","",l)\
+lr1<-grep("R1",l,value=T)\
+lr2<-grep("R2",l,value=T)\
+\
+l<-unique(gsub(".R1|.R2","",l2))\
+ls<-list.files("saifiles")\
+ls1<-grep("R1",ls,value=T)\
+ls2<-grep("R2",ls,value=T)\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+\cf0 f<-read.table("cells.txt", header=T,sep="\\t")\
+f<-f[match(gsub("trimmed.GC031537_|.R1.fastq","",lr1),f$barcode),]\
+cells<-paste(f$type,f$n,f$barcode,sep="_")\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 \
+\
+\
+for(i in l)\{\
+tempf1<-grep(i,lr1,value=T)\
+tempf2<-grep(i,lr2,value=T)\
+temps1<-grep(i,ls1,value=T)\
+temps2<-grep(i,ls2,value=T)\
+tempc<-grep(gsub("GC031537_","",i),cells,value=T)\
+\
+temp<-paste("\CocoaLigature1 /cm/shared/apps/bwa/0.6.2/
+\f1\fs24 bwa sampe -P -s 
+\f0\fs22 -r '@RG\\tID:",\CocoaLigature0 tempc\CocoaLigature1 ,"\\tSM:",i,"\\tPL:ILLUMINA\\tCN:GC_KUL_UZ' \CocoaLigature0 /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/humangenome/hg19Mt_indexBWA/hg19MT
+\f1\fs24 \CocoaLigature1  
+\f0\fs22 \CocoaLigature0 saifiles/",temps1," saifiles/", temps2, " trimmedfastqfiles/", tempf1, " trimmedfastqfiles/",tempf2, " > samfiles/",tempc,".sam\
+echo ",i , " converted to sam\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab720\pardirnatural
+
+\f1\fs24 \cf0 \CocoaLigature1 samtools view -hbS -o bamfiles/
+\f0\fs22 \CocoaLigature0 ",tempc,".bam samfiles/",tempc,".sam\
+echo ",i," converted to bam",sep="")\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 write.table(temp,paste("shfiles/SAMandBAM_",i,".sh",sep=""), col.names=F, row.names=F, quote=F)\
+\}\
+\
+l2<-list.files(\CocoaLigature1 "\CocoaLigature0 shfiles")\
+l2<-grep("SAMandBAM_.*.sh", l2,value=T)\
+\
+\
+i<-l2[1]\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("AMandBAM_GC031537|.sh","",i), " sh shfiles/",i,sep="")\
+system(temp)
+\f1\fs24 \CocoaLigature1 \
+
+\f0\fs22 \CocoaLigature0 \
+for(i in l2[-1])\{\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("AMandBAM_GC031537_[ACGT][ACGT][ACGT][ACGT]|.sh","",i), " sh shfiles/",i,sep="")\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab720\pardirnatural
+
+\f1\fs24 \cf0 \CocoaLigature1 system(temp)\
+\}\
+\
+\pard\pardeftab720
+
+\f0\fs22 \cf3 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 \CocoaLigature0 fastq<-list.files("trimmedfastqfiles")\
+sai<-list.files("saifiles")\cf3 \CocoaLigature1 \
+\pard\pardeftab720
+\cf3 sam<-list.files("bamfiles")\
+sam<-gsub(".bam","",sam)\
+for(i in sam)\{\
+print(i)\
+temp2<-grep(i,sai,value=T)\
+if(length(temp2)==2)\{\
+temp<-paste("rm saifiles/",temp2,sep="")\
+system(temp[1])\
+system(temp[2])\
+temp<-paste("rm \cf0 \CocoaLigature0 trimmedfastqfiles/\cf3 \CocoaLigature1 ",grep(i,fastq,value=T),sep="")\
+system(temp[1])\
+system(temp[2])\
+\}\
+\}\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+\cf0 \CocoaLigature0 \
+######### Index and sort files ########\
+\
+f<-list.files("bamfiles")\
+s<-grep("*[TCGA][TCGA].bam$",f,value=T)\
+\
+for(i in s)\{\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 temp<-paste("\CocoaLigature1 samtools sort
+\f1\fs24  bamfiles
+\f0\fs22 \CocoaLigature0 /",i," bamfiles/", gsub(".bam",".sorted",i),"\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 \CocoaLigature1 samtools index
+\f1\fs24  bamfiles
+\f0\fs22 \CocoaLigature0 /",gsub(".bam",".sorted.bam",i),"\
+echo ",i," indexed",sep="")\
+write.table(temp,paste("shfiles/indexBAM_",gsub(".bam","",i),".sh",sep=""), col.names=F, row.names=F, quote=F)\
+\}\
+\
+l2<-list.files(\CocoaLigature1 "\CocoaLigature0 shfiles")\
+l2<-grep("indexBAM_.*.sh", l2,value=T)\
+\
+\
+i<-l2[1]\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("ndexBAM_|HCC38-BL_|B8FF4C_|.sh","",i), " sh shfiles/",i,sep="")\
+system(temp)
+\f1\fs24 \CocoaLigature1 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+
+\f0\fs22 \cf0 \CocoaLigature0 \
+for(i in l2[-1])\{\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("ndexBAM_|HCC38-BL_|B8FF4C_|.sh","",i), " sh shfiles/",i,sep="")\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab720\pardirnatural
+
+\f1\fs24 \cf0 \CocoaLigature1 system(temp)\
+\}\
+\
+\
+#########\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+
+\f0\fs22 \cf0 \CocoaLigature0 \
+###### Insert size Picard ###\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+\cf0 /cm/shared/apps/jdk/\cf3 1\cf0 .\cf3 7\cf0 .\cf3 0\cf0 /bin/java \cf4 -Xmx4G\cf0  \cf4 -Djava\cf0 .\cf5 io.tmpdir\cf0 =/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/temp \cf4 -jar\cf0  /cm/shared/apps/picard/current/CollectInsertSizeMetrics.jar \cf5 INPUT\cf0 =bamfiles/TbWGA_3.sorted.reheader.bam \cf5 HISTOGRAM_FILE\cf0 =insertSize/histTbWGA_3.pdf \cf5 OUTPUT\cf0 =insertSize/outputinsertSize \cf5 VALIDATION_STRINGENCY\cf0 =SILENT \cf5 ASSUME_SORTED\cf0 =true\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+\cf0 \
+sge batch -o outputfiles/insertSize3 -e errorfiles/insertSize3 -N insertS3 sh shfiles/insertSize3.sh\
+\
+f<-list.files("bamfiles")\
+s<-grep("sorted.bam$",f,value=T)\
+\
+for(i in s)\{\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 temp<-paste("/cm/shared/apps/jdk/\cf3 1\cf0 .\cf3 7\cf0 .\cf3 0\cf0 /bin/java \cf4 -Xmx4G\cf0  \cf4 -Djava\cf0 .\cf5 io.tmpdir\cf0 =/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/temp \cf4 -jar\cf0  /cm/shared/apps/picard/current/CollectInsertSizeMetrics.jar \cf5 INPUT\cf0 =bamfiles/",i, " \cf5 HISTOGRAM_FILE\cf0 =insertSize/hist",gsub(".sorted.bam","",i),".pdf \cf5 OUTPUT\cf0 =insertSize/outputinsertSize",gsub(".sorted.bam","",i)," \cf5 VALIDATION_STRINGENCY\cf0 =SILENT \cf5 ASSUME_SORTED\cf0 =true \
+echo ",i," indexed",sep="")\
+write.table(temp,paste("shfiles/insertSize_",gsub(".bam","",i),".sh",sep=""), col.names=F, row.names=F, quote=F)\
+\}\
+\
+l2<-list.files(\CocoaLigature1 "\CocoaLigature0 shfiles")\
+l2<-grep("insertSize_.*.sh", l2,value=T)\
+\
+\
+i<-l2[1]\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("nsertSize_|HCC38-BL_|B8FF4C_|.sh","",i), " sh shfiles/",i,sep="")\
+system(temp)
+\f1\fs24 \CocoaLigature1 \
+
+\f0\fs22 \CocoaLigature0 \
+for(i in l2[-1])\{\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("nsertSize_|HCC38-BL_|B8FF4C_|.sh","",i), " sh shfiles/",i,sep="")\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab720\pardirnatural
+
+\f1\fs24 \cf0 \CocoaLigature1 system(temp)\
+\}\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs22 \cf0 \CocoaLigature0 \
+\
+\
+#############################################\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+\cf0 ############\
+#coverage\
+\
+/cm/shared/apps/jdk/1.7.0/bin/java -jar /cm/shared/apps/gatk/current/GenomeAnalysisTK.jar -R /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/humangenome/fasta/hg19Mt.fa -T DepthOfCoverage -o coverage/TbWGA_3 -I bamfiles/TbWGA_3.sorted.reheader.bam 
+\f2\fs24 \CocoaLigature1 --omitDepthOutputAtEachBase\
+
+\f0\fs22 \CocoaLigature0 -ct 1 -ct 2 -ct 3 -ct 4 -ct 5 -ct 6 -ct 7 -ct 8 -ct 9 -ct 10 -ct 12 -ct 15 -ct 20 -ct 25 -ct 100 \
+\
+sge batch -o outputfiles/GATKcoverage13 -e errorfiles/GATKcoverage13 -N cov13 sh shfiles/GATKcoverage13.sh\
+\
+f<-list.files("bamfiles")\
+s<-grep("sorted.bam$",f,value=T)\
+\
+for(i in s)\{\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 temp<-paste("/cm/shared/apps/jdk/1.7.0/bin/java -jar /cm/shared/apps/gatk/current/GenomeAnalysisTK.jar -R /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/humangenome/fasta/hg19Mt.fa -T DepthOfCoverage -o coverage/",gsub(".sorted.bam","",i)," -I bamfiles/", i, " 
+\f2\fs24 \CocoaLigature1 --omitDepthOutputAtEachBase 
+\f0\fs22 \CocoaLigature0 -ct 1 -ct 2 -ct 3 -ct 4 -ct 5 -ct 6 -ct 7 -ct 8 -ct 9 -ct 10 -ct 12 -ct 15 -ct 20 -ct 25 -ct 100\
+echo ",i," coverage done",sep="")\
+write.table(temp,paste("shfiles/coverage_",gsub(".bam","",i),".sh",sep=""), col.names=F, row.names=F, quote=F)\
+\}\
+\
+l2<-list.files(\CocoaLigature1 "\CocoaLigature0 shfiles")\
+l2<-grep("coverage_.*.sh", l2,value=T)\
+\
+\
+i<-l2[1]\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("overage_|HCC38-BL_|B8FF4C_|.sh","",i), " sh shfiles/",i,sep="")\
+system(temp)
+\f1\fs24 \CocoaLigature1 \
+
+\f0\fs22 \CocoaLigature0 \
+for(i in l2[-1])\{\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("overage_|HCC38-BL_|B8FF4C_|.sh","",i), " sh shfiles/",i,sep="")\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab720\pardirnatural
+
+\f1\fs24 \cf0 \CocoaLigature1 system(temp)\
+\}\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs22 \cf0 \CocoaLigature0 \
+\pard\pardeftab720
+\cf0 ### Coverage in one file\
+\
+sge batch -o outputfileCoverage -e errorfileCoverage R CMD BATCH Coverage.R Coverage.out\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 f<-list.files("coverage")\
+f<-grep(".sample_cumulative_coverage_proportions$",f,value=T)\
+\
+cov<-NULL\
+\
+\
+for(i in f)\{\
+temp<-paste("cut coverage/",i," -f 3",sep="")\
+\
+print(i)\
+cov<-c(cov,system(temp,intern=T)[2])\
+\
+\}\
+covs<-data.frame("Sample"=f,"cov"=cov)\
+write.table(cove, "Coverages.txt", col.names=T, row.names=F, quote=F, sep="\\t")\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+\cf0 \
+##\
+x<-system("cat coverage/B8FF4C_59_AAGAGGCA-GTAAGGAG.sample_statistics", intern=T)\
+sum(as.numeric(strsplit(x[3],"\\t")[[1]][-1]))\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab720\pardirnatural
+
+\f1\fs24 \cf0 \CocoaLigature1 #
+\f0\fs22 \CocoaLigature0 [1] 2861343702\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+\cf0 x<-system("cat coverage/B8FF4C_59_AAGAGGCA-GTAAGGAG.sample_cumulative_coverage_counts", intern=T)\
+sum(as.numeric(strsplit(x[2],"\\t")[[1]][-c(1,2)]))\
+#37259160\
+\
+37259160/2861343702\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f1\fs24 \cf0 \CocoaLigature1 #
+\f0\fs22 \CocoaLigature0  0.01302156
+\f1\fs24 \CocoaLigature1 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab720\pardirnatural
+\cf0 \
+\
+#####   Remove duplicates  ####\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs22 \cf0 \CocoaLigature0 \
+\pard\pardeftab720
+
+\f1\fs24 \cf0 \CocoaLigature1 java -Djava.io.tmpdir=/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/temp -Xmx4g -jar /cm/shared/apps/picard/current/MarkDuplicates.jar I=bamfiles/
+\f0\fs22 \CocoaLigature0 TbWGA_3.sorted.reheader.bam
+\f1\fs24 \CocoaLigature1  O=bamfiles/
+\f0\fs22 \CocoaLigature0 TbWGA_3.sorted.reheader.bam\CocoaLigature1 _dedup.bam
+\f1\fs24  M=metrics/
+\f0\fs22 \CocoaLigature0 TbWGA_3.sorted.reheader
+\f1\fs24 \CocoaLigature1 .txt REMOVE_DUPLICATES=true AS=true VALIDATION_STRINGENCY=LENIENT 
+\f2 MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=50\
+\
+\pard\pardeftab720
+
+\f0\fs22 \cf0 \CocoaLigature0 sge batch -o outputfiles/removedupl13 -e errorfiles/removedupl13 -N redup13 sh shfiles/removedupl13.sh\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+\cf0 f<-list.files("bamfiles")\
+s<-grep("sorted.bam$",f,value=T)\
+\
+for(i in s)\{\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 temp<-paste("
+\f1\fs24 \CocoaLigature1 java -Djava.io.tmpdir=/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/temp -Xmx4g -jar /cm/shared/apps/picard/current/MarkDuplicates.jar I=bamfiles/
+\f0\fs22 \CocoaLigature0 "
+\f1\fs24 \CocoaLigature1 ,i," O=bamfiles/", 
+\f0\fs22 \CocoaLigature0 gsub(
+\f1\fs24 \CocoaLigature1 "
+\f0\fs22 \CocoaLigature0 .bam","",i), "\CocoaLigature1 _dedup.bam
+\f1\fs24  M=metrics/
+\f0\fs22 \CocoaLigature0 "
+\f1\fs24 \CocoaLigature1 , 
+\f0\fs22 \CocoaLigature0 gsub(".bam","",i),"
+\f1\fs24 \CocoaLigature1 .txt REMOVE_DUPLICATES=true AS=true VALIDATION_STRINGENCY=LENIENT
+\f0\fs22 \CocoaLigature0 \
+echo ",i," dupl removed",sep="")\
+write.table(temp,paste("shfiles/removedupl_",gsub(".bam","",i),".sh",sep=""), col.names=F, row.names=F, quote=F)\
+\}\
+\
+l2<-list.files(\CocoaLigature1 "\CocoaLigature0 shfiles")\
+l2<-grep("removedupl_.*.sh", l2,value=T)\
+\
+\
+i<-l2[1]\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("emovedupl_|HCC38-BL_|B8FF4C_|.sh","",i), " sh shfiles/",i,sep="")\
+system(temp)
+\f1\fs24 \CocoaLigature1 \
+
+\f0\fs22 \CocoaLigature0 \
+for(i in l2[-1])\{\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("emovedupl_|HCC38-BL_|B8FF4C_|.sh","",i), " sh shfiles/",i,sep="")\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab720\pardirnatural
+
+\f1\fs24 \cf0 \CocoaLigature1 system(temp)\
+\}\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs22 \cf0 \CocoaLigature0 \
+\pard\pardeftab720
+\cf0 ### Nr of reads\
+\
+sge batch -o outputfilenrReads -e errorfilenrReads R CMD BATCH nrReads.R nrReads.out\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+\cf0 f<-list.files("bamfiles")\
+f<-grep("bam$",f,value=T)\
+\
+nrReads<-NULL\
+\
+\
+for(i in f)\{\
+temp<-paste("samtools view bamfiles/",i," | wc -l",sep="")\
+\
+print(i)\
+nrReads<-c(nrReads,system(temp,intern=T))\
+\
+\}\
+nrReads<-data.frame("Sample"=f,"nrReadsGenes"=nrReads)\
+write.table(nrReads, "nrReads.txt", col.names=T, row.names=F, quote=F, sep="\\t")\
+\pard\pardeftab720
+\cf0 \
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+\cf0 #####################################################\
+## Hitsfile\
+#
+\f3\fs26 \cf6 \CocoaLigature1 samtools view -F 4 sample.bam | grep "XT:A:U" | perl -lane 'print "$F[2]\\t$F[3]"' > sample.hits\
+
+\f0\fs22 \cf0 \CocoaLigature0 \
+\
+\
+\
+\pard\pardeftab720
+\cf0 \CocoaLigature1 bam<-list.files("bamfiles")\
+bam<-grep("sorted.dedup", bam, invert=F, value=T)\
+\
+for(i in bam)\{\
+temp<-paste("
+\f3\fs26 \cf6 samtools view -F 4 bamfiles/",i," | grep \\"XT:A:U\\" | perl -lane 'print \\"$F[2]\\t$F[3]\\"' > hits/",gsub("bam","hits",i)
+\f0\fs22 \cf0 ,sep="")\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 \CocoaLigature0 write.table(temp,paste("shfiles/hits_",i,".sh",sep=""), col.names=F, row.names=F, quote=F)\
+\pard\pardeftab720
+\cf0 \CocoaLigature1 \}\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 \CocoaLigature0 l2<-list.files(\CocoaLigature1 "\CocoaLigature0 shfiles")\
+l2<-grep("hits_.*.sh", l2,value=T)\
+\
+\
+i<-l2[1]\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("its_|.sh","",i), " sh shfiles/",i,sep="")\
+system(temp)
+\f1\fs24 \CocoaLigature1 \
+
+\f0\fs22 \CocoaLigature0 \
+for(i in l2[-1])\{\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("its_|.sh","",i), " sh shfiles/",i,sep="")\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab720\pardirnatural
+
+\f1\fs24 \cf0 \CocoaLigature1 system(temp)\
+\}\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs22 \cf0 \CocoaLigature0 \
+###### GC files #########\
+\
+/cm/shared/apps/bedtools/2.17.0/bin/nucBed -fi /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/humangenome/fasta/hg19MtNoChrs.fa -bed Combined_Human_NCBI37.2_500K_89bases_mappable_bins.txt > countfiles/Combined_Human_NCBI37.2_500K_89bases_mappable_bins_GCperc_INPUTtemp.txt
+\f4\fs20 \CocoaLigature1 \
+
+\f0\fs22 \CocoaLigature0 \
+/cm/shared/apps/bedtools/2.17.0/bin/nucBed -fi /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/humangenome/fasta/hg19MtNoChrs.fa -bed Combined_Human_NCBI37.2_50K_89bases_mappable_bins.txt > countfiles/Combined_Human_NCBI37.2_50K_89bases_mappable_bins_GCperc_INPUTtemp.txt\
+\
+/cm/shared/apps/bedtools/2.17.0/bin/nucBed -fi /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/humangenome/fasta/hg19MtNoChrs.fa -bed Combined_Human_NCBI37.2_10K_89bases_mappable_bins.txt > countfiles/Combined_Human_NCBI37.2_10K_89bases_mappable_bins_GCperc_INPUTtemp.txt\
+\
+sge batch -o outputfiles/GCcontent500K -e errorfiles/GCcontent500K -N GC500K sh shfiles/GCcontent500K.sh\
+sge batch -o outputfiles/GCcontent50K -e errorfiles/GCcontent50K -N GC50K sh shfiles/GCcontent50K.sh\
+sge batch -o outputfiles/GCcontent10K -e errorfiles/GCcontent10K -N GC10K sh shfiles/GCcontent10K.sh\
+\
+#rscript to make final file\
+#500K\
+\pard\pardeftab720
+\cf0 sge batch -o outputfilegccontentFinal500K -e errorfilegccontentFinal500K R CMD BATCH gccontentFinal500K.R gccontentFinal500K.out\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+\cf0 ##\
+\
+\pard\tx280\tx560\tx840\tx1120\tx1400\tx1680\tx1960\tx2240\tx2520\tx2800\tx3080\tx3360\tx3640\tx3920\tx4200\tx4480\tx4760\tx5040\tx5320\tx5600\tx5880\tx6160\tx6440\tx6720\tx7000\tx7280\tx7560\tx7840\tx8120\tx8400\tx8680\tx8960\tx9240\tx9520\tx9800\tx10080\tx10360\tx10640\tx10920\tx11200\tx11480\tx11760\tx12040\tx12320\tx12600\tx12880\tx13160\tx13440\tx13720\tx14000\tx14280\tx14560\tx14840\tx15120\tx15400\tx15680\tx15960\tx16240\tx16520\tx16800\tx17080\tx17360\tx17640\tx17920\li80\fi-80\pardirnatural
+
+\f5\fs28 \cf0 \CocoaLigature1 file\cf7 <-\cf8  \cf7 read.table(\cf8 "
+\f0\fs22 \cf9 \CocoaLigature0 Combined_Human_NCBI37.2_500K_89bases_mappable_bins.txt
+\f5\fs28 \cf8 \CocoaLigature1 "\cf7 ,\cf0 header\cf7 =\cf10 F
+\f2\fs26 \cf7 ,\cf8  
+\f5\fs28 \cf0 sep\cf7 =\cf8 "\\t"\cf7 )\
+\
+\cf0 x\cf7 <-as.numeric(\cf0 file\cf7 $\cf0 V5\cf7 )\
+\cf8 \
+\cf0 abs\cf7 <-\cf0 x\cf7 [\cf11 1\cf7 ]\cf8 \
+\cf10 for\cf7 (\cf0 i \cf10 in \cf11 2\cf7 :nrow(\cf0 file\cf7 ))\{\
+	\cf0 abs\cf7 <-c(\cf0 abs\cf7 ,sum(\cf0 x\cf7 [\cf11 1\cf7 :\cf0 i\cf7 ]))\
+\}\cf8 \
+\
+\cf0 gccontent\cf8  \cf7 <-\cf8  \cf7 read.table("
+\f0\fs22 \cf0 \CocoaLigature0 countfiles/Combined_Human_NCBI37.2_500K_89bases_mappable_bins_GCperc_INPUTtemp.txt"
+\f5\fs28 \cf7 \CocoaLigature1 ,\cf0 header\cf7 =\cf10 F
+\f2\fs26 \cf7 ,\cf8  
+\f5\fs28 \cf0 sep\cf7 =\cf8 "\\t"\cf7 )\cf8 \
+\cf7 data.frame(paste(\cf0 gccontent[1:10,1],\cf7 "\cf0 :",gccontent[1:10,2],"-",gccontent[1:10,3],sep=\cf7 "\cf0 "),gccontent$V7[1:10], abs[1:10])\cf7 \
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+
+\f0\fs22 \cf0 \CocoaLigature0 write.table(d
+\f5\fs28 \cf7 \CocoaLigature1 ata.frame(paste(\cf0 gccontent[,1],\cf7 "\cf0 :",gccontent[,2],"-",gccontent[,3],sep=\cf7 "\cf0 "),gccontent$V7, abs)
+\f0\fs22 \CocoaLigature0 , "countfiles/Combined_Human_NCBI37.2_500K_89bases_mappable_bins_GCperc_INPUT.txt", col.names=F, row.names=F, quote=F, sep="\\t")\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+\cf0 \
+\
+#50K\
+\pard\pardeftab720
+\cf0 sge batch -o outputfilegccontentFinal50K -e errorfilegccontentFinal50K R CMD BATCH gccontentFinal50K.R gccontentFinal50K.out\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+\cf0 ##\
+\
+\pard\tx280\tx560\tx840\tx1120\tx1400\tx1680\tx1960\tx2240\tx2520\tx2800\tx3080\tx3360\tx3640\tx3920\tx4200\tx4480\tx4760\tx5040\tx5320\tx5600\tx5880\tx6160\tx6440\tx6720\tx7000\tx7280\tx7560\tx7840\tx8120\tx8400\tx8680\tx8960\tx9240\tx9520\tx9800\tx10080\tx10360\tx10640\tx10920\tx11200\tx11480\tx11760\tx12040\tx12320\tx12600\tx12880\tx13160\tx13440\tx13720\tx14000\tx14280\tx14560\tx14840\tx15120\tx15400\tx15680\tx15960\tx16240\tx16520\tx16800\tx17080\tx17360\tx17640\tx17920\li80\fi-80\pardirnatural
+
+\f5\fs28 \cf0 \CocoaLigature1 file\cf7 <-\cf8  \cf7 read.table(\cf8 "
+\f0\fs22 \cf9 \CocoaLigature0 Combined_Human_NCBI37.2_50K_89bases_mappable_bins.txt
+\f5\fs28 \cf8 \CocoaLigature1 "\cf7 ,\cf0 header\cf7 =\cf10 F
+\f2\fs26 \cf7 ,\cf8  
+\f5\fs28 \cf0 sep\cf7 =\cf8 "\\t"\cf7 )\
+\
+\cf0 x\cf7 <-as.numeric(\cf0 file\cf7 $\cf0 V5\cf7 )\
+\cf8 \
+\cf0 abs\cf7 <-\cf0 x\cf7 [\cf11 1\cf7 ]\cf8 \
+\cf10 for\cf7 (\cf0 i \cf10 in \cf11 2\cf7 :nrow(\cf0 file\cf7 ))\{\
+	\cf0 abs\cf7 <-c(\cf0 abs\cf7 ,sum(\cf0 x\cf7 [\cf11 1\cf7 :\cf0 i\cf7 ]))\
+\}\cf8 \
+\
+\cf0 gccontent\cf8  \cf7 <-\cf8  \cf7 read.table("
+\f0\fs22 \cf0 \CocoaLigature0 countfiles/Combined_Human_NCBI37.2_50K_89bases_mappable_bins_GCperc_INPUTtemp.txt"
+\f5\fs28 \cf7 \CocoaLigature1 ,\cf0 header\cf7 =\cf10 F
+\f2\fs26 \cf7 ,\cf8  
+\f5\fs28 \cf0 sep\cf7 =\cf8 "\\t"\cf7 )\cf8 \
+\cf7 data.frame(paste(\cf0 gccontent[1:10,1],\cf7 "\cf0 :",gccontent[1:10,2],"-",gccontent[1:10,3],sep=\cf7 "\cf0 "),gccontent$V7[1:10], abs[1:10])\cf7 \
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+
+\f0\fs22 \cf0 \CocoaLigature0 write.table(d
+\f5\fs28 \cf7 \CocoaLigature1 ata.frame(paste(\cf0 gccontent[,1],\cf7 "\cf0 :",gccontent[,2],"-",gccontent[,3],sep=\cf7 "\cf0 "),gccontent$V7, abs)
+\f0\fs22 \CocoaLigature0 , "countfiles/Combined_Human_NCBI37.2_50K_89bases_mappable_bins_GCperc_INPUT.txt", col.names=F, row.names=F, quote=F, sep="\\t")\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+\cf0 \
+#10K\
+\pard\pardeftab720
+\cf0 sge batch -o outputfilegccontentFinal10K -e errorfilegccontentFinal10K R CMD BATCH gccontentFinal10K.R gccontentFinal10K.out\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+\cf0 ##\
+\
+\pard\tx280\tx560\tx840\tx1120\tx1400\tx1680\tx1960\tx2240\tx2520\tx2800\tx3080\tx3360\tx3640\tx3920\tx4200\tx4480\tx4760\tx5040\tx5320\tx5600\tx5880\tx6160\tx6440\tx6720\tx7000\tx7280\tx7560\tx7840\tx8120\tx8400\tx8680\tx8960\tx9240\tx9520\tx9800\tx10080\tx10360\tx10640\tx10920\tx11200\tx11480\tx11760\tx12040\tx12320\tx12600\tx12880\tx13160\tx13440\tx13720\tx14000\tx14280\tx14560\tx14840\tx15120\tx15400\tx15680\tx15960\tx16240\tx16520\tx16800\tx17080\tx17360\tx17640\tx17920\li80\fi-80\pardirnatural
+
+\f5\fs28 \cf0 \CocoaLigature1 file\cf7 <-\cf8  \cf7 read.table(\cf8 "
+\f0\fs22 \cf9 \CocoaLigature0 Combined_Human_NCBI37.2_10K_89bases_mappable_bins.txt
+\f5\fs28 \cf8 \CocoaLigature1 "\cf7 ,\cf0 header\cf7 =\cf10 F
+\f2\fs26 \cf7 ,\cf8  
+\f5\fs28 \cf0 sep\cf7 =\cf8 "\\t"\cf7 )\
+\
+\cf0 x\cf7 <-as.numeric(\cf0 file\cf7 $\cf0 V5\cf7 )\
+\cf8 \
+\cf0 abs\cf7 <-\cf0 x\cf7 [\cf11 1\cf7 ]\cf8 \
+\cf10 for\cf7 (\cf0 i \cf10 in \cf11 2\cf7 :nrow(\cf0 file\cf7 ))\{\
+	\cf0 abs\cf7 <-c(\cf0 abs\cf7 ,sum(\cf0 x\cf7 [\cf11 1\cf7 :\cf0 i\cf7 ]))\
+\}\cf8 \
+\
+\cf0 gccontent\cf8  \cf7 <-\cf8  \cf7 read.table("
+\f0\fs22 \cf0 \CocoaLigature0 countfiles/Combined_Human_NCBI37.2_10K_89bases_mappable_bins_GCperc_INPUTtemp.txt"
+\f5\fs28 \cf7 \CocoaLigature1 ,\cf0 header\cf7 =\cf10 F
+\f2\fs26 \cf7 ,\cf8  
+\f5\fs28 \cf0 sep\cf7 =\cf8 "\\t"\cf7 )\cf8 \
+\cf7 data.frame(paste(\cf0 gccontent[1:10,1],\cf7 "\cf0 :",gccontent[1:10,2],"-",gccontent[1:10,3],sep=\cf7 "\cf0 "),gccontent$V7[1:10], abs[1:10])\cf7 \
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+
+\f0\fs22 \cf0 \CocoaLigature0 write.table(d
+\f5\fs28 \cf7 \CocoaLigature1 ata.frame(paste(\cf0 gccontent[,1],\cf7 "\cf0 :",gccontent[,2],"-",gccontent[,3],sep=\cf7 "\cf0 "),gccontent$V7, abs)
+\f0\fs22 \CocoaLigature0 , "countfiles/Combined_Human_NCBI37.2_10K_89bases_mappable_bins_GCperc_INPUT.txt", col.names=F, row.names=F, quote=F, sep="\\t")\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+\cf0 \
+### Countfiles ###\
+\
+\pard\pardeftab720\ri380
+
+\f6\fs20 \cf0 \CocoaLigature1 awk '\{print $1"\\t"$2"\\t"$2\}' "$sample"_bwa_RG_NA.sorted_dedup_unique.hits | /cm/shared/apps/bedtools/2.17.0/bin//coverageBed -a - -Combined_Human_NCBI37.2_500K_101bases_mappable_bins.txt > sample_mappable_101bases.count\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs22 \cf0 \CocoaLigature0 \
+awk '\{print $1"\\t"$2"\\t"$2\}' hits/B8FF4C_59_AAGAGGCA-GTAAGGAG.sorted_dedup.hits | sed 's/chr//g' | /cm/shared/apps/bedtools/2.17.0/bin//coverageBed -a - -b Combined_Human_NCBI37.2_500K_89bases_mappable_bins.txt 
+\f6\fs20 \CocoaLigature1 > 
+\f0\fs22 \CocoaLigature0 countfiles/
+\f6\fs20 \CocoaLigature1 sample_mappable_500K_89bases.count
+\f0\fs22 \CocoaLigature0 \
+\
+##R 500K\
+\pard\pardeftab720
+\cf0 \CocoaLigature1 hits<-list.files("hits")\
+hits<-grep("sorted.dedup", hits, invert=F, value=T)\
+\
+for(i in hits)\{\
+temp<-paste("\CocoaLigature0 awk '\{print $1\\"\\\\t\\"$2\\"\\\\t\\"$2\}' hits/", i, " | sed 's/chr//g'| /cm/shared/apps/bedtools/2.17.0/bin/coverageBed -a - -b Combined_Human_NCBI37.2_500K_89bases_mappable_bins.txt 
+\f6\fs20 \CocoaLigature1 > 
+\f0\fs22 \CocoaLigature0 countfiles/", 
+\f6\fs20 \CocoaLigature1 gsub("hits","_mappable_500K_89bases.count",i)
+\f0\fs22 ,sep="")\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 \CocoaLigature0 write.table(temp,paste("shfiles/counts500K_",i,".sh",sep=""), col.names=F, row.names=F, quote=F)\
+\pard\pardeftab720
+\cf0 \CocoaLigature1 \}\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 \CocoaLigature0 l2<-list.files(\CocoaLigature1 "\CocoaLigature0 shfiles")\
+l2<-grep("counts500K_.*.sh", l2,value=T)\
+\
+\
+i<-l2[1]\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("ounts500K_|.sh","",i), " sh shfiles/",i,sep="")\
+system(temp)
+\f1\fs24 \CocoaLigature1 \
+
+\f0\fs22 \CocoaLigature0 \
+for(i in l2[-1])\{\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("ounts500K_|.sh","",i), " sh shfiles/",i,sep="")\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab720\pardirnatural
+
+\f1\fs24 \cf0 \CocoaLigature1 system(temp)\
+\}\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs22 \cf0 \CocoaLigature0 ##R 10K\
+\pard\pardeftab720
+\cf0 \CocoaLigature1 hits<-list.files("hits")\
+hits<-grep("sorted.dedup", hits, invert=F, value=T)\
+\
+for(i in hits)\{\
+temp<-paste("\CocoaLigature0 awk '\{print $1\\"\\\\t\\"$2\\"\\\\t\\"$2\}' hits/", i, " | sed 's/chr//g'| /cm/shared/apps/bedtools/2.17.0/bin/coverageBed -a - -b Combined_Human_NCBI37.2_10K_89bases_mappable_bins.txt 
+\f6\fs20 \CocoaLigature1 > 
+\f0\fs22 \CocoaLigature0 countfiles/", 
+\f6\fs20 \CocoaLigature1 gsub("hits","_mappable_10K_89bases.count",i)
+\f0\fs22 ,sep="")\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 \CocoaLigature0 write.table(temp,paste("shfiles/counts10K_",i,".sh",sep=""), col.names=F, row.names=F, quote=F)\
+\pard\pardeftab720
+\cf0 \CocoaLigature1 \}\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 \CocoaLigature0 l2<-list.files(\CocoaLigature1 "\CocoaLigature0 shfiles")\
+l2<-grep("counts10K_.*.sh", l2,value=T)\
+\
+\
+i<-l2[1]\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("ounts10K_|.sh","",i), " sh shfiles/",i,sep="")\
+system(temp)
+\f1\fs24 \CocoaLigature1 \
+
+\f0\fs22 \CocoaLigature0 \
+for(i in l2[-1])\{\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("ounts10K_|.sh","",i), " sh shfiles/",i,sep="")\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab720\pardirnatural
+
+\f1\fs24 \cf0 \CocoaLigature1 system(temp)\
+\}\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs22 \cf0 \CocoaLigature0 \
+##R 50K\
+\pard\pardeftab720
+\cf0 \CocoaLigature1 hits<-list.files("hits")\
+hits<-grep("sorted.dedup", hits, invert=F, value=T)\
+\
+for(i in hits)\{\
+temp<-paste("\CocoaLigature0 awk '\{print $1\\"\\\\t\\"$2\\"\\\\t\\"$2\}' hits/", i, " | sed 's/chr//g'| /cm/shared/apps/bedtools/2.17.0/bin/coverageBed -a - -b Combined_Human_NCBI37.2_50K_89bases_mappable_bins.txt 
+\f6\fs20 \CocoaLigature1 > 
+\f0\fs22 \CocoaLigature0 countfiles/", 
+\f6\fs20 \CocoaLigature1 gsub("hits","_mappable_50K_89bases.count",i)
+\f0\fs22 ,sep="")\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 \CocoaLigature0 write.table(temp,paste("shfiles/counts50K_",i,".sh",sep=""), col.names=F, row.names=F, quote=F)\
+\pard\pardeftab720
+\cf0 \CocoaLigature1 \}\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 \CocoaLigature0 l2<-list.files(\CocoaLigature1 "\CocoaLigature0 shfiles")\
+l2<-grep("counts50K_.*.sh", l2,value=T)\
+\
+\
+i<-l2[1]\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("ounts50K_|.sh","",i), " sh shfiles/",i,sep="")\
+system(temp)
+\f1\fs24 \CocoaLigature1 \
+
+\f0\fs22 \CocoaLigature0 \
+for(i in l2[-1])\{\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("ounts50K_|.sh","",i), " sh shfiles/",i,sep="")\
+system(temp)
+\f1\fs24 \CocoaLigature1 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab720\pardirnatural
+\cf0 \}\
+\
+\
+### Sort files \
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs22 \cf0 \CocoaLigature0 sort -k1,1 -k2,2n countfiles/B8FF4C_80_CAGAGAGG-AAGGAGTA.sorted_dedup._mappable_500K_89bases.count | cut -f1-6 > B8FF4C_80_CAGAGAGG-AAGGAGTA.sorted_dedup._mappable_500K_89bases.sorted.count
+\f1\fs24 \CocoaLigature1 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+
+\f0\fs22 \cf0 \CocoaLigature0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+\cf0 ##R \
+\pard\pardeftab720
+\cf0 \CocoaLigature1 hits<-list.files("countfiles")\
+#hits<-grep("sorted.dedup", hits, invert=F, value=T)\
+\
+for(i in hits)\{\
+temp<-paste("\CocoaLigature0 sort -k1,1 -k2,2n countfiles/",i," | cut -f1-6 > countfiles/", gsub("count","sorted.count",i)\CocoaLigature1 ,sep="")\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 \CocoaLigature0 write.table(temp,paste("shfiles/sortcountfile_",i,".sh",sep=""), col.names=F, row.names=F, quote=F)\
+\pard\pardeftab720
+\cf0 \CocoaLigature1 \}\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 \CocoaLigature0 l2<-list.files(\CocoaLigature1 "\CocoaLigature0 shfiles")\
+l2<-grep("sortcountfile_.*.sh", l2,value=T)\
+\
+\
+i<-l2[1]\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("ortcountfile_|.sh","",i), " sh shfiles/",i,sep="")\
+system(temp)
+\f1\fs24 \CocoaLigature1 \
+
+\f0\fs22 \CocoaLigature0 \
+for(i in l2[-1])\{\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("ortcountfile_|.sh","",i), " sh shfiles/",i,sep="")\
+system(temp)
+\f1\fs24 \CocoaLigature1 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab720\pardirnatural
+\cf0 \}\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+
+\f0\fs22 \cf0 \CocoaLigature0 \
+#########################################\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+\cf0 \
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+###########################\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 ###### Insert size Picard duplicates removed ###\
+\
+/cm/shared/apps/jdk/\cf3 1\cf0 .\cf3 7\cf0 .\cf3 0\cf0 /bin/java \cf4 -Xmx4G\cf0  \cf4 -Djava\cf0 .\cf5 io.tmpdir\cf0 =/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/temp \cf4 -jar\cf0  /cm/shared/apps/picard/current/CollectInsertSizeMetrics.jar \cf5 INPUT\cf0 =bamfiles/TbWGA_3.sorted.reheader.bam\CocoaLigature1 _dedup.bam\CocoaLigature0  \cf5 HISTOGRAM_FILE\cf0 =insertSize/histTbWGA_3noDupl.pdf \cf5 OUTPUT\cf0 =insertSize/outputinsertSize3noDupl \cf5 VALIDATION_STRINGENCY\cf0 =SILENT \cf5 ASSUME_SORTED\cf0 =true\
+\
+/cm/shared/apps/jdk/\cf3 1\cf0 .\cf3 7\cf0 .\cf3 0\cf0 /bin/java \cf4 -Xmx4G\cf0  \cf4 -Djava\cf0 .\cf5 io.tmpdir\cf0 =/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/temp \cf4 -jar\cf0  /cm/shared/apps/picard/current/CollectInsertSizeMetrics.jar \cf5 INPUT\cf0 =bamfiles/TbWGA_7.sorted.reheader.bam\CocoaLigature1 _dedup.bam\CocoaLigature0  \cf5 HISTOGRAM_FILE\cf0 =insertSize/histTbWGA_7noDupl.pdf \cf5 OUTPUT\cf0 =insertSize/outputinsertSize7noDupl \cf5 VALIDATION_STRINGENCY\cf0 =SILENT \cf5 ASSUME_SORTED\cf0 =true\
+\
+/cm/shared/apps/jdk/\cf3 1\cf0 .\cf3 7\cf0 .\cf3 0\cf0 /bin/java \cf4 -Xmx4G\cf0  \cf4 -Djava\cf0 .\cf5 io.tmpdir\cf0 =/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/temp \cf4 -jar\cf0  /cm/shared/apps/picard/current/CollectInsertSizeMetrics.jar \cf5 INPUT\cf0 =bamfiles/TbWGA_12.sorted.reheader.bam\CocoaLigature1 _dedup.bam\CocoaLigature0  \cf5 HISTOGRAM_FILE\cf0 =insertSize/histTbWGA_12noDupl.pdf \cf5 OUTPUT\cf0 =insertSize/outputinsertSize12noDupl \cf5 VALIDATION_STRINGENCY\cf0 =SILENT \cf5 ASSUME_SORTED\cf0 =true\
+\
+/cm/shared/apps/jdk/\cf3 1\cf0 .\cf3 7\cf0 .\cf3 0\cf0 /bin/java \cf4 -Xmx4G\cf0  \cf4 -Djava\cf0 .\cf5 io.tmpdir\cf0 =/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/temp \cf4 -jar\cf0  /cm/shared/apps/picard/current/CollectInsertSizeMetrics.jar \cf5 INPUT\cf0 =bamfiles/TbWGA_13.sorted.reheader.bam\CocoaLigature1 _dedup.bam\CocoaLigature0  \cf5 HISTOGRAM_FILE\cf0 =insertSize/histTbWGA_13noDupl.pdf \cf5 OUTPUT\cf0 =insertSize/outputinsertSize13noDupl \cf5 VALIDATION_STRINGENCY\cf0 =SILENT \cf5 ASSUME_SORTED\cf0 =true\
+\
+sge batch -o outputfiles/insertSize3noDupl -e errorfiles/insertSize3noDupl -N insertS3 sh shfiles/insertSize3noDupl.sh\
+sge batch -o outputfiles/insertSize7noDupl -e errorfiles/insertSize7noDupl -N insertS7 sh shfiles/insertSize7noDupl.sh\
+sge batch -o outputfiles/insertSize12noDupl -e errorfiles/insertSize12noDupl -N insertS12 sh shfiles/insertSize12noDupl.sh\
+sge batch -o outputfiles/insertSize13noDupl -e errorfiles/insertSize13noDupl -N insertS13 sh shfiles/insertSize13noDupl.sh\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+\cf0 \
+#####\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 ###### Insert size data Parveen Picard duplicates removed ###\
+/cm/shared/apps/jdk/\cf3 1\cf0 .\cf3 7\cf0 .\cf3 0\cf0 /bin/java \cf4 -Xmx4G\cf0  \cf4 -Djava\cf0 .\cf5 io.tmpdir\cf0 =/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/temp \cf4 -jar\cf0  /cm/shared/apps/picard/current/CollectInsertSizeMetrics.jar \cf5 INPUT\cf0 =/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/dataKoen/dataParveen/human_Batch3Pico_trim_13425_13_13437_13_bwa_RG_NA.sorted_dedup.bam \cf5 HISTOGRAM_FILE\cf0 =insertSize/histhuman_Batch3Pico13.pdf \cf5 OUTPUT\cf0 =insertSize/outputinsertSizehuman_Batch3Pico13 \cf5 VALIDATION_STRINGENCY\cf0 =SILENT \cf5 ASSUME_SORTED\cf0 =true\
+\
+/cm/shared/apps/jdk/\cf3 1\cf0 .\cf3 7\cf0 .\cf3 0\cf0 /bin/java \cf4 -Xmx4G\cf0  \cf4 -Djava\cf0 .\cf5 io.tmpdir\cf0 =/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/temp \cf4 -jar\cf0  /cm/shared/apps/picard/current/CollectInsertSizeMetrics.jar \cf5 INPUT\cf0 =/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/dataKoen/dataParveen/human_Batch3Pico_trim_13425_14_13437_14_bwa_RG_NA.sorted_dedup.bam \cf5 HISTOGRAM_FILE\cf0 =insertSize/histhuman_Batch3Pico14.pdf \cf5 OUTPUT\cf0 =insertSize/outputinsertSizehuman_Batch3Pico14 \cf5 VALIDATION_STRINGENCY\cf0 =SILENT \cf5 ASSUME_SORTED\cf0 =true\
+\
+/cm/shared/apps/jdk/\cf3 1\cf0 .\cf3 7\cf0 .\cf3 0\cf0 /bin/java \cf4 -Xmx4G\cf0  \cf4 -Djava\cf0 .\cf5 io.tmpdir\cf0 =/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/temp \cf4 -jar\cf0  /cm/shared/apps/picard/current/CollectInsertSizeMetrics.jar \cf5 INPUT\cf0 =/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/dataKoen/dataParveen/human_Batch3Pico_trim_13425_5_13437_5_bwa_RG_NA.sorted_dedup.bam \cf5 HISTOGRAM_FILE\cf0 =insertSize/histhuman_Batch3Pico5.pdf \cf5 OUTPUT\cf0 =insertSize/outputinsertSizehuman_Batch3Pico5 \cf5 VALIDATION_STRINGENCY\cf0 =SILENT \cf5 ASSUME_SORTED\cf0 =true\
+\
+/cm/shared/apps/jdk/\cf3 1\cf0 .\cf3 7\cf0 .\cf3 0\cf0 /bin/java \cf4 -Xmx4G\cf0  \cf4 -Djava\cf0 .\cf5 io.tmpdir\cf0 =/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/temp \cf4 -jar\cf0  /cm/shared/apps/picard/current/CollectInsertSizeMetrics.jar \cf5 INPUT\cf0 =/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/dataKoen/dataParveen/human_Batch3Pico_trim_13425_6_13437_6_bwa_RG_NA.sorted_dedup.bam \cf5 HISTOGRAM_FILE\cf0 =insertSize/histhuman_Batch3Pico6.pdf \cf5 OUTPUT\cf0 =insertSize/outputinsertSizehuman_Batch3Pico6 \cf5 VALIDATION_STRINGENCY\cf0 =SILENT \cf5 ASSUME_SORTED\cf0 =true\
+\
+sge batch -o outputfiles/insertSize13Pico -e errorfiles/insertSize13Pico -N insertS13 sh shfiles/insertSize13Pico.sh\
+sge batch -o outputfiles/insertSize14Pico -e errorfiles/insertSize14Pico -N insertS14 sh shfiles/insertSize14Pico.sh\
+sge batch -o outputfiles/insertSize5Pico -e errorfiles/insertSize5Pico -N insertS5 sh shfiles/insertSize5Pico.sh\
+sge batch -o outputfiles/insertSize6Pico -e errorfiles/insertSize6Pico -N insertS6 sh shfiles/insertSize6Pico.sh\
+\
+##Matched normal\
+\
+/cm/shared/apps/jdk/\cf3 1\cf0 .\cf3 7\cf0 .\cf3 0\cf0 /bin/java \cf4 -Xmx4G\cf0  \cf4 -Djava\cf0 .\cf5 io.tmpdir\cf0 =/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/temp \cf4 -jar\cf0  /cm/shared/apps/picard/current/CollectInsertSizeMetrics.jar \cf5 INPUT\cf0 =/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/dataKoen/dataParveen/human_Batch3Pico_trim_13425_11_13437_11_bwa_RG_NA.sorted_dedup.bam \cf5 HISTOGRAM_FILE\cf0 =insertSize/histhuman_Batch3Pico11.pdf \cf5 OUTPUT\cf0 =insertSize/outputinsertSizehuman_Batch3Pico11 \cf5 VALIDATION_STRINGENCY\cf0 =SILENT \cf5 ASSUME_SORTED\cf0 =true\
+\
+/cm/shared/apps/jdk/\cf3 1\cf0 .\cf3 7\cf0 .\cf3 0\cf0 /bin/java \cf4 -Xmx4G\cf0  \cf4 -Djava\cf0 .\cf5 io.tmpdir\cf0 =/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/temp \cf4 -jar\cf0  /cm/shared/apps/picard/current/CollectInsertSizeMetrics.jar \cf5 INPUT\cf0 =/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/dataKoen/dataParveen/human_Batch3Pico_trim_13425_12_13437_12_bwa_RG_NA.sorted_dedup.bam \cf5 HISTOGRAM_FILE\cf0 =insertSize/histhuman_Batch3Pico12.pdf \cf5 OUTPUT\cf0 =insertSize/outputinsertSizehuman_Batch3Pico12 \cf5 VALIDATION_STRINGENCY\cf0 =SILENT \cf5 ASSUME_SORTED\cf0 =true\
+\
+/cm/shared/apps/jdk/\cf3 1\cf0 .\cf3 7\cf0 .\cf3 0\cf0 /bin/java \cf4 -Xmx4G\cf0  \cf4 -Djava\cf0 .\cf5 io.tmpdir\cf0 =/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/temp \cf4 -jar\cf0  /cm/shared/apps/picard/current/CollectInsertSizeMetrics.jar \cf5 INPUT\cf0 =/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/dataKoen/dataParveen/human_Batch3Pico_trim_13425_15_13437_15_bwa_RG_NA.sorted_dedup.bam \cf5 HISTOGRAM_FILE\cf0 =insertSize/histhuman_Batch3Pico15.pdf \cf5 OUTPUT\cf0 =insertSize/outputinsertSizehuman_Batch3Pico15 \cf5 VALIDATION_STRINGENCY\cf0 =SILENT \cf5 ASSUME_SORTED\cf0 =true\
+\
+/cm/shared/apps/jdk/\cf3 1\cf0 .\cf3 7\cf0 .\cf3 0\cf0 /bin/java \cf4 -Xmx4G\cf0  \cf4 -Djava\cf0 .\cf5 io.tmpdir\cf0 =/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/temp \cf4 -jar\cf0  /cm/shared/apps/picard/current/CollectInsertSizeMetrics.jar \cf5 INPUT\cf0 =/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/dataKoen/dataParveen/human_Batch3Pico_trim_13425_16_13437_16_bwa_RG_NA.sorted_dedup.bam \cf5 HISTOGRAM_FILE\cf0 =insertSize/histhuman_Batch3Pico16.pdf \cf5 OUTPUT\cf0 =insertSize/outputinsertSizehuman_Batch3Pico16 \cf5 VALIDATION_STRINGENCY\cf0 =SILENT \cf5 ASSUME_SORTED\cf0 =true\
+\
+sge batch -o outputfiles/insertSize11Pico -e errorfiles/insertSize11Pico -N insertS11 sh shfiles/insertSize11Pico.sh\
+sge batch -o outputfiles/insertSize12Pico -e errorfiles/insertSize12Pico -N insertS12 sh shfiles/insertSize12Pico.sh\
+sge batch -o outputfiles/insertSize15Pico -e errorfiles/insertSize15Pico -N insertS15 sh shfiles/insertSize15Pico.sh\
+sge batch -o outputfiles/insertSize16Pico -e errorfiles/insertSize16Pico -N insertS16 sh shfiles/insertSize16Pico.sh\
+\
+#####\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+\cf0 \
+\
+######################\
+\
+### Index genome ###\
+(indexecoli.sh)\
+\
+/cm/shared/apps/bwa/0.6.2/bwa index -a bwtsw -p /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/ecoli /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/ecoli/Escherichia_coli.HUSEC2011CHR1.31.dna.genome.fa >> logfile\
+\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+
+\f1\fs24 \cf0 \CocoaLigature1 ################ Align Samples to ecoli ###################################\
+\pard\pardeftab720
+
+\f0\fs22 \cf0 -align:\
+/cm/shared/apps/bwa/0.7.8/bwa aln -l 32 genome \cf2 sample.lane1.R1.fastq.gz\cf0  > sample.lane1.R1.sai\
+/cm/shared/apps/bwa/0.7.8/bwa aln -l 32 genome\'a0\cf2 sample.lane1.R1.fastq.gz\cf0 \'a0> sample.lane1.R2.sai\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+
+\f1\fs24 \cf0 \
+## R script ##
+\f0\fs22 \CocoaLigature0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+\cf0 l<-list.files("trimmedfastqfiles")\
+l<-grep("TbWGA_3|7|12|13_",l,value=T)\
+\
+for(i in l)\{\
+temp<-paste("\CocoaLigature1 /cm/shared/apps/bwa/0.7.8/
+\f1\fs24 bwa aln -l 32 
+\f0\fs22 \CocoaLigature0 /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/ecoli/ecoli trimmedfastqfiles/",i," > saifiles/ecoli.",gsub("fastq","sai",i),"\
+echo ",i , " done",sep="")\
+write.table(temp,paste("shfiles/alignecoli_",gsub(".fastq","",i),".sh",sep=""), col.names=F, row.names=F, quote=F)\
+\}\
+\
+l2<-list.files("shfiles")\
+l2<-grep("alignecoli_.*.sh", l2,value=T)\
+\
+i<-l2[1]\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("lignecoli_trimmed.TbWGA_|.fastq.gz.sh|_S[0-9]_|00|_","",i), " sh shfiles/",i,sep="")\
+system(temp)
+\f1\fs24 \CocoaLigature1 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+\cf0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs22 \cf0 \CocoaLigature0 i<-l2[2]\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("lignecoli_trimmed.TbWGA_|.fastq.gz.sh|_S[0-9]_|00|_","",i), " sh shfiles/",i,sep="")\
+system(temp)\
+\
+for(i in l2[-c(1,2)])\{\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("lignecoli_trimmed.TbWGA_|.fastq.gz.sh|_S[0-9]_|00|_","",i), " sh shfiles/",i,sep="")\
+system(temp)\
+\}\
+\
+\pard\pardeftab720
+\cf0 \CocoaLigature1 ############ SAM and BAM ################################\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab720\pardirnatural
+
+\f1\fs24 \cf0 ## R script ##
+\f0\fs22 \CocoaLigature0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 l<-list.files("trimmedfastqfiles")\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+\cf0 l<-grep("TbWGA_3|7|12|13_",l,value=T)\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 l2<-gsub(".fastq|trimmed.","",l)\
+lr1<-grep("R1",l,value=T)\
+lr2<-grep("R2",l,value=T)\
+\
+l<-unique(gsub("_R1_001|_R2_001","",l2))\
+ls<-list.files("saifiles")\
+ls1<-grep("R1",ls,value=T)\
+ls2<-grep("R2",ls,value=T)\
+\
+for(i in l)\{\
+tempf1<-grep(i,lr1,value=T)\
+tempf2<-grep(i,lr2,value=T)\
+temps1<-grep(i,ls1,value=T)\
+temps2<-grep(i,ls2,value=T)\
+\
+temp<-paste("\CocoaLigature1 /cm/shared/apps/bwa/0.7.8/
+\f1\fs24 bwa sampe -P -s 
+\f0\fs22 -r '@RG\\tID:",i,"\\tSM:",i,"\\tPL:ILLUMINA\\tCN:GC_KUL_UZ' \CocoaLigature0 /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/ecoli/ecoli
+\f1\fs24 \CocoaLigature1  
+\f0\fs22 \CocoaLigature0 saifiles/",temps1," saifiles/", temps2, " trimmedfastqfiles/", tempf1, " trimmedfastqfiles/",tempf2, " > samfiles/ecoli.",i,".sam\
+echo ",i , " converted to sam\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab720\pardirnatural
+
+\f1\fs24 \cf0 \CocoaLigature1 samtools view -hbS -o bamfiles/
+\f0\fs22 \CocoaLigature0 ecoli.",i,".bam samfiles/ecoli.",i,".sam\
+echo ",i," converted to bam",sep="")\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 write.table(temp,paste("shfiles/SAMandBAMecoli_",i,".sh",sep=""), col.names=F, row.names=F, quote=F)\
+\}\
+\
+l2<-list.files(\CocoaLigature1 "\CocoaLigature0 shfiles")\
+l2<-grep("SAMandBAMecoli_.*.sh", l2,value=T)\
+\
+\
+i<-l2[1]\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("AMandBAMecoli_TbWGA_|.sh|_S[0-9]_|00|_","",i), " sh shfiles/",i,sep="")\
+system(temp)
+\f1\fs24 \CocoaLigature1 \
+
+\f0\fs22 \CocoaLigature0 \
+for(i in l2[-1])\{\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("AMandBAMecoli_TbWGA_|.sh|_S[0-9]_|00|_","",i), " sh shfiles/",i,sep="")\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab720\pardirnatural
+
+\f1\fs24 \cf0 \CocoaLigature1 system(temp)\
+\}\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs22 \cf0 \CocoaLigature0 #### Merge lanes #####\
+\
+f<-list.files("bamfiles")\
+s<-unique(gsub("_S.*","",f))\
+s<-grep("ecoli",s,value=T)\
+\
+for(i in s)\{\
+l<-grep(paste(i,"_",sep=""),f,value=T)\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 temp<-paste("\CocoaLigature1 samtools merge
+\f1\fs24  bamfiles
+\f0\fs22 \CocoaLigature0 /",i,".bam ", paste("bamfiles/",l,collapse=" ",sep=""),"\
+echo ",i," merged",sep="")\
+write.table(temp,paste("shfiles/mergeBAMecoli_",i,".sh",sep=""), col.names=F, row.names=F, quote=F)\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+\cf0 \}\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 l2<-list.files(\CocoaLigature1 "\CocoaLigature0 shfiles")\
+l2<-grep("mergeBAMecoli_.*.sh", l2,value=T)\
+\
+\
+i<-l2[1]\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("ergeBAMecoli_ecoli.TbWGA_|.sh|_S[0-9]_|00|_","",i), " sh shfiles/",i,sep="")\
+system(temp)
+\f1\fs24 \CocoaLigature1 \
+
+\f0\fs22 \CocoaLigature0 \
+for(i in l2[-1])\{\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("ergeBAMecoli_ecoli.TbWGA_|.sh|_S[0-9]_|00|_","",i), " sh shfiles/",i,sep="")\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab720\pardirnatural
+
+\f1\fs24 \cf0 \CocoaLigature1 system(temp)\
+\}\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs22 \cf0 \CocoaLigature0 \
+\
+###### Index genome micobiome\
+\
+### Index genome ###\
+(shfiles/index\cf12 HMREFG\cf0 .sh)\
+\
+/cm/shared/apps/bwa/0.6.2/bwa index -a bwtsw -p /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/dataKoen/\cf12 HMREFG\cf0 /HMP /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/dataKoen/\cf12 HMREFG/\cf0 all_seqs.fa >> logfile\
+\
+## Align to HMP\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+
+\f1\fs24 \cf0 \CocoaLigature1 ## R script ##
+\f0\fs22 \CocoaLigature0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+\cf0 l<-list.files("trimmedfastqfiles")\
+l<-grep("TbWGA_3|7|12|13_",l,value=T)\
+\
+for(i in l)\{\
+temp<-paste("\CocoaLigature1 /cm/shared/apps/bwa/0.7.8/
+\f1\fs24 bwa aln -l 32 
+\f0\fs22 \CocoaLigature0 /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/dataKoen/\cf12 HMREFG\cf0 /HMP trimmedfastqfiles/",i," > saifiles/HMP.",gsub("fastq","sai",i),"\
+echo ",i , " done",sep="")\
+write.table(temp,paste("shfiles/aligneHMP_",gsub(".fastq","",i),".sh",sep=""), col.names=F, row.names=F, quote=F)\
+\}\
+\
+l2<-list.files("shfiles")\
+l2<-grep("aligneHMP_.*.sh", l2,value=T)\
+\
+i<-l2[1]\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("ligneHMP_trimmed.TbWGA_|.fastq.gz.sh|_S[0-9]_|00|_","",i), " sh shfiles/",i,sep="")\
+system(temp)
+\f1\fs24 \CocoaLigature1 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+\cf0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs22 \cf0 \CocoaLigature0 i<-l2[2]\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("ligneHMP_trimmed.TbWGA_|.fastq.gz.sh|_S[0-9]_|00|_","",i), " sh shfiles/",i,sep="")\
+system(temp)\
+\
+for(i in l2[-c(1,2)])\{\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("ligneHMP_trimmed.TbWGA_|.fastq.gz.sh|_S[0-9]_|00|_","",i), " sh shfiles/",i,sep="")\
+system(temp)\
+\}\
+\pard\pardeftab720
+\cf3 \CocoaLigature1 \
+\pard\pardeftab720
+\cf0 ############ SAM and BAM ################################\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab720\pardirnatural
+
+\f1\fs24 \cf0 ## R script ##
+\f0\fs22 \CocoaLigature0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 l<-list.files("trimmedfastqfiles")\
+l<-grep("TbWGA_3|7|12|13_",l,value=T)\
+l2<-gsub(".fastq|trimmed.","",l)\
+lr1<-grep("R1",l,value=T)\
+lr2<-grep("R2",l,value=T)\
+\
+l<-unique(gsub("_R1_001|_R2_001","",l2))\
+ls<-list.files("saifiles")\
+ls1<-grep("HMP.*.R1",ls,value=T)\
+ls2<-grep("HMP.*.R2",ls,value=T)\
+\
+for(i in l)\{\
+tempf1<-grep(i,lr1,value=T)\
+tempf2<-grep(i,lr2,value=T)\
+temps1<-grep(i,ls1,value=T)\
+temps2<-grep(i,ls2,value=T)\
+\
+temp<-paste("\CocoaLigature1 /cm/shared/apps/bwa/0.7.8/
+\f1\fs24 bwa sampe -P -s 
+\f0\fs22 -r '@RG\\tID:",i,"\\tSM:",i,"\\tPL:ILLUMINA\\tCN:GC_KUL_UZ' \CocoaLigature0 /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/dataKoen/\cf12 HMREFG\cf0 /HMP
+\f1\fs24 \CocoaLigature1  
+\f0\fs22 \CocoaLigature0 saifiles/",temps1," saifiles/", temps2, " trimmedfastqfiles/", tempf1, " trimmedfastqfiles/",tempf2, " > samfiles/HMP.",i,".sam\
+echo ",i , " converted to sam\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab720\pardirnatural
+
+\f1\fs24 \cf0 \CocoaLigature1 samtools view -hbS -o bamfiles/
+\f0\fs22 \CocoaLigature0 HMP.",i,".bam samfiles/HMP.",i,".sam\
+echo ",i," converted to bam",sep="")\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 write.table(temp,paste("shfiles/SAMandBAMHMP_",i,".sh",sep=""), col.names=F, row.names=F, quote=F)\
+\}\
+\
+l2<-list.files(\CocoaLigature1 "\CocoaLigature0 shfiles")\
+l2<-grep("SAMandBAMHMP_.*.sh", l2,value=T)\
+\
+\
+i<-l2[1]\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("AMandBAMHMP_TbWGA_|.sh|_S[0-9]_|00|_","",i), " sh shfiles/",i,sep="")\
+system(temp)
+\f1\fs24 \CocoaLigature1 \
+
+\f0\fs22 \CocoaLigature0 \
+for(i in l2[-1])\{\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("AMandBAMHMP_TbWGA_|.sh|_S[0-9]_|00|_","",i), " sh shfiles/",i,sep="")\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab720\pardirnatural
+
+\f1\fs24 \cf0 \CocoaLigature1 system(temp)\
+\}\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+
+\f0\fs22 \cf0 \CocoaLigature0 #### Merge lanes #####\
+\
+f<-list.files("bamfiles")\
+s<-unique(gsub("_S.*","",f))\
+s<-grep("HMP",s,value=T)\
+\
+for(i in s)\{\
+l<-grep(paste(i,"_",sep=""),f,value=T)\
+\
+temp<-paste("\CocoaLigature1 samtools merge
+\f1\fs24  bamfiles
+\f0\fs22 \CocoaLigature0 /",i,".bam ", paste("bamfiles/",l,collapse=" ",sep=""),"\
+echo ",i," merged",sep="")\
+write.table(temp,paste("shfiles/mergeBAM_",i,".sh",sep=""), col.names=F, row.names=F, quote=F)\
+\}\
+\
+l2<-list.files(\CocoaLigature1 "\CocoaLigature0 shfiles")\
+l2<-grep("mergeBAM_HMP.*.sh", l2,value=T)\
+\
+\
+i<-l2[1]\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("ergeBAM_HMP.|.sh|_S[0-9]_|00|_","",i), " sh shfiles/",i,sep="")\
+system(temp)
+\f1\fs24 \CocoaLigature1 \
+
+\f0\fs22 \CocoaLigature0 \
+for(i in l2[-1])\{\
+temp<-paste("sge batch -o outputfiles/",gsub(".sh","",i)," -e errorfiles/", gsub(".sh","",i)," -N ",gsub("ergeBAM_HMP.|.sh|_S[0-9]_|00|_","",i), " sh shfiles/",i,sep="")\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab720\pardirnatural
+
+\f1\fs24 \cf0 \CocoaLigature1 system(temp)\
+\}\
+\
+
+\f0\fs22 \CocoaLigature0 samtools view -F 4 bamfiles/HMP.TbWGA_7.bam | wc -l\
+samtools view bamfiles/HMP.TbWGA_7.bam | wc -l\
+samtools view -F 4 bamfiles/HMP.TbWGA_12.bam | wc -l
+\f1\fs24 \CocoaLigature1 \
+
+\f0\fs22 \CocoaLigature0 samtools view bamfiles/HMP.TbWGA_12.bam | wc -l\
+samtools view -F 4 bamfiles/HMP.TbWGA_3.bam | wc -l\
+samtools view bamfiles/HMP.TbWGA_3.bam | wc -l\
+samtools view -F 4 bamfiles/HMP.TbWGA_13.bam | wc -l
+\f1\fs24 \CocoaLigature1 \
+
+\f0\fs22 \CocoaLigature0 samtools view bamfiles/HMP.TbWGA_13.bam | wc -l\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab720\pardirnatural
+\cf0 samtools view -F 4 bamfiles/HMP.TbWGA_7.bam | grep Escherichia\
+samtools view -F 4 bamfiles/HMP.TbWGA_12.bam | grep Escherichia\
+samtools view -F 4 bamfiles/HMP.TbWGA_13.bam | grep Escherichia\
+samtools view -F 4 bamfiles/HMP.TbWGA_3.bam | grep Escherichia\
+\
+\
+\pard\pardeftab720
+\cf3 \CocoaLigature1 ##############################\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural
+\cf0 \CocoaLigature0 fastq<-list.files("trimmedfastqfiles")\
+sai<-list.files("saifiles")\cf3 \CocoaLigature1 \
+\pard\pardeftab720
+\cf3 sam<-list.files("bamfiles")\
+sam<-gsub(".bam","",sam)\
+for(i in sam)\{\
+print(i)\
+temp2<-grep(i,sai,value=T)\
+if(length(temp2)==2)\{\
+temp<-paste("rm saifiles/",temp2,sep="")\
+system(temp[1])\
+system(temp[2])\
+temp<-paste("rm \cf0 \CocoaLigature0 trimmedfastqfiles/\cf3 \CocoaLigature1 ",grep(i,fastq,value=T),sep="")\
+system(temp[1])\
+system(temp[2])\
+\}\
+\}\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+\cf0 \CocoaLigature0 \
+\
+#### trimmed data, done before\
+[jhaan0@avalokazuur dataKoen]$ samtools view bamfiles/human_HCC38_Tn5_TbWGA-12_S45_bwa_RG_NA.sorted.bam | wc -l\
+17213356\
+[jhaan0@avalokazuur dataKoen]$ samtools view bamfiles/human_HCC38_Tn5_TbWGA-12_S45_bwa_RG_NA.sorted_dedup.bam | wc -l\
+13920189\
+\
+\
+sed 's/chrM/MT/' < /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/humangenome/fasta/hg19Mt.fa | sed 's/chr//' > /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/humangenome/fasta/hg19MtNoChrs.fa\
+\
+sed 's/chrM/MT/' < /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/humangenome/fasta/hg19Mt.fa.fai | sed 's/chr//' > /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/humangenome/fasta/hg19MtNoChrs.fa.fai\
+\
+\
+/cm/shared/apps/jdk/\cf3 1\cf0 .\cf3 7\cf0 .\cf3 0\cf0 /bin/java \cf4 -jar\cf0  /cm/shared/apps/gatk/current/GenomeAnalysisTK.jar \cf4 -R\cf0  /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/humangenome/fasta/hg19MtNoChrs.fa \cf4 -T\cf0  DepthOfCoverage \cf4 -o\cf0  noDupl3 \cf4 -I\cf0  ../bamfiles/\cf9 human_HCC38_Tn5_TbWGA-3_S40_bwa_RG_NA.sorted_dedup.bam\cf0  \cf4 -ct\cf0  \cf3 1\cf0  \cf4 -ct\cf0  \cf3 2\cf0  \cf4 -ct\cf0  \cf3 3\cf0  \cf4 -ct\cf0  \cf3 4\cf0  \cf4 -ct\cf0  \cf3 5\cf0  \cf4 -ct\cf0  \cf3 6\cf0  \cf4 -ct\cf0  \cf3 7\cf0  \cf4 -ct\cf0  \cf3 8\cf0  \cf4 -ct\cf0  \cf3 9\cf0  \cf4 -ct\cf0  \cf3 10\cf0  \cf4 -ct\cf0  \cf3 12\cf0  \cf4 -ct\cf0  \cf3 15\cf0  \cf4 -ct\cf0  \cf3 20\cf0  \cf4 -ct\cf0  \cf3 25\cf0  \cf4 -ct\cf0  \cf3 100\cf0  \
+/cm/shared/apps/jdk/\cf3 1\cf0 .\cf3 7\cf0 .\cf3 0\cf0 /bin/java \cf4 -jar\cf0  /cm/shared/apps/gatk/current/GenomeAnalysisTK.jar \cf4 -R\cf0  /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/humangenome/fasta/hg19MtNoChrs.fa \cf4 -T\cf0  DepthOfCoverage \cf4 -o\cf0  Dupl3 \cf4 -I\cf0  ../bamfiles/\cf9 human_HCC38_Tn5_TbWGA-3_S40_bwa_RG_NA.sorted.bam\cf0  \cf4 -ct\cf0  \cf3 1\cf0  \cf4 -ct\cf0  \cf3 2\cf0  \cf4 -ct\cf0  \cf3 3\cf0  \cf4 -ct\cf0  \cf3 4\cf0  \cf4 -ct\cf0  \cf3 5\cf0  \cf4 -ct\cf0  \cf3 6\cf0  \cf4 -ct\cf0  \cf3 7\cf0  \cf4 -ct\cf0  \cf3 8\cf0  \cf4 -ct\cf0  \cf3 9\cf0  \cf4 -ct\cf0  \cf3 10\cf0  \cf4 -ct\cf0  \cf3 12\cf0  \cf4 -ct\cf0  \cf3 15\cf0  \cf4 -ct\cf0  \cf3 20\cf0  \cf4 -ct\cf0  \cf3 25\cf0  \cf4 -ct\cf0  \cf3 100\
+\
+\cf0 /cm/shared/apps/jdk/\cf3 1\cf0 .\cf3 7\cf0 .\cf3 0\cf0 /bin/java \cf4 -jar\cf0  /cm/shared/apps/gatk/current/GenomeAnalysisTK.jar \cf4 -R\cf0  /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/humangenome/fasta/hg19MtNoChrs.fa \cf4 -T\cf0  DepthOfCoverage \cf4 -o\cf0  noDupl13 \cf4 -I\cf0  ../bamfiles/\cf9 human_HCC38_Tn5_TbWGA-13_S46_bwa_RG_NA.sorted_dedup.bam\cf0  \cf4 -ct\cf0  \cf3 1\cf0  \cf4 -ct\cf0  \cf3 2\cf0  \cf4 -ct\cf0  \cf3 3\cf0  \cf4 -ct\cf0  \cf3 4\cf0  \cf4 -ct\cf0  \cf3 5\cf0  \cf4 -ct\cf0  \cf3 6\cf0  \cf4 -ct\cf0  \cf3 7\cf0  \cf4 -ct\cf0  \cf3 8\cf0  \cf4 -ct\cf0  \cf3 9\cf0  \cf4 -ct\cf0  \cf3 10\cf0  \cf4 -ct\cf0  \cf3 12\cf0  \cf4 -ct\cf0  \cf3 15\cf0  \cf4 -ct\cf0  \cf3 20\cf0  \cf4 -ct\cf0  \cf3 25\cf0  \cf4 -ct\cf0  \cf3 100\cf0  \
+/cm/shared/apps/jdk/\cf3 1\cf0 .\cf3 7\cf0 .\cf3 0\cf0 /bin/java \cf4 -jar\cf0  /cm/shared/apps/gatk/current/GenomeAnalysisTK.jar \cf4 -R\cf0  /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/humangenome/fasta/hg19MtNoChrs.fa \cf4 -T\cf0  DepthOfCoverage \cf4 -o\cf0  Dupl13 \cf4 -I\cf0  ../bamfiles/\cf9 human_HCC38_Tn5_TbWGA-13_S46_bwa_RG_NA.sorted.bam\cf0  \cf4 -ct\cf0  \cf3 1\cf0  \cf4 -ct\cf0  \cf3 2\cf0  \cf4 -ct\cf0  \cf3 3\cf0  \cf4 -ct\cf0  \cf3 4\cf0  \cf4 -ct\cf0  \cf3 5\cf0  \cf4 -ct\cf0  \cf3 6\cf0  \cf4 -ct\cf0  \cf3 7\cf0  \cf4 -ct\cf0  \cf3 8\cf0  \cf4 -ct\cf0  \cf3 9\cf0  \cf4 -ct\cf0  \cf3 10\cf0  \cf4 -ct\cf0  \cf3 12\cf0  \cf4 -ct\cf0  \cf3 15\cf0  \cf4 -ct\cf0  \cf3 20\cf0  \cf4 -ct\cf0  \cf3 25\cf0  \cf4 -ct\cf0  \cf3 100\
+\
+\cf0 /cm/shared/apps/jdk/\cf3 1\cf0 .\cf3 7\cf0 .\cf3 0\cf0 /bin/java \cf4 -jar\cf0  /cm/shared/apps/gatk/current/GenomeAnalysisTK.jar \cf4 -R\cf0  /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/humangenome/fasta/hg19MtNoChrs.fa \cf4 -T\cf0  DepthOfCoverage \cf4 -o\cf0  noDupl12 \cf4 -I\cf0  ../bamfiles/\cf9 human_HCC38_Tn5_TbWGA-12_S45_bwa_RG_NA.sorted_dedup.bam\cf0  \cf4 -ct\cf0  \cf3 1\cf0  \cf4 -ct\cf0  \cf3 2\cf0  \cf4 -ct\cf0  \cf3 3\cf0  \cf4 -ct\cf0  \cf3 4\cf0  \cf4 -ct\cf0  \cf3 5\cf0  \cf4 -ct\cf0  \cf3 6\cf0  \cf4 -ct\cf0  \cf3 7\cf0  \cf4 -ct\cf0  \cf3 8\cf0  \cf4 -ct\cf0  \cf3 9\cf0  \cf4 -ct\cf0  \cf3 10\cf0  \cf4 -ct\cf0  \cf3 12\cf0  \cf4 -ct\cf0  \cf3 15\cf0  \cf4 -ct\cf0  \cf3 20\cf0  \cf4 -ct\cf0  \cf3 25\cf0  \cf4 -ct\cf0  \cf3 100\cf0  \
+/cm/shared/apps/jdk/\cf3 1\cf0 .\cf3 7\cf0 .\cf3 0\cf0 /bin/java \cf4 -jar\cf0  /cm/shared/apps/gatk/current/GenomeAnalysisTK.jar \cf4 -R\cf0  /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/humangenome/fasta/hg19MtNoChrs.fa \cf4 -T\cf0  DepthOfCoverage \cf4 -o\cf0  Dupl12 \cf4 -I\cf0  ../bamfiles/\cf9 human_HCC38_Tn5_TbWGA-12_S45_bwa_RG_NA.sorted.bam\cf0  \cf4 -ct\cf0  \cf3 1\cf0  \cf4 -ct\cf0  \cf3 2\cf0  \cf4 -ct\cf0  \cf3 3\cf0  \cf4 -ct\cf0  \cf3 4\cf0  \cf4 -ct\cf0  \cf3 5\cf0  \cf4 -ct\cf0  \cf3 6\cf0  \cf4 -ct\cf0  \cf3 7\cf0  \cf4 -ct\cf0  \cf3 8\cf0  \cf4 -ct\cf0  \cf3 9\cf0  \cf4 -ct\cf0  \cf3 10\cf0  \cf4 -ct\cf0  \cf3 12\cf0  \cf4 -ct\cf0  \cf3 15\cf0  \cf4 -ct\cf0  \cf3 20\cf0  \cf4 -ct\cf0  \cf3 25\cf0  \cf4 -ct\cf0  \cf3 100\
+\
+\cf0 /cm/shared/apps/jdk/\cf3 1\cf0 .\cf3 7\cf0 .\cf3 0\cf0 /bin/java \cf4 -jar\cf0  /cm/shared/apps/gatk/current/GenomeAnalysisTK.jar \cf4 -R\cf0  /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/humangenome/fasta/hg19MtNoChrs.fa \cf4 -T\cf0  DepthOfCoverage \cf4 -o\cf0  noDupl7 \cf4 -I\cf0  ../bamfiles/\cf9 human_HCC38_Tn5_TbWGA-7_S42_bwa_RG_NA.sorted_dedup.bam\cf0  \cf4 -ct\cf0  \cf3 1\cf0  \cf4 -ct\cf0  \cf3 2\cf0  \cf4 -ct\cf0  \cf3 3\cf0  \cf4 -ct\cf0  \cf3 4\cf0  \cf4 -ct\cf0  \cf3 5\cf0  \cf4 -ct\cf0  \cf3 6\cf0  \cf4 -ct\cf0  \cf3 7\cf0  \cf4 -ct\cf0  \cf3 8\cf0  \cf4 -ct\cf0  \cf3 9\cf0  \cf4 -ct\cf0  \cf3 10\cf0  \cf4 -ct\cf0  \cf3 12\cf0  \cf4 -ct\cf0  \cf3 15\cf0  \cf4 -ct\cf0  \cf3 20\cf0  \cf4 -ct\cf0  \cf3 25\cf0  \cf4 -ct\cf0  \cf3 100\cf0  \
+/cm/shared/apps/jdk/\cf3 1\cf0 .\cf3 7\cf0 .\cf3 0\cf0 /bin/java \cf4 -jar\cf0  /cm/shared/apps/gatk/current/GenomeAnalysisTK.jar \cf4 -R\cf0  /uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/humangenome/fasta/hg19MtNoChrs.fa \cf4 -T\cf0  DepthOfCoverage \cf4 -o\cf0  Dupl7 \cf4 -I\cf0  ../bamfiles/\cf9 human_HCC38_Tn5_TbWGA-7_S42_bwa_RG_NA.sorted.bam\cf0  \cf4 -ct\cf0  \cf3 1\cf0  \cf4 -ct\cf0  \cf3 2\cf0  \cf4 -ct\cf0  \cf3 3\cf0  \cf4 -ct\cf0  \cf3 4\cf0  \cf4 -ct\cf0  \cf3 5\cf0  \cf4 -ct\cf0  \cf3 6\cf0  \cf4 -ct\cf0  \cf3 7\cf0  \cf4 -ct\cf0  \cf3 8\cf0  \cf4 -ct\cf0  \cf3 9\cf0  \cf4 -ct\cf0  \cf3 10\cf0  \cf4 -ct\cf0  \cf3 12\cf0  \cf4 -ct\cf0  \cf3 15\cf0  \cf4 -ct\cf0  \cf3 20\cf0  \cf4 -ct\cf0  \cf3 25\cf0  \cf4 -ct\cf0  \cf3 100}
