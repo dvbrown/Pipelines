@@ -21,7 +21,7 @@ def runJob(comm, taskName):
     print '\n##############################################    RUNNNG TASK ' + taskName + ' at {0}'.format(started) +   '    ###############################################'
     print comm + '\n'
     #run the command
-    #os.system(comm)
+    os.system(comm)
     
     
 def trimReads(inputFile, outputFile):
