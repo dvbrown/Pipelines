@@ -12,7 +12,7 @@
                         [--forced_tasks]
 
 """
-import sys, os
+import sys, os, re
 import atac_commands 
 
 #88888888888888888888888888888888888888888888888888888888888888888888888888888888888888888
@@ -196,16 +196,16 @@ outputDir = options.output_directory
 def trimReads(input_file, output_dir):
     'Take the raw sequencing reads and trim off the adpaters. The output will all be in one directory'
     #   Get read 2 filename using string subsitiution
-    read2 = re.sub('R1.fastq.gz', 'R2.fastq.gz', inputFile)
+    read2 = re.sub('.R1.fastq.gz', '.R2.fastq.gz', input_file)
     #   Get the output filename by taking the end of the full path of the input filename
-    outputFile = inputFile[:-92]
+    output_file = input_file[:-92]
     # Build the path for the output directory by concatenating the output directory and output file
-    outputFile = outputDir + outputFile
-    outputFile2 = re.sub('R1.fastq.gz', 'R2.fastq.gz', outputFile)
+    output_file = output_dir + output_file
+    output_file2 = re.sub('.R1.fastq.gz', '.R2.fastq.gz', output_file)
     comm = '''/home/dbrown0/.local/bin/cutadapt -q 15,15 --minimum-length 35 \
     -a CTGTCTCTTATA -A CTGTCTCTTATA \
     -o {3} -p {4} {1} {2}
-    '''.format(binaryPath, inputFile, read2, outputFile, outputFile2)
+    '''.format(binaryPath, input_file, read2, output_file, output_file2)
     print comm
     #os.system(comm)
     
