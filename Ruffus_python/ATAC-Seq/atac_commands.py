@@ -39,9 +39,9 @@ def alignReads(inputFile, outputFile):
     '''Align the fastq reads using bowtie'''
     read2 = re.sub('.R1.fastq.gz', '.R2.fastq.gz', inputFile)
     sampleName = inputFile[:33]
-    rgID = '@RG\tID:{}\tLB:ATAC_Seq_Tn5\tPL:nextera\tCN:KULeuven'.format(sampleName)
+    rgID = '--rg-id {} --rg PL:Nextera'.format(sampleName)
     comm = '''{0}bowtie2/current/bowtie2 --local -p 8 --rg-id {1} -x {2} -1 {3} -2 {4} \
-    | samtools view -bS -o {5} - \
+    | {0}samtools/current/samtools view -bS -o {5} -S \
     '''.format(binaryPath, rgID, refGenome, inputFile, read2, outputFile)
     runJob(comm, 'ALIGNING READS')
     
