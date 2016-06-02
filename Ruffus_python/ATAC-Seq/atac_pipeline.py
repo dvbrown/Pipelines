@@ -208,7 +208,7 @@ def trimReads(input_file, output_dir):
     {0} {1}
     '''.format(input_file, read2, output_file, output_file2)
     print comm
-    #os.system(comm)
+    os.system(comm)
     
 trimReads(inputFile[0], outputDir[0])
 
