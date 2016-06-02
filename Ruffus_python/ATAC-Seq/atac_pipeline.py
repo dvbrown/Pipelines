@@ -216,7 +216,7 @@ def trimReads(input_file, output_dir):
 def runAlignment(inputFile, outputFile):
     atac_commands.alignReads(inputFile, outputFile)
     
-@transform(inputFile, suffix('.bam'), '.merge.bam')
+@transform(runAlignment, suffix('.bam'), '.merge.bam')
 def runBamMerge(inputFile, outputFile):
     atac_commands.mergeBams(inputFile, outputFile)
     
