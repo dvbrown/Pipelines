@@ -53,7 +53,7 @@ if __name__ == '__main__':
                         /data/sample_1.bam  500  sample_1 \n
                         /data/sample_2.bam  300  sample_2 \n
                         and so forth""")     
-    parser.add_option("-0", "--output_directory", dest="output_directory",
+    parser.add_option("-o", "--output_directory", dest="output_directory",
                         action="append",
                         default = list(),
                         metavar="FILE",
@@ -193,9 +193,25 @@ if options.verbose:
 inputFile = options.input_file
 outputDir = options.output_directory
 
-@transform(inputFile, suffix('.gz'), 'r"/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/dbrown0/Data/ATAC-Seq/160526.NextSeq.FCA/\trim.gz')    
-def runTrimming(inputFile, outputDir, outputFile):
-    atac_commands.trimReads(inputFile, outputFile)
+def trimReads(inputFile, outputDir):
+    'Take the raw sequencing reads and trim off the adpaters. The output will all be in one directory'
+    #   Get read 2 filename using string subsitiution
+    read2 = re.sub('R1.fastq.gz', 'R2.fastq.gz', inputFile)
+    #   Get the output filename by taking the end of the full path of the input filename
+    outputFile = inputFile[:-92]
+    # Build the path for the output directory by concatenating the output directory and output file
+    outputFile = outputDir + outputFile
+    outputFile2 = re.sub('R1.fastq.gz', 'R2.fastq.gz', outputFile)
+    comm = '''/home/dbrown0/.local/bin/cutadapt -q 15,15 --minimum-length 35 \
+    -a CTGTCTCTTATA -A CTGTCTCTTATA \
+    -o {3} -p {4} {1} {2}
+    '''.format(binaryPath, inputFile, read2, outputFile, outputFile2)
+    print comm
+    #os.system(comm)
+
+#@transform(inputFile, suffix('.gz'), 'r"/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/dbrown0/Data/ATAC-Seq/160526.NextSeq.FCA/\trim.gz')    
+#def runTrimming(inputFile, outputDir, outputFile):
+#    atac_commands.trimReads(inputFile, outputFile)
     
 
 #################################    END PIPELINE    #####################################
