@@ -26,7 +26,7 @@ def runJob(comm, taskName):
     
 def trimReads(inputFile, outputFile):
     'Take the raw sequencing reads and trim off the adpaters'
-    read2 = re.sub('', '', inputFile)
+    read2 = re.sub('.R1.fastq.gz', '.R2.fastq.gz', inputFile)
     outputFile2 = re.sub('', '', outputFile)
     comm = '''/home/dbrown0/.local/bin/cutadapt -q 15,15 --minimum-length 35 \
     -a CTGTCTCTTATA -A CTGTCTCTTATA \
@@ -36,9 +36,10 @@ def trimReads(inputFile, outputFile):
     
 
 def alignReads(inputFile, outputFile):
-    '''Align the fastq reads using bwa or bowtie or something'''
-    read2 = re.sub('', '', inputFile) # Put the regular expression in the first position
-    rgID = ''
+    '''Align the fastq reads using bowtie'''
+    read2 = re.sub('.R1.fastq.gz', '.R2.fastq.gz', inputFile)
+    sampleName = inputFile[:33]
+    rgID = '@RG\tID:{}\tLB:ATAC_Seq_Tn5\tPL:nextera\tCN:KULeuven'.format(sampleName)
     comm = '''{0}bowtie2/current/bowtie2 --local -p 8 --rg-id {1} -x {2} -1 {3} -2 {4} \
     | samtools view -bS -o '{5} -
     '''.format(binaryPath, rgID, refGenome, inputFile, read2, outputFile)
@@ -47,13 +48,13 @@ def alignReads(inputFile, outputFile):
     
 def mergeBams(inputFile, outputFile):
     'As some samples are split over multiple lanes of sequencing combine the aligned files'
-    bam2 = re.sub('_L001_','_L002_', inputFile)
-    bam3 = re.sub('_001.','_002.', inputFile)
-    bam4 = re.sub('_001.','_002.', bam2)
+    bam2 = re.sub('lane1','lane2', inputFile)
+    bam3 = re.sub('lane1.','lane3.', inputFile)
+    bam4 = re.sub('lane1.','lane4.', inputFile)
     
     comm = '''java -Xmx10g -jar {0}MergeSamFiles.jar \
     INPUT= {1} + INPUT= {2} ' INPUT= {3} + INPUT= {4} OUTPUT= {5} \
-    CREATE_INDEX=true MAX_RECORDS_IN_RAM=750000 TMP_DIR={6}
+    CREATE_INDEX=true MAX_RECORDS_IN_RAM=750000 TMP_DIR={6} \
     '''.format(picardPath, inputFile, bam2, bam3, bam4, outputFile, tmpDir)
 
     runJob(comm, 'MERGING BAM FILES')

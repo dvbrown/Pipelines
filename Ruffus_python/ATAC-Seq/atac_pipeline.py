@@ -210,11 +210,11 @@ def trimReads(input_file, output_dir):
     print comm
     os.system(comm)
     
-trimReads(inputFile[0], outputDir[0])
+#   trimReads(inputFile[0], outputDir[0])
 
-#@transform(inputFile, suffix('.gz'), 'r"/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/dbrown0/Data/ATAC-Seq/160526.NextSeq.FCA/\trim.gz')    
-#def runTrimming(inputFile, outputDir, outputFile):
-#    atac_commands.trimReads(inputFile, outputFile)
+@transform(inputFile, suffix('.fastq.gz'), '.bam')    
+def runAlignment(inputFile, outputFile):
+    atac_commands.alignReads(inputFile, outputFile)
     
 
 #################################    END PIPELINE    #####################################
