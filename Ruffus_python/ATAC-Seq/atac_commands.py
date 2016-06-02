@@ -9,7 +9,7 @@ javaPath = '/cm/shared/apps/jdk/1.7.0/bin/java'
 picardPath = '/cm/shared/apps/picard/current/'
 gatkPath = '/cm/shared/apps/gatk/current/'
 bedtoolsPath = '/cm/shared/apps/bedtools/2.17.0/bin/'
-tmpDir = ''
+tmpDir = '/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/dbrown0/Data/ATAC-Seq/160526.NextSeq.FCA/tmp'
 
 #################################    BEGIN COMMANDS    #####################################
 
@@ -21,7 +21,7 @@ def runJob(comm, taskName):
     print '\n##############################################    RUNNNG TASK ' + taskName + ' at {0}'.format(started) +   '    ###############################################'
     print comm + '\n'
     #run the command
-    os.system(comm)
+    #os.system(comm)
     
     
 def trimReads(inputFile, outputFile):
@@ -41,7 +41,7 @@ def alignReads(inputFile, outputFile):
     sampleName = inputFile[:33]
     rgID = '@RG\tID:{}\tLB:ATAC_Seq_Tn5\tPL:nextera\tCN:KULeuven'.format(sampleName)
     comm = '''{0}bowtie2/current/bowtie2 --local -p 8 --rg-id {1} -x {2} -1 {3} -2 {4} \
-    | samtools view -bS -o '{5} -
+    | samtools view -bS -o '{5} - \
     '''.format(binaryPath, rgID, refGenome, inputFile, read2, outputFile)
     runJob(comm, 'ALIGNING READS')
     
@@ -52,9 +52,9 @@ def mergeBams(inputFile, outputFile):
     bam3 = re.sub('lane1.','lane3.', inputFile)
     bam4 = re.sub('lane1.','lane4.', inputFile)
     
-    comm = '''java -Xmx10g -jar {0}MergeSamFiles.jar \
-    INPUT= {1} + INPUT= {2} ' INPUT= {3} + INPUT= {4} OUTPUT= {5} \
-    CREATE_INDEX=true MAX_RECORDS_IN_RAM=750000 TMP_DIR={6} \
+    comm = '''java -Xmx5g -jar {0}MergeSamFiles.jar \
+    INPUT= {1} + INPUT= {2} ' INPUT= {3} + INPUT= {4} \
+    OUTPUT= {5} SORT_ORDER=coordinate \
     '''.format(picardPath, inputFile, bam2, bam3, bam4, outputFile, tmpDir)
 
     runJob(comm, 'MERGING BAM FILES')

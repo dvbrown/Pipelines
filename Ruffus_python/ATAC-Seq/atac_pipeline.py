@@ -212,9 +212,13 @@ def trimReads(input_file, output_dir):
     
 #   trimReads(inputFile[0], outputDir[0])
 
-@transform(inputFile, suffix('.fastq.gz'), '.bam')    
+@transform(inputFile, suffix('.fastq.gz'), '.bam')
 def runAlignment(inputFile, outputFile):
     atac_commands.alignReads(inputFile, outputFile)
+    
+@transform(inputFile, suffix('.bam'), '.merge.bam')
+def runBamMerge(inputFile, outputFile):
+    atac_commands.mergeBams(inputFile, outputFile)
     
 
 #################################    END PIPELINE    #####################################
