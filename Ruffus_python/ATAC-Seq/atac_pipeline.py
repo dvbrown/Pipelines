@@ -198,18 +198,19 @@ def trimReads(input_file, output_dir):
     #   Get read 2 filename using string subsitiution
     read2 = re.sub('.R1.fastq.gz', '.R2.fastq.gz', input_file)
     #   Get the output filename by taking the end of the full path of the input filename
-    output_file = input_file[:-92]
+    output_file = input_file[-92:]
     # Build the path for the output directory by concatenating the output directory and output file
     output_file = output_dir + output_file
     output_file2 = re.sub('.R1.fastq.gz', '.R2.fastq.gz', output_file)
-    comm = '''/home/dbrown0/.local/bin/cutadapt -q 15,15 --minimum-length 35 \
+    comm = '''/home/dbrown0/.local/bin/cutadapt -q 20,20 --minimum-length 35 \
     -a CTGTCTCTTATA -A CTGTCTCTTATA \
-    -o {3} -p {4} {1} {2}
-    '''.format(binaryPath, input_file, read2, output_file, output_file2)
+    -o {2} -p {3} \
+    {0} {1}
+    '''.format(input_file, read2, output_file, output_file2)
     print comm
     #os.system(comm)
     
-trimReads(inputFile, outputDir)
+trimReads(inputFile[0], outputDir[0])
 
 #@transform(inputFile, suffix('.gz'), 'r"/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/dbrown0/Data/ATAC-Seq/160526.NextSeq.FCA/\trim.gz')    
 #def runTrimming(inputFile, outputDir, outputFile):
