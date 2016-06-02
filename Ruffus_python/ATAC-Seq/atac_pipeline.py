@@ -193,7 +193,7 @@ if options.verbose:
 inputFile = options.input_file
 outputDir = options.output_directory
 
-def trimReads(inputFile, outputDir):
+def trimReads(input_file, output_dir):
     'Take the raw sequencing reads and trim off the adpaters. The output will all be in one directory'
     #   Get read 2 filename using string subsitiution
     read2 = re.sub('R1.fastq.gz', 'R2.fastq.gz', inputFile)
@@ -208,6 +208,8 @@ def trimReads(inputFile, outputDir):
     '''.format(binaryPath, inputFile, read2, outputFile, outputFile2)
     print comm
     #os.system(comm)
+    
+trimReads(inputFile, outputDir)
 
 #@transform(inputFile, suffix('.gz'), 'r"/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/dbrown0/Data/ATAC-Seq/160526.NextSeq.FCA/\trim.gz')    
 #def runTrimming(inputFile, outputDir, outputFile):
