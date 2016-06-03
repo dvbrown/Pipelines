@@ -203,7 +203,7 @@ def trimReads(input_file, output_dir):
     comm = '''/home/dbrown0/.local/bin/cutadapt -q 20,20 --minimum-length 35 \
     -a CTGTCTCTTATA -A CTGTCTCTTATA \
     -o {2} -p {3} \
-    {0} {1}
+    {0} {1} \
     '''.format(input_file, read2, output_file, output_file2)
     print comm
     os.system(comm)

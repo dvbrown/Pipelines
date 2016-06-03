@@ -21,7 +21,7 @@ def runJob(comm, taskName):
     print '\n##############################################    RUNNNG TASK ' + taskName + ' at {0}'.format(started) +   '    ###############################################'
     print comm + '\n'
     #run the command
-    #os.system(comm)
+    os.system(comm)
     
     
 def trimReads(inputFile, outputFile):
@@ -30,7 +30,7 @@ def trimReads(inputFile, outputFile):
     outputFile2 = re.sub('', '', outputFile)
     comm = '''/home/dbrown0/.local/bin/cutadapt -q 15,15 --minimum-length 35 \
     -a CTGTCTCTTATA -A CTGTCTCTTATA \
-    -o {3} -p {4} {1} {2}
+    -o {3} -p {4} {1} {2} \
     '''.format(binaryPath, inputFile, read2, outputFile, outputFile2)
     runJob(comm, 'TRIMMING READS')
     
@@ -39,9 +39,9 @@ def alignReads(inputFile, outputFile):
     '''Align the fastq reads using bowtie'''
     read2 = re.sub('.R1.fastq.gz', '.R2.fastq.gz', inputFile)
     sampleName = inputFile[:33]
-    rgID = '@RG\tID:{}\tLB:ATAC_Seq_Tn5\tPL:nextera\tCN:KULeuven'.format(sampleName)
+    rgID = '{} --rg PL:Nextera'.format(sampleName)
     comm = '''{0}bowtie2/current/bowtie2 --local -p 8 --rg-id {1} -x {2} -1 {3} -2 {4} \
-    | samtools view -bS -o '{5} - \
+    | {0}samtools/current/samtools view -bS -o {5} -S \
     '''.format(binaryPath, rgID, refGenome, inputFile, read2, outputFile)
     runJob(comm, 'ALIGNING READS')
     
@@ -53,7 +53,7 @@ def mergeBams(inputFile, outputFile):
     bam4 = re.sub('lane1.','lane4.', inputFile)
     
     comm = '''java -Xmx5g -jar {0}MergeSamFiles.jar \
-    INPUT= {1} + INPUT= {2} ' INPUT= {3} + INPUT= {4} \
+    INPUT= {1} + INPUT= {2} + INPUT= {3} + INPUT= {4} \
     OUTPUT= {5} SORT_ORDER=coordinate \
     '''.format(picardPath, inputFile, bam2, bam3, bam4, outputFile, tmpDir)
 
