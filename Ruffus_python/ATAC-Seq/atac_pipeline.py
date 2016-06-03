@@ -212,15 +212,37 @@ def trimReads(input_file, output_dir):
     
 #   trimReads(inputFile[0], outputDir[0])
 
-@transform(inputFile, suffix('.fastq.gz'), '.bam')
-def runAlignment(inputFile, outputFile):
+#@transform(inputFile, suffix('.fastq.gz'), '.bam')
+#def runAlignment(inputFile, outputFile):
+#    atac_commands.alignReads(inputFile, outputFile)
+#    
+#@transform(inputFile, suffix('.bam'), '.merge.bam')
+#def runBamMerge(inputFile, outputFile):
+#    atac_commands.mergeBams(inputFile, outputFile)
+    
+#   Align the fastqs from each lane in a single script
+@transform(inputFile, suffix('lane1.gcap_dev.R1.fastq.gz'), 'lane1.gcap_dev.R1.bam')
+def runAligLane1(inputFile, outputFile):
+    atac_commands.alignReads(inputFile, outputFile)
+
+# Make this a follows decorator    
+@transform(inputFile, suffix('lane2.gcap_dev.R1.fastq.gz'), 'lane2.gcap_dev.R1.bam')
+def runAligLane2(inputFile, outputFile):
     atac_commands.alignReads(inputFile, outputFile)
     
-@transform(inputFile, suffix('.bam'), '.merge.bam')
-def runBamMerge(inputFile, outputFile):
-    atac_commands.mergeBams(inputFile, outputFile)
+@transform(inputFile, suffix('lane3.gcap_dev.R1.fastq.gz'), 'lane3.gcap_dev.R1.bam')
+def runAligLane3(inputFile, outputFile):
+    atac_commands.alignReads(inputFile, outputFile)
     
+@transform(inputFile, suffix('lane4.gcap_dev.R1.fastq.gz'), 'lane4.gcap_dev.R1.bam')
+def runAligLane4(inputFile, outputFile):
+    atac_commands.alignReads(inputFile, outputFile)
 
+#   Merge all bams from different lanes together into one file   
+@merge([runAligLane1, runAligLane2, runAligLane3, runAligLane4], 'merged.bam')
+def runBamMergePipeline(inputFileNames, outputFile):
+    atac_commands.mergeBamPipeline(inputFileNames, outputFile)
+    
 #################################    END PIPELINE    #####################################
 
 #   Print list of tasks
