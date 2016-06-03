@@ -238,7 +238,8 @@ def runAligLane3(inputFile, outputFile):
 def runAligLane4(inputFile, outputFile):
     atac_commands.alignReads(inputFile, outputFile)
 
-#   Merge all bams from different lanes together into one file   
+#   Merge all bams from different lanes together into one file
+@follows(runAligLane4)  
 @merge([runAligLane1, runAligLane2, runAligLane3, runAligLane4], 'merged.bam')
 def runBamMergePipeline(inputFileNames, outputFile):
     atac_commands.mergeBamPipeline(inputFileNames, outputFile)
