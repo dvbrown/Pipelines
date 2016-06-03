@@ -38,7 +38,7 @@ def trimReads(inputFile, outputFile):
 def alignReads(inputFile, outputFile):
     '''Align the fastq reads using bowtie'''
     read2 = re.sub('.R1.fastq.gz', '.R2.fastq.gz', inputFile)
-    sampleName = inputFile[9:17]
+    sampleName = inputFile[90:118]
     rgID = '{} --rg PL:Nextera'.format(sampleName)
     comm = '''{0}bowtie2/current/bowtie2 --local -p 8 --rg-id {1} -x {2} -1 {3} -2 {4} \
     | {0}samtools/current/samtools view -bS -o {5} -S \
@@ -53,7 +53,7 @@ def mergeBams(inputFile, outputFile):
     bam4 = re.sub('lane1.','lane4.', inputFile)
     
     comm = '''java -Xmx5g -jar {0}MergeSamFiles.jar \
-    INPUT= {1} + INPUT= {2} + INPUT= {3} + INPUT= {4} \
+    INPUT={1} INPUT={2} INPUT={3} INPUT={4} \
     OUTPUT= {5} SORT_ORDER=coordinate \
     '''.format(picardPath, inputFile, bam2, bam3, bam4, outputFile, tmpDir)
 
@@ -69,8 +69,8 @@ def mergeBamPipeline(inputFileNames, outputFile):
     bam4 = inputFileNames[3]
     
     comm = '''java -Xmx5g -jar {0}MergeSamFiles.jar \
-    INPUT= {1} + INPUT= {2} ' INPUT= {3} + INPUT= {4} \
-    OUTPUT= {5} SORT_ORDER=coordinate \
+    INPUT={1} INPUT={2} INPUT={3} + INPUT={4} \
+    OUTPUT={5} SORT_ORDER=coordinate \
     '''.format(picardPath, bam1, bam2, bam3, bam4, outputFile, tmpDir)
 
     runJob(comm, 'MERGING BAM FILES')
