@@ -3,7 +3,7 @@ import os, time, re
 #################################    GLOBAL PARAMETERS    #####################################
 
 #   The reference genome is version 19 from Josien. The chr prefix and mitochondrail DNA is included
-refGenome = '/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/humangenome/fasta/hg19Mt.fa'
+refGenome = '/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/dbrown0/Data/hg19Mt.fa'
 binaryPath = '/cm/shared/apps/'
 javaPath = '/cm/shared/apps/jdk/1.7.0/bin/java'
 picardPath = '/cm/shared/apps/picard/current/'
@@ -21,7 +21,7 @@ def runJob(comm, taskName):
     print '\n##############################################    RUNNNG TASK ' + taskName + ' at {0}'.format(started) +   '    ###############################################'
     print comm + '\n'
     #run the command
-    os.system(comm)
+    #os.system(comm)
     
     
 def trimReads(inputFile, outputFile):
@@ -58,6 +58,24 @@ def mergeBams(inputFile, outputFile):
     '''.format(picardPath, inputFile, bam2, bam3, bam4, outputFile, tmpDir)
 
     runJob(comm, 'MERGING BAM FILES')
+    
+######################   Merge in proper pipeline    ##############
+    
+def mergeBamPipeline(inputFileNames, outputFile):
+    'As some samples are split over multiple lanes of sequencing combine the aligned files'
+    bam1 = inputFileNames[0]
+    bam2 = inputFileNames[1]
+    bam3 = inputFileNames[2]
+    bam4 = inputFileNames[3]
+    
+    comm = '''java -Xmx5g -jar {0}MergeSamFiles.jar \
+    INPUT= {1} + INPUT= {2} ' INPUT= {3} + INPUT= {4} \
+    OUTPUT= {5} SORT_ORDER=coordinate \
+    '''.format(picardPath, bam1, bam2, bam3, bam4, outputFile, tmpDir)
+
+    runJob(comm, 'MERGING BAM FILES')
+    
+######################################################################
     
     
 def sortSamtools(inputFile, outputFile):

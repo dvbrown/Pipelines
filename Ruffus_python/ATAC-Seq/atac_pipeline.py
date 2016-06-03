@@ -48,17 +48,14 @@ if __name__ == '__main__':
                         default = list(),
                         metavar="FILE",
                         type="string",
-                        help="""The pindel configuration file that describes the bam files. \n
-                        Per line: path and file name of bam, insert size and sample tag. For example: 
-                        /data/sample_1.bam  500  sample_1 \n
-                        /data/sample_2.bam  300  sample_2 \n
-                        and so forth""")     
-    parser.add_option("-o", "--output_directory", dest="output_directory",
-                        action="append",
-                        default = list(),
-                        metavar="FILE",
-                        type="string",
-                        help="""The directory where the output should go to.""")                           
+                        help="""Write some help""")     
+#    parser.add_option("-o", "--output_directory", dest="output_directory",
+#                        action="append",
+#                        default = list(),
+#                        metavar="FILE",
+#                        type="string",
+#                        help="""The directory where the output should go to.""")
+                        
     parser.add_option("-t", "--target_tasks", dest="target_tasks",
                         action="append",
                         default = list(),
@@ -191,7 +188,8 @@ if options.verbose:
 
 # Assign the input specifed from the command line to a variable
 inputFile = options.input_file
-outputDir = options.output_directory
+print inputFile
+#outputDir = options.output_directory
 
 def trimReads(input_file, output_dir):
     'Take the raw sequencing reads and trim off the adpaters. The output will all be in one directory'
@@ -212,15 +210,40 @@ def trimReads(input_file, output_dir):
     
 #   trimReads(inputFile[0], outputDir[0])
 
-@transform(inputFile, suffix('.fastq.gz'), '.bam')
-def runAlignment(inputFile, outputFile):
+#@transform(inputFile, suffix('.fastq.gz'), '.bam')
+#def runAlignment(inputFile, outputFile):
+#    atac_commands.alignReads(inputFile, outputFile)
+#    
+#@transform(inputFile, suffix('.bam'), '.merge.bam')
+#def runBamMerge(inputFile, outputFile):
+#    atac_commands.mergeBams(inputFile, outputFile)
+    
+#   Align the fastqs from each lane in a single script
+@transform(inputFile, suffix('lane1.gcap_dev.R1.fastq.gz'), 'lane1.gcap_dev.R1.bam')
+def runAligLane1(inputFile, outputFile):
     atac_commands.alignReads(inputFile, outputFile)
-    
-@transform(runAlignment, suffix('.bam'), '.merge.bam')
-def runBamMerge(inputFile, outputFile):
-    atac_commands.mergeBams(inputFile, outputFile)
-    
 
+# Make this a follows decorator
+@follows(runAligLane1) 
+@transform(inputFile, suffix('lane2.gcap_dev.R1.fastq.gz'), 'lane2.gcap_dev.R1.bam')
+def runAligLane2(inputFile, outputFile):
+    atac_commands.alignReads(inputFile, outputFile)
+
+@follows(runAligLane2) 
+@transform(inputFile, suffix('lane3.gcap_dev.R1.fastq.gz'), 'lane3.gcap_dev.R1.bam')
+def runAligLane3(inputFile, outputFile):
+    atac_commands.alignReads(inputFile, outputFile)
+
+@follows(runAligLane3)  
+@transform(inputFile, suffix('lane4.gcap_dev.R1.fastq.gz'), 'lane4.gcap_dev.R1.bam')
+def runAligLane4(inputFile, outputFile):
+    atac_commands.alignReads(inputFile, outputFile)
+
+#   Merge all bams from different lanes together into one file   
+@merge([runAligLane1, runAligLane2, runAligLane3, runAligLane4], 'merged.bam')
+def runBamMergePipeline(inputFileNames, outputFile):
+    atac_commands.mergeBamPipeline(inputFileNames, outputFile)
+    
 #################################    END PIPELINE    #####################################
 
 #   Print list of tasks
