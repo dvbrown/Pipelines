@@ -239,7 +239,7 @@ def runAligLane4(inputFile, outputFile):
     atac_commands.alignReads(inputFile, outputFile)
 
 #   Merge all bams from different lanes together into one file
-#   Generate output file name
+#   Generate output file name. Make this using grep next time
 mergeName = inputFile[0]
 mergeName = mergeName[91:116]
 
