@@ -241,7 +241,7 @@ def runAligLane4(inputFile, outputFile):
 #   Merge all bams from different lanes together into one file
 #   Generate output file name
 mergeName = inputFile[0]
-mergeName = mergeName[90:116]
+mergeName = mergeName[91:116]
 
 @follows(runAligLane4)  
 @merge([runAligLane1, runAligLane2, runAligLane3, runAligLane4], '{0}.merge.bam'.format(mergeName))
