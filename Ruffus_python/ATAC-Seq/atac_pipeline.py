@@ -188,7 +188,6 @@ if options.verbose:
 
 # Assign the input specifed from the command line to a variable
 inputFile = options.input_file
-print inputFile
 #outputDir = options.output_directory
 
 def trimReads(input_file, output_dir):
