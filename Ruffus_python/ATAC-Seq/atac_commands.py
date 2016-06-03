@@ -3,7 +3,7 @@ import os, time, re
 #################################    GLOBAL PARAMETERS    #####################################
 
 #   The reference genome is version 19 from Josien. The chr prefix and mitochondrail DNA is included
-refGenome = '/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/dbrown0/Data/hg19Mt.fa'
+refGenome = '/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/dbrown0/Data/hg19Mt'
 binaryPath = '/cm/shared/apps/'
 javaPath = '/cm/shared/apps/jdk/1.7.0/bin/java'
 picardPath = '/cm/shared/apps/picard/current/'
@@ -38,7 +38,7 @@ def trimReads(inputFile, outputFile):
 def alignReads(inputFile, outputFile):
     '''Align the fastq reads using bowtie'''
     read2 = re.sub('.R1.fastq.gz', '.R2.fastq.gz', inputFile)
-    sampleName = inputFile[:33]
+    sampleName = inputFile[9:17]
     rgID = '{} --rg PL:Nextera'.format(sampleName)
     comm = '''{0}bowtie2/current/bowtie2 --local -p 8 --rg-id {1} -x {2} -1 {3} -2 {4} \
     | {0}samtools/current/samtools view -bS -o {5} -S \
