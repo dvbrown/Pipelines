@@ -248,6 +248,21 @@ mergeName = mergeName[91:116]
 def runBamMergePipeline(inputFileNames, outputFile):
     atac_commands.mergeBamPipeline(inputFileNames, outputFile)
     
+@transform(inputFile, suffix('.bam'), '')
+#	Samtools index does not generate an output using the standard output
+def runIndexing(inputFile, outputFile):
+    atac_commands.indexSamtools(inputFile)
+
+@follows(runIndexing)
+@transform(inputFile, suffix('.bam'), '.lib_metrics.txt')
+def runEstimateLibraryStats(inputFile, outputFile):
+    atac_commands.estimateLibComplexity(inputFile, outputFile)
+    
+@follows(runEstimateLibraryStats)
+@transform(inputFile, suffix('.bam'), '.deDup.bam')
+def runDuplicateRemoval(inputFile, outputFile):
+    atac_commands.removeDuplicates(inputFile, outputFile)
+    
 #################################    END PIPELINE    #####################################
 
 #   Print list of tasks

@@ -28,6 +28,7 @@ def trimReads(inputFile, outputFile):
     'Take the raw sequencing reads and trim off the adpaters'
     read2 = re.sub('.R1.fastq.gz', '.R2.fastq.gz', inputFile)
     outputFile2 = re.sub('', '', outputFile)
+    #	Trim the Nextera adapter sequences
     comm = '''/home/dbrown0/.local/bin/cutadapt -q 15,15 --minimum-length 35 \
     -a CTGTCTCTTATA -A CTGTCTCTTATA \
     -o {3} -p {4} {1} {2} \
@@ -37,6 +38,7 @@ def trimReads(inputFile, outputFile):
 
 def alignReads(inputFile, outputFile):
     '''Align the fastq reads using bowtie'''
+    #	Extract the read 2 filename
     read2 = re.sub('.R1.fastq.gz', '.R2.fastq.gz', inputFile)
     sampleName = inputFile[90:162]
     libraryName = inputFile[117:136]
@@ -48,61 +50,48 @@ def alignReads(inputFile, outputFile):
     runJob(comm, 'ALIGNING READS')
     
     
-def mergeBams(inputFile, outputFile):
-    'As some samples are split over multiple lanes of sequencing combine the aligned files'
-    bam2 = re.sub('lane1','lane2', inputFile)
-    bam3 = re.sub('lane1.','lane3.', inputFile)
-    bam4 = re.sub('lane1.','lane4.', inputFile)
-    
-    comm = '''java -Xmx5g -jar {0}MergeSamFiles.jar \
-    INPUT={1} INPUT={2} INPUT={3} INPUT={4} \
-    OUTPUT= {5} SORT_ORDER=coordinate \
-    '''.format(picardPath, inputFile, bam2, bam3, bam4, outputFile, tmpDir)
-
-    runJob(comm, 'MERGING BAM FILES')
-    
-######################   Merge in proper pipeline    ##############
-    
 def mergeBamPipeline(inputFileNames, outputFile):
     'As some samples are split over multiple lanes of sequencing combine the aligned files'
     bam1 = inputFileNames[0]
     bam2 = inputFileNames[1]
     bam3 = inputFileNames[2]
     bam4 = inputFileNames[3]
-    
     comm = '''java -Xmx5g -jar {0}MergeSamFiles.jar \
     INPUT={1} INPUT={2} INPUT={3} INPUT={4} \
     OUTPUT={5} SORT_ORDER=coordinate \
     '''.format(picardPath, bam1, bam2, bam3, bam4, outputFile, tmpDir)
-
     runJob(comm, 'MERGING BAM FILES')
-    
-######################################################################
     
     
 def sortSamtools(inputFile, outputFile):
-    comm = "samtools sort {0} > {1}".format(inputFile, outputFile)
+    comm = "{0}samtools/current/samtools sort {1} > {2}".format(binaryPath, inputFile, outputFile)
     runJob(comm, "SORTING ALIGNMENTS")
     
 
 def indexSamtools(inputFile):
-    com = "samtools index {}".format(inputFile)
+    com = "{0}samtools/current/samtools index {1}".format(binaryPath, inputFile)
     # No output file therefore invoke os.system directly
+    print '\n##############################################    RUNNNG TASK INDEX SAMTOOLS     ###############################################\n'
     os.system(com)
     
     
 def removeDuplicates(inputFile, outputFile):
     'Remove duplicates using Picard'
-    comm = '''MarkDuplicates.jar \
-    REMOVE_DUPLICATES=true AS=true VALIDATION_STRINGENCY=LENIENT \
-    MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=50 '''
+    comm = '''java -Xmx5g -jar {0}MarkDuplicates.jar \ 
+    INPUT={1} OUPUT={2} METRICS_FILE={2}.txt \
+    REMOVE_SEQUENCING_DUPLICATES=true \
+    CREATE_INDEX=true \
+    REMOVE_DUPLICATES=true AS=true \
+    MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=50 \
+    '''.format(binaryPath, inputFile, outputFile)
     runJob(comm, 'REMOVING DUPLICATES')
     
     
-def estimateLibSize(inputFile, outputFile):
-    'Estimate the library size using Picard tools.'
-    comm = '''
-    '''
+def estimateLibComplexity(inputFile, outputFile):
+    'Estimate the library size using Picard tools. This should be done before duplicate removal'
+    comm = '''java -Xmx5g -jar {0}EstimateLibraryComplexity \
+     I={1} \
+     O={2}'''.format(binaryPath, inputFile, outputFile)
     runJob(comm, 'ESTIMATING LIBRARY SIZE')
     
 # FRAGMENT ANALYSIS - from the single-cell ATAC-Seq paper
