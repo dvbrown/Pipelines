@@ -83,7 +83,7 @@ def removeDuplicates(inputFile, outputFile):
     CREATE_INDEX=true \
     REMOVE_DUPLICATES=true AS=true \
     MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=50 \
-    '''.format(binaryPath, inputFile, outputFile)
+    '''.format(picardPath, inputFile, outputFile)
     runJob(comm, 'REMOVING DUPLICATES')
     
     
@@ -91,7 +91,7 @@ def estimateLibComplexity(inputFile, outputFile):
     'Estimate the library size using Picard tools. This should be done before duplicate removal'
     comm = '''java -Xmx5g -jar {0}EstimateLibraryComplexity \
      I={1} \
-     O={2}'''.format(binaryPath, inputFile, outputFile)
+     O={2}'''.format(picardPath, inputFile, outputFile)
     runJob(comm, 'ESTIMATING LIBRARY SIZE')
     
 # FRAGMENT ANALYSIS - from the single-cell ATAC-Seq paper
