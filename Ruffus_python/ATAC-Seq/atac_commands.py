@@ -81,7 +81,7 @@ def removeDuplicates(inputFile, outputFile):
     INPUT={1} OUPUT={2} METRICS_FILE={2}.txt \
     REMOVE_SEQUENCING_DUPLICATES=true \
     CREATE_INDEX=true \
-    REMOVE_DUPLICATES=true
+    REMOVE_DUPLICATES=true \
     '''.format(picardPath, inputFile, outputFile)
     runJob(comm, 'REMOVING DUPLICATES')
     
