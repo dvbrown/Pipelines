@@ -77,7 +77,7 @@ def indexSamtools(inputFile):
     
 def removeDuplicates(inputFile, outputFile):
     'Remove duplicates using Picard'
-    comm = '''java -Xmx5g -jar {0}MarkDuplicates.jar \ 
+    comm = '''java -Xmx5g -jar {0}MarkDuplicates.jar \
     INPUT={1} OUPUT={2} METRICS_FILE={2}.txt \
     REMOVE_SEQUENCING_DUPLICATES=true \
     CREATE_INDEX=true \
