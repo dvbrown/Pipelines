@@ -218,35 +218,35 @@ def trimReads(input_file, output_dir):
 #    atac_commands.mergeBams(inputFile, outputFile)
     
 #   Align the fastqs from each lane in a single script
-@transform(inputFile, suffix('lane1.gcap_dev.R1.fastq.gz'), 'lane1.gcap_dev.R1.bam')
-def runAligLane1(inputFile, outputFile):
-    atac_commands.alignReads(inputFile, outputFile)
-
-# Make this a follows decorator
-@follows(runAligLane1) 
-@transform(inputFile, suffix('lane2.gcap_dev.R1.fastq.gz'), 'lane2.gcap_dev.R1.bam')
-def runAligLane2(inputFile, outputFile):
-    atac_commands.alignReads(inputFile, outputFile)
-
-@follows(runAligLane2) 
-@transform(inputFile, suffix('lane3.gcap_dev.R1.fastq.gz'), 'lane3.gcap_dev.R1.bam')
-def runAligLane3(inputFile, outputFile):
-    atac_commands.alignReads(inputFile, outputFile)
-
-@follows(runAligLane3)
-@transform(inputFile, suffix('lane4.gcap_dev.R1.fastq.gz'), 'lane4.gcap_dev.R1.bam')
-def runAligLane4(inputFile, outputFile):
-    atac_commands.alignReads(inputFile, outputFile)
-
-#   Merge all bams from different lanes together into one file
-#   Generate output file name. Make this using grep next time
-mergeName = inputFile[0]
-mergeName = mergeName[91:116]
-
-@follows(runAligLane4)  
-@merge([runAligLane1, runAligLane2, runAligLane3, runAligLane4], '{0}.merge.bam'.format(mergeName))
-def runBamMergePipeline(inputFileNames, outputFile):
-    atac_commands.mergeBamPipeline(inputFileNames, outputFile)
+# @transform(inputFile, suffix('lane1.gcap_dev.R1.fastq.gz'), 'lane1.gcap_dev.R1.bam')
+# def runAligLane1(inputFile, outputFile):
+#     atac_commands.alignReads(inputFile, outputFile)
+# 
+# # Make this a follows decorator
+# @follows(runAligLane1) 
+# @transform(inputFile, suffix('lane2.gcap_dev.R1.fastq.gz'), 'lane2.gcap_dev.R1.bam')
+# def runAligLane2(inputFile, outputFile):
+#     atac_commands.alignReads(inputFile, outputFile)
+# 
+# @follows(runAligLane2) 
+# @transform(inputFile, suffix('lane3.gcap_dev.R1.fastq.gz'), 'lane3.gcap_dev.R1.bam')
+# def runAligLane3(inputFile, outputFile):
+#     atac_commands.alignReads(inputFile, outputFile)
+# 
+# @follows(runAligLane3)
+# @transform(inputFile, suffix('lane4.gcap_dev.R1.fastq.gz'), 'lane4.gcap_dev.R1.bam')
+# def runAligLane4(inputFile, outputFile):
+#     atac_commands.alignReads(inputFile, outputFile)
+# 
+# #   Merge all bams from different lanes together into one file
+# #   Generate output file name. Make this using grep next time
+# mergeName = inputFile[0]
+# mergeName = mergeName[91:116]
+# 
+# @follows(runAligLane4)  
+# @merge([runAligLane1, runAligLane2, runAligLane3, runAligLane4], '{0}.merge.bam'.format(mergeName))
+# def runBamMergePipeline(inputFileNames, outputFile):
+#     atac_commands.mergeBamPipeline(inputFileNames, outputFile)
     
 @transform(inputFile, suffix('.bam'), '')
 #	Samtools index does not generate an output using the standard output
