@@ -9,6 +9,7 @@ javaPath = '/cm/shared/apps/jdk/1.7.0/bin/java'
 picardPath = '/cm/shared/apps/picard/current/'
 gatkPath = '/cm/shared/apps/gatk/current/'
 bedtoolsPath = '/cm/shared/apps/bedtools/2.17.0/bin/'
+openChromatinBed = '/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/dbrown0/Bioinformatics/Resources/GM.nucpos.bed'
 tmpDir = '/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/dbrown0/Data/ATAC-Seq/160526.NextSeq.FCA/tmp'
 
 #################################    BEGIN COMMANDS    #####################################
@@ -104,6 +105,15 @@ def removeMtDNAreads(inputFile, outputFile):
     grep -v chrM | xargs samtools view -b {0} > \
     {1}'''.format(inputFile, outputFile)
     runJob(comm, 'REMOVING MITOCHONDRIAL READS')
+    
+    
+def nucleoatac(inputFile, outputFile):
+    'Call nucleosomes using the nucleotac software by the Greenleaf lab: http://nucleoatac.readthedocs.io/en/latest/nucleoatac/'
+    comm = '''nucleoatac run --bed {0} \
+    --bam {1} --fasta {2} \
+    --out {3} \
+    '''.format(openChromatinBed, inputFile, refGenome, outputFile) 
+    runJob(comm, 'RUNNING NUCLEOATAC')
     
 # FRAGMENT ANALYSIS - from the single-cell ATAC-Seq paper
 #As in our previous work3, we adjusted the plus strand aligning reads by +4 and the minus strand aligning reads by -5 bp 

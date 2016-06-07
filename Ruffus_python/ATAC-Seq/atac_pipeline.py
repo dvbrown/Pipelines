@@ -263,19 +263,24 @@ def trimReads(input_file, output_dir):
 #def runDuplicateRemoval(inputFile, outputFile):
 #    atac_commands.removeDuplicates(inputFile, outputFile)
 #    
-@transform(inputFile, suffix('.bam'), '.chrs.txt')
-def runChrAlignStats(inputFile, outputFile):
-    atac_commands.countAlignChr(inputFile, outputFile)
+#@transform(inputFile, suffix('.bam'), '.chrs.txt')
+#def runChrAlignStats(inputFile, outputFile):
+#    atac_commands.countAlignChr(inputFile, outputFile)
+#    
+#@follows(runChrAlignStats)
+#@transform(inputFile, suffix('.bam'), '.noMt.bam')
+#def runMTremoval(inputFile, outputFile):
+#    atac_commands.removeMtDNAreads(inputFile, outputFile)
+#    
+#@transform(runMTremoval, suffix('.bam'), '')
+##	Samtools index does not generate an output using the standard output
+#def runIndexing(inputFile, outputFile):
+#    atac_commands.indexSamtools(inputFile)
     
-@follows(runChrAlignStats)
-@transform(inputFile, suffix('.bam'), '.noMt.bam')
-def runMTremoval(inputFile, outputFile):
-    atac_commands.removeMtDNAreads(inputFile, outputFile)
-    
-@transform(runMTremoval, suffix('.bam'), '')
+@transform(inputFile, suffix('.bam'), '')
 #	Samtools index does not generate an output using the standard output
-def runIndexing(inputFile, outputFile):
-    atac_commands.indexSamtools(inputFile)
+def runNucleoATAC(inputFile, outputFile):
+    atac_commands.nucleoatac(inputFile, outputFile)
     
 #################################    END PIPELINE    #####################################
 
