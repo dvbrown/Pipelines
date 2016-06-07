@@ -272,6 +272,11 @@ def runChrAlignStats(inputFile, outputFile):
 def runMTremoval(inputFile, outputFile):
     atac_commands.removeMtDNAreads(inputFile, outputFile)
     
+@transform(runMTremoval, suffix('.bam'), '')
+#	Samtools index does not generate an output using the standard output
+def runIndexing(inputFile, outputFile):
+    atac_commands.indexSamtools(inputFile)
+    
 #################################    END PIPELINE    #####################################
 
 #   Print list of tasks
