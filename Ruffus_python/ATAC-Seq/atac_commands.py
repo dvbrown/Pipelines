@@ -92,7 +92,7 @@ def estimateLibComplexity(inputFile, outputFile):
      O={2}'''.format(picardPath, inputFile, outputFile)
     runJob(comm, 'ESTIMATING LIBRARY SIZE')
     
-def count(inputFile, outputFile):
+def countAlignChr(inputFile, outputFile):
     'Obtain the number of reads mapping to each chromosome'
     comm = '''samtools idxstats {0} | cut -f 1,3 > {1}'''.format(inputFile, outputFile)
     runJob(comm, 'COUNT READS PER CHROMOSOME')
