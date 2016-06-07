@@ -92,6 +92,19 @@ def estimateLibComplexity(inputFile, outputFile):
      O={2}'''.format(picardPath, inputFile, outputFile)
     runJob(comm, 'ESTIMATING LIBRARY SIZE')
     
+def count(inputFile, outputFile):
+    'Obtain the number of reads mapping to each chromosome'
+    comm = '''samtools idxstats {0} | cut -f 1,3 > {1}'''.format(inputFile, outputFile)
+    runJob(comm, 'COUNT READS PER CHROMOSOME')
+
+
+def removeMtDNAreads(inputFile, outputFile):
+    'Remove mitochondrial reads from ATAC-Seq data'
+    comm = '''samtools idxstats {0} | cut -f 1 | \
+    grep -v chrM | xargs samtools view -b {0} > \
+    {1}'''.format(inputFile, outputFile)
+    runJob(comm, 'REMOVING MITOCHONDRIAL READS')
+    
 # FRAGMENT ANALYSIS - from the single-cell ATAC-Seq paper
 #As in our previous work3, we adjusted the plus strand aligning reads by +4 and the minus strand aligning reads by -5 bp 
 #to represent the center of the transposon binding event. For calculating accessibility for each peak, 
