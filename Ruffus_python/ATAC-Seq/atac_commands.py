@@ -9,6 +9,7 @@ javaPath = '/cm/shared/apps/jdk/1.7.0/bin/java'
 picardPath = '/cm/shared/apps/picard/current/'
 gatkPath = '/cm/shared/apps/gatk/current/'
 bedtoolsPath = '/cm/shared/apps/bedtools/2.17.0/bin/'
+localBinaryPath = '/home/dbrown0/.local/bin/'
 openChromatinBed = '/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/dbrown0/Bioinformatics/Resources/GM.nucpos.bed'
 tmpDir = '/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/dbrown0/Data/ATAC-Seq/160526.NextSeq.FCA/tmp'
 
@@ -30,10 +31,10 @@ def trimReads(inputFile, outputFile):
     read2 = re.sub('.R1.fastq.gz', '.R2.fastq.gz', inputFile)
     outputFile2 = re.sub('', '', outputFile)
     #	Trim the Nextera adapter sequences
-    comm = '''/home/dbrown0/.local/bin/cutadapt -q 15,15 --minimum-length 35 \
+    comm = '''{5}cutadapt -q 15,15 --minimum-length 35 \
     -a CTGTCTCTTATA -A CTGTCTCTTATA \
     -o {3} -p {4} {1} {2} \
-    '''.format(binaryPath, inputFile, read2, outputFile, outputFile2)
+    '''.format(binaryPath, inputFile, read2, outputFile, outputFile2, localBinaryPath)
     runJob(comm, 'TRIMMING READS')
     
 
@@ -109,10 +110,10 @@ def removeMtDNAreads(inputFile, outputFile):
     
 def nucleoatac(inputFile, outputFile):
     'Call nucleosomes using the nucleotac software by the Greenleaf lab: http://nucleoatac.readthedocs.io/en/latest/nucleoatac/'
-    comm = '''nucleoatac run --bed {0} \
+    comm = '''{4}nucleoatac run --bed {0} \
     --bam {1} --fasta {2} \
     --out {3} \
-    '''.format(openChromatinBed, inputFile, refGenome, outputFile) 
+    '''.format(openChromatinBed, inputFile, refGenome, outputFile, localBinaryPath) 
     runJob(comm, 'RUNNING NUCLEOATAC')
     
 # FRAGMENT ANALYSIS - from the single-cell ATAC-Seq paper
