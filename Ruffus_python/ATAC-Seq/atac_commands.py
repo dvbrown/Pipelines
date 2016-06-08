@@ -111,10 +111,11 @@ def removeMtDNAreads(inputFile, outputFile):
     
 def nucleoatac(inputFile, outputFile):
     'Call nucleosomes using the nucleotac software by the Greenleaf lab: http://nucleoatac.readthedocs.io/en/latest/nucleoatac/'
-    comm = '''{4}nucleoatac run --bed {0} \
+    out = outputFile[104:147]    
+    comm = '''{4}nucleoatac run --bed {0cat } \
     --bam {1} --fasta {2}.fa \
     --out {3} --write_all \
-    '''.format(openChromatinBed, inputFile, refGenome, outputFile, nucleoAtacPath) 
+    '''.format(openChromatinBed, inputFile, refGenome, out, nucleoAtacPath) 
     runJob(comm, 'RUNNING NUCLEOATAC')
     
 # FRAGMENT ANALYSIS - from the single-cell ATAC-Seq paper
