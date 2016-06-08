@@ -118,6 +118,15 @@ def nucleoatac(inputFile, outputFile):
     '''.format(openChromatinBed, inputFile, refGenome, out, nucleoAtacPath) 
     runJob(comm, 'RUNNING NUCLEOATAC')
     
+def pyatac(inputFile, outputFile):
+    'Call nucleosomes sizes'
+    out = outputFile[110:146]    
+    comm = '''{2}pyatac sizes \
+    --bam {0} \
+    --out {1} --upper 1000 \
+    '''.format(inputFile, out, nucleoAtacPath) 
+    runJob(comm, 'RUNNING NUCLEOATAC')
+    
 # FRAGMENT ANALYSIS - from the single-cell ATAC-Seq paper
 #As in our previous work3, we adjusted the plus strand aligning reads by +4 and the minus strand aligning reads by -5 bp 
 #to represent the center of the transposon binding event. For calculating accessibility for each peak, 

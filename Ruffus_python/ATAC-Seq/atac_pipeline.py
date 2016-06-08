@@ -281,6 +281,12 @@ def trimReads(input_file, output_dir):
 #	Samtools index does not generate an output using the standard output
 def runNucleoATAC(inputFile, outputFile):
     atac_commands.nucleoatac(inputFile, outputFile)
+
+@follows(runNucleoATAC)
+@transform(inputFile, suffix('.bam'), '')
+#	Samtools index does not generate an output using the standard output
+def runPyATAC(inputFile, outputFile):
+    atac_commands.pyatac(inputFile, outputFile)
     
 #################################    END PIPELINE    #####################################
 
