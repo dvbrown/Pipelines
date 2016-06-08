@@ -19,10 +19,14 @@ The python binary is located in
 You will need to install the ruffus python module. To do this you need to install it in your local folder.
 ```
 mkdir /home/dbrown0/local/lib/python2.7/site-packages
-easy_install --prefix=$HOME/local ruffus --upgrade
+python2.7 -m easy_install --prefix=$HOME/local ruffus --upgrade
 
 ```
 When you launch python2.7 ruffus should be installed
+
+Use conda and the bioinformatics environment I made
+
+source activate bioinformatics
 
 ```
 
