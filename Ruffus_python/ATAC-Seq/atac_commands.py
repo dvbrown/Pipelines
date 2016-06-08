@@ -113,7 +113,7 @@ def nucleoatac(inputFile, outputFile):
     'Call nucleosomes using the nucleotac software by the Greenleaf lab: http://nucleoatac.readthedocs.io/en/latest/nucleoatac/'
     comm = '''{4}nucleoatac run --bed {0} \
     --bam {1} --fasta {2}.fa \
-    --out {3} \
+    --out {3} --write_all \
     '''.format(openChromatinBed, inputFile, refGenome, outputFile, nucleoAtacPath) 
     runJob(comm, 'RUNNING NUCLEOATAC')
     
