@@ -111,7 +111,7 @@ def removeMtDNAreads(inputFile, outputFile):
     
 def nucleoatac(inputFile, outputFile):
     'Call nucleosomes using the nucleotac software by the Greenleaf lab: http://nucleoatac.readthedocs.io/en/latest/nucleoatac/'
-    out = outputFile[104:147]    
+    out = outputFile[110:146]    
     comm = '''{4}nucleoatac run --bed {0} \
     --bam {1} --fasta {2}.fa \
     --out {3} --write_all \
