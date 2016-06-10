@@ -11,6 +11,7 @@ gatkPath = '/cm/shared/apps/gatk/current/'
 bedtoolsPath = '/cm/shared/apps/bedtools/2.17.0/bin/'
 localBinaryPath = '/home/dbrown0/.local/bin/'
 nucleoAtacPath = '/home/dbrown0/local/NucleoATAC/bin/'
+atacPyPath = '/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/dbrown0/Bioinformatics/Pipelines/Ruffus_python/ATAC-Seq'
 openChromatinBed = '/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/dbrown0/Bioinformatics/Resources/GM.nucpos.bed'
 tmpDir = '/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/dbrown0/Data/ATAC-Seq/160526.NextSeq.FCA/tmp'
 
@@ -21,8 +22,8 @@ def runJob(comm, taskName):
     run a command based on the value of the string "comm" and capture the standard output.
     Throws an exception when failure occurs'''
     started = time.strftime('%X %x %Z')
-    print '\n##############################################    RUNNNG TASK ' + taskName + ' at {0}'.format(started) +   '    ###############################################'
-    print comm + '\n'
+    print('\n##############################################    RUNNNG TASK ' + taskName + ' at {0}'.format(started) +   '    ###############################################')
+    print(comm + '\n')
     #run the command
     os.system(comm)
     
@@ -74,7 +75,7 @@ def sortSamtools(inputFile, outputFile):
 def indexSamtools(inputFile):
     com = "{0}samtools/current/samtools index {1}".format(binaryPath, inputFile)
     # No output file therefore invoke os.system directly
-    print '\n##############################################    RUNNNG TASK INDEX SAMTOOLS     ###############################################\n'
+    print('\n##############################################    RUNNNG TASK INDEX SAMTOOLS     ###############################################\n')
     os.system(com)
     
     
@@ -126,6 +127,16 @@ def pyatac(inputFile, outputFile):
     --out {1} --upper 1000 \
     '''.format(inputFile, out, nucleoAtacPath) 
     runJob(comm, 'RUNNING NUCLEOATAC')
+    
+def kDavieATAC(inputFile, outputFile):
+    '''Use Kristofer Davie\'s script to analyse ATAC-Seq data. Some useful options are:
+        -proc N  # Multiprocessing across N processors
+        --sumsOnly # Doesn't write the final matrix to disk, only the sums (saves on space)
+        --rpm # Normalises to reads per million good for comparing signal between samples'''
+        
+    comm = '''python {0}kris_davie_makeHeatmap.py --sumsOnly -proc 4 {1} {2} 100 {4} \
+    '''.format(atacPyPath, inputFile, openChromatinBed, outputFile)
+    runJob(comm, 'RUNNING ATAC DAVIE')
     
 # FRAGMENT ANALYSIS - from the single-cell ATAC-Seq paper
 #As in our previous work3, we adjusted the plus strand aligning reads by +4 and the minus strand aligning reads by -5 bp 

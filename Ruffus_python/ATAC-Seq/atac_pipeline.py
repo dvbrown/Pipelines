@@ -204,7 +204,7 @@ def trimReads(input_file, output_dir):
     -o {2} -p {3} \
     {0} {1} \
     '''.format(input_file, read2, output_file, output_file2)
-    print comm
+    print(comm)
     os.system(comm)
     
 #   trimReads(inputFile[0], outputDir[0])
@@ -277,16 +277,20 @@ def trimReads(input_file, output_dir):
 #def runIndexing(inputFile, outputFile):
 #    atac_commands.indexSamtools(inputFile)
     
-@transform(inputFile, suffix('.bam'), '')
-#	Samtools index does not generate an output using the standard output
-def runNucleoATAC(inputFile, outputFile):
-    atac_commands.nucleoatac(inputFile, outputFile)
-
-@follows(runNucleoATAC)
-@transform(inputFile, suffix('.bam'), '')
-#	Samtools index does not generate an output using the standard output
-def runPyATAC(inputFile, outputFile):
-    atac_commands.pyatac(inputFile, outputFile)
+#@transform(inputFile, suffix('.bam'), '')
+##	Samtools index does not generate an output using the standard output
+#def runNucleoATAC(inputFile, outputFile):
+#    atac_commands.nucleoatac(inputFile, outputFile)
+#
+#@follows(runNucleoATAC)
+#@transform(inputFile, suffix('.bam'), '')
+##	Samtools index does not generate an output using the standard output
+#def runPyATAC(inputFile, outputFile):
+#    atac_commands.pyatac(inputFile, outputFile)
+    
+@transform(inputFile, suffix('.bam'), 'davie.txt')
+def runKrisATAC(inputFile, outputFile):
+    atac_commands.kDavieATAC(inputFile, outputFile)
     
 #################################    END PIPELINE    #####################################
 
