@@ -277,10 +277,10 @@ def trimReads(input_file, output_dir):
 #def runIndexing(inputFile, outputFile):
 #    atac_commands.indexSamtools(inputFile)
     
-@transform(inputFile, suffix('.bam'), '')
-#	Samtools index does not generate an output using the standard output
-def runNucleoATAC(inputFile, outputFile):
-    atac_commands.nucleoatac(inputFile, outputFile)
+#@transform(inputFile, suffix('.bam'), '')
+##	Samtools index does not generate an output using the standard output
+#def runNucleoATAC(inputFile, outputFile):
+#    atac_commands.nucleoatac(inputFile, outputFile)
 #
 #@follows(runNucleoATAC)
 #@transform(inputFile, suffix('.bam'), '')
@@ -288,8 +288,7 @@ def runNucleoATAC(inputFile, outputFile):
 #def runPyATAC(inputFile, outputFile):
 #    atac_commands.pyatac(inputFile, outputFile)
 
-@follows(runNucleoATAC) 
-@transform(inputFile, suffix('.bam'), 'davie.txt')
+@transform(inputFile, suffix('.bam'), '')
 def runKrisATAC(inputFile, outputFile):
     atac_commands.kDavieATAC(inputFile, outputFile)
     

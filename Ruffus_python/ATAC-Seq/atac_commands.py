@@ -134,7 +134,7 @@ def kDavieATAC(inputFile, outputFile):
         --sumsOnly # Doesn't write the final matrix to disk, only the sums (saves on space)
         --rpm # Normalises to reads per million good for comparing signal between samples'''
         
-    comm = '''python {0}krisDavie_makeHeatmap.py --sumsOnly -proc 4 {1} {2} 100 {3} \
+    comm = '''python {0}krisDavie_makeHeatmap.py --sumsOnly -proc 8 {1} {2} 2000 {3} \
     '''.format(atacPyPath, inputFile, openChromatinBed, outputFile)
     runJob(comm, 'RUNNING ATAC DAVIE')
     
