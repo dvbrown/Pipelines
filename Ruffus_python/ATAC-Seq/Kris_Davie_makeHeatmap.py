@@ -487,8 +487,10 @@ if args.debug:
     print('6. Memory usage: %s (kb)' % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
 
 
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+mpl.use('Agg')
 
 matrixSums = pd.DataFrame(matrix.sum()).T
 
@@ -523,7 +525,6 @@ else:
 
 plt.savefig('.'.join([args.outputFile, 'heatmap', 'pdf']), bbox_inches='tight')
 
-import matplotlib as mpl
 
 plt.figure()
 mpl.use('Agg')
