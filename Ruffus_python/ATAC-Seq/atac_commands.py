@@ -11,7 +11,7 @@ gatkPath = '/cm/shared/apps/gatk/current/'
 bedtoolsPath = '/cm/shared/apps/bedtools/2.17.0/bin/'
 localBinaryPath = '/home/dbrown0/.local/bin/'
 nucleoAtacPath = '/home/dbrown0/local/NucleoATAC/bin/'
-atacPyPath = '/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/dbrown0/Bioinformatics/Pipelines/Ruffus_python/ATAC-Seq'
+atacPyPath = '/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/dbrown0/Bioinformatics/Pipelines/Ruffus_python/ATAC-Seq/'
 openChromatinBed = '/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/dbrown0/Bioinformatics/Resources/GM.nucpos.bed'
 tmpDir = '/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/dbrown0/Data/ATAC-Seq/160526.NextSeq.FCA/tmp'
 
