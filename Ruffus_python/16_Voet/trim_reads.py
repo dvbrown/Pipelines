@@ -27,7 +27,7 @@ def trimReads(input_file, output_dir):
     output_file = output_dir + output_file
     output_file2 = re.sub('.R1.fastq.gz', '.R2.fastq.gz', output_file)
     
-    comm = '''/home/dbrown0/.local/bin/cutadapt -q 20,20 --minimum-length 35 \
+    comm = '''/home/dbrown0/miniconda3/envs/py2bioinf/bin/cutadapt -q 20,20 --minimum-length 35 \
     -a CTGTCTCTTATA -A CTGTCTCTTATA \
     -o {2} -p {3} \
     {0} {1} \

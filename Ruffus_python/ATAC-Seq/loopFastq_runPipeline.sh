@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #	The regular expression that defines the fastq files
-FILES=/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/gcpu/samples/GC031715_*/runs/run.160526.NextSeq.FCA.lane*/current/result/*.R1.fastq.gz
+FILES=/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/gcpu/samples/GC032543_*/runs/run.160610.HiSeq2000.FCB.lane*/current/result/*.R1.fastq.gz 
 
 for f in $FILES
 do
