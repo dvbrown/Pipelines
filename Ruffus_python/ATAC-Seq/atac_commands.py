@@ -62,7 +62,7 @@ def mergeBamPipeline(inputFileNames, outputFile):
     bam4 = inputFileNames[3]
     comm = '''java -Xmx5g -jar {0}MergeSamFiles.jar \
     INPUT={1} INPUT={2} INPUT={3} INPUT={4} \
-    OUTPUT={5} SORT_ORDER=coordinate \
+    OUTPUT={5} SORT_ORDER=coordinate CREATE_INDEX=true \
     '''.format(picardPath, bam1, bam2, bam3, bam4, outputFile, tmpDir)
     runJob(comm, 'MERGING BAM FILES')
     

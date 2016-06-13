@@ -248,11 +248,8 @@ def trimReads(input_file, output_dir):
 # def runBamMergePipeline(inputFileNames, outputFile):
 #     atac_commands.mergeBamPipeline(inputFileNames, outputFile)
     
-#@transform(inputFile, suffix('.bam'), '')
-##	Samtools index does not generate an output using the standard output
-#def runIndexing(inputFile, outputFile):
-#    atac_commands.indexSamtools(inputFile)
-#
+#-------------------------    POST ALIGNMENT    -----------------------------
+
 #@follows(runIndexing)
 #@transform(inputFile, suffix('.bam'), '.lib_metrics.txt')
 #def runEstimateLibraryStats(inputFile, outputFile):
@@ -276,17 +273,6 @@ def trimReads(input_file, output_dir):
 ##	Samtools index does not generate an output using the standard output
 #def runIndexing(inputFile, outputFile):
 #    atac_commands.indexSamtools(inputFile)
-    
-#@transform(inputFile, suffix('.bam'), '')
-##	Samtools index does not generate an output using the standard output
-#def runNucleoATAC(inputFile, outputFile):
-#    atac_commands.nucleoatac(inputFile, outputFile)
-#
-#@follows(runNucleoATAC)
-#@transform(inputFile, suffix('.bam'), '')
-##	Samtools index does not generate an output using the standard output
-#def runPyATAC(inputFile, outputFile):
-#    atac_commands.pyatac(inputFile, outputFile)
 
 @transform(inputFile, suffix('.bam'), '')
 def runKrisATAC(inputFile, outputFile):
