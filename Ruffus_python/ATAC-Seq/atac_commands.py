@@ -110,6 +110,14 @@ def removeMtDNAreads(inputFile, outputFile):
     runJob(comm, 'REMOVING MITOCHONDRIAL READS')
     
     
+def collectInsertSize(inputFile, outputFile):
+    'Generate a plot of insert size distribution using Picard'
+    comm = '''java -Xmx5g -jar {0}CollectInsertSizeMetrics.jar \
+    I={1} O={2}.txt H={2}.pdf \
+    M=0.5'''.format(picardPath, inputFile, outputFile)
+    runJob(comm, 'GENERATE INSERT SIZE PLOT')
+    
+    
 def nucleoatac(inputFile, outputFile):
     'Call nucleosomes using the nucleotac software by the Greenleaf lab: http://nucleoatac.readthedocs.io/en/latest/nucleoatac/'
     out = outputFile[110:146]    

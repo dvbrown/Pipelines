@@ -274,9 +274,13 @@ def trimReads(input_file, output_dir):
 #def runIndexing(inputFile, outputFile):
 #    atac_commands.indexSamtools(inputFile)
 
+#@transform(inputFile, suffix('.bam'), '')
+#def runKrisATAC(inputFile, outputFile):
+#    atac_commands.kDavieATAC(inputFile, outputFile)
+    
 @transform(inputFile, suffix('.bam'), '')
-def runKrisATAC(inputFile, outputFile):
-    atac_commands.kDavieATAC(inputFile, outputFile)
+def runPicardInsert(inputFile, outputFile):
+    atac_commands.collectInsertSize(inputFile, outputFile)
     
 #################################    END PIPELINE    #####################################
 
