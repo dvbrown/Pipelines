@@ -31,10 +31,8 @@ def trimReads(inputFile, outputFile):
     read2 = re.sub('.R1.fastq.gz', '.R2.fastq.gz', inputFile)
     outputFile2 = re.sub('.R1.', '.R2.', outputFile)
     #	Trim the Nextera adapter sequences
-    comm = '''{0}cutadapt -q 15,15 --minimum-length 35 \
-    -a CTGTCTCTTATA -A CTGTCTCTTATA \
-    -o {3} -p {4} {1} {2} \
-    '''.format(localBinaryPath, inputFile, read2, outputFile, outputFile2)
+    comm = '''
+    '''.format()
     runJob(comm, 'TRIMMING READS')
     
 
@@ -46,9 +44,8 @@ def alignReads(inputFile, outputFile):
     libraryName = inputFile[117:136]
     #   Build the read group information
     rgID = '{0} --rg SM:{1} --rg PL:ILLUMINA --rg LB:{2} '.format(inputFile, libraryName, sampleName)
-    comm = '''{0}bowtie2/current/bowtie2 --local -p 8 --rg-id {1} -x {2} -1 {3} -2 {4} \
-    | {0}samtools/current/samtools view -bS -o {5} -S \
-    '''.format(binaryPath, rgID, refGenome, inputFile, read2, outputFile)
+    comm = '''
+    '''.format()
     runJob(comm, 'ALIGNING READS')
     
     
@@ -84,29 +81,3 @@ def estimateLibComplexity(inputFile, outputFile):
      O={2}'''.format(picardPath, inputFile, outputFile)
     runJob(comm, 'ESTIMATING LIBRARY SIZE')
     
-    
-def countAlignChr(inputFile, outputFile):
-    'Obtain the number of reads mapping to each chromosome'
-    comm = '''samtools idxstats {0} | cut -f 1,3 > {1}'''.format(inputFile, outputFile)
-    runJob(comm, 'COUNT READS PER CHROMOSOME')
-    
-    
-def collectInsertSize(inputFile, outputFile):
-    'Generate a plot of insert size distribution using Picard'
-    comm = '''java -Xmx5g -jar {0}CollectInsertSizeMetrics.jar \
-    I={1} O={2}.txt H={2}.pdf \
-    M=0.5'''.format(picardPath, inputFile, outputFile)
-    runJob(comm, 'GENERATE INSERT SIZE PLOT')
-
-def calculateExpression(inputFile, outputFile):
-    'Calculate the expression estimate in TPM using RSEM'
-    comm = '''
-    '''
-    runJob(comm, 'CALUCLATING EXPRESSION')
-    
-    
-def countReadsGenes(inputFile, outputFile):
-    'Count the number of reads mapped to genes using HTSeq'
-    comm = '''
-    '''
-    runJob(comm, 'COUNTING READS TO GENES')

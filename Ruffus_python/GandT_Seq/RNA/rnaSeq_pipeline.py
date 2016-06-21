@@ -182,7 +182,7 @@ if options.verbose:
 # Assign the input specifed from the command line to a variable
 inputFile = options.input_file
 
-@transform(inputFile, suffix('.fastq.gz'), '.tr.fastq.gz')
+@transform(inputFile, suffix('.R1.fastq.gz'), '.R1.tr.fastq.gz')
 def runTrim(inputFile, outputFile):
     rnaSeq_commands.trimReads(inputFile, outputFile)
 
