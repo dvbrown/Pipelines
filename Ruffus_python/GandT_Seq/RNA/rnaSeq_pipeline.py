@@ -182,54 +182,58 @@ if options.verbose:
 # Assign the input specifed from the command line to a variable
 inputFile = options.input_file
 
-@transform(inputFile, suffix('.fastq.gz'), '.bam')
+@transform(inputFile, suffix('.fastq.gz'), '.tr.fastq.gz')
+def runTrim(inputFile, outputFile):
+    rnaSeq_commands.trimReads(inputFile, outputFile)
+
+@transform(runTrim, suffix('.tr.fastq.gz'), '.bam')
 def runAlignment(inputFile, outputFile):
     rnaSeq_commands.alignReads(inputFile, outputFile)
     
-@transform(inputFile, suffix('.bam'), '.merge.bam')
-def runBamMerge(inputFile, outputFile):
-    rnaSeq_commands.mergeBams(inputFile, outputFile)
-    
-#   Align the fastqs from each lane in a single script
- @transform(inputFile, suffix('lane1.gcap_dev.R1.fastq.gz'), 'lane1.gcap_dev.R1.bam')
- def runAligLane1(inputFile, outputFile):
-     rnaSeq_commands.alignReads(inputFile, outputFile)
- 
- # Make this a follows decorator
- @follows(runAligLane1) 
- @transform(inputFile, suffix('lane2.gcap_dev.R1.fastq.gz'), 'lane2.gcap_dev.R1.bam')
- def runAligLane2(inputFile, outputFile):
-     rnaSeq_commands.alignReads(inputFile, outputFile)
- 
- @follows(runAligLane2) 
- @transform(inputFile, suffix('lane3.gcap_dev.R1.fastq.gz'), 'lane3.gcap_dev.R1.bam')
- def runAligLane3(inputFile, outputFile):
-     rnaSeq_commands.alignReads(inputFile, outputFile)
- 
- @follows(runAligLane3)
- @transform(inputFile, suffix('lane4.gcap_dev.R1.fastq.gz'), 'lane4.gcap_dev.R1.bam')
- def runAligLane4(inputFile, outputFile):
-     rnaSeq_commands.alignReads(inputFile, outputFile)
- 
- #   Merge all bams from different lanes together into one file
- #   Generate output file name. Make this using grep next time
- mergeName = inputFile[0]
- mergeName = mergeName[91:116]
- 
- @follows(runAligLane4)  
- @merge([runAligLane1, runAligLane2, runAligLane3, runAligLane4], '{0}.merge.bam'.format(mergeName))
- def runBamMergePipeline(inputFileNames, outputFile):
-     rnaSeq_commands.mergeBamPipeline(inputFileNames, outputFile)
-    
-#-------------------------    POST ALIGNMENT    -----------------------------
-
-@transform(runBamMergePipeline, suffix('.bam'), '.exp.txt')
-def runCalculateExpression(inputFileNames, outputFile):
-    rnaSeq_commands.calculateExpression(inputFileNames, outputFile)
-
-@follows(runBamMergePipeline, suffix('.bam'), '.count.txt')
-@transform(inputFileNames, outputFile):
-    rnaSeq_commands.countReadsGenes(inputFileNames, outputFile)
+#@transform(inputFile, suffix('.bam'), '.merge.bam')
+#def runBamMerge(inputFile, outputFile):
+#    rnaSeq_commands.mergeBams(inputFile, outputFile)
+#    
+##   Align the fastqs from each lane in a single script
+# @transform(inputFile, suffix('lane1.gcap_dev.R1.fastq.gz'), 'lane1.gcap_dev.R1.bam')
+# def runAligLane1(inputFile, outputFile):
+#     rnaSeq_commands.alignReads(inputFile, outputFile)
+# 
+# # Make this a follows decorator
+# @follows(runAligLane1) 
+# @transform(inputFile, suffix('lane2.gcap_dev.R1.fastq.gz'), 'lane2.gcap_dev.R1.bam')
+# def runAligLane2(inputFile, outputFile):
+#     rnaSeq_commands.alignReads(inputFile, outputFile)
+# 
+# @follows(runAligLane2) 
+# @transform(inputFile, suffix('lane3.gcap_dev.R1.fastq.gz'), 'lane3.gcap_dev.R1.bam')
+# def runAligLane3(inputFile, outputFile):
+#     rnaSeq_commands.alignReads(inputFile, outputFile)
+# 
+# @follows(runAligLane3)
+# @transform(inputFile, suffix('lane4.gcap_dev.R1.fastq.gz'), 'lane4.gcap_dev.R1.bam')
+# def runAligLane4(inputFile, outputFile):
+#     rnaSeq_commands.alignReads(inputFile, outputFile)
+# 
+# #   Merge all bams from different lanes together into one file
+# #   Generate output file name. Make this using grep next time
+# mergeName = inputFile[0]
+# mergeName = mergeName[91:116]
+# 
+# @follows(runAligLane4)  
+# @merge([runAligLane1, runAligLane2, runAligLane3, runAligLane4], '{0}.merge.bam'.format(mergeName))
+# def runBamMergePipeline(inputFileNames, outputFile):
+#     rnaSeq_commands.mergeBamPipeline(inputFileNames, outputFile)
+#    
+##-------------------------    POST ALIGNMENT    -----------------------------
+#
+#@transform(runBamMergePipeline, suffix('.bam'), '.exp.txt')
+#def runCalculateExpression(inputFileNames, outputFile):
+#    rnaSeq_commands.calculateExpression(inputFileNames, outputFile)
+#
+#@follows(runBamMergePipeline, suffix('.bam'), '.count.txt')
+#@transform(inputFileNames, outputFile):
+#    rnaSeq_commands.countReadsGenes(inputFileNames, outputFile)
     
 #################################    END PIPELINE    #####################################
 

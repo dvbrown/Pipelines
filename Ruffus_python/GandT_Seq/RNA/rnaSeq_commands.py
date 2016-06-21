@@ -10,7 +10,7 @@ javaPath = '/cm/shared/apps/jdk/1.7.0/bin/java'
 picardPath = '/cm/shared/apps/picard/current/'
 gatkPath = '/cm/shared/apps/gatk/current/'
 bedtoolsPath = '/cm/shared/apps/bedtools/2.17.0/bin/'
-localBinaryPath = '/home/dbrown0/.local/bin/'
+localBinaryPath = '/home/dbrown0/miniconda3/envs/py2bioinf/bin/'
 tmpDir = ''
 
 #################################    BEGIN COMMANDS    #####################################
@@ -29,19 +29,19 @@ def runJob(comm, taskName):
 def trimReads(inputFile, outputFile):
     'Take the raw sequencing reads and trim off the adpaters'
     read2 = re.sub('.R1.fastq.gz', '.R2.fastq.gz', inputFile)
-    outputFile2 = re.sub('', '', outputFile)
+    outputFile2 = re.sub('.R1.', '.R2.', outputFile)
     #	Trim the Nextera adapter sequences
-    comm = '''{5}cutadapt -q 15,15 --minimum-length 35 \
+    comm = '''{0}cutadapt -q 15,15 --minimum-length 35 \
     -a CTGTCTCTTATA -A CTGTCTCTTATA \
     -o {3} -p {4} {1} {2} \
-    '''.format(binaryPath, inputFile, read2, outputFile, outputFile2, localBinaryPath)
+    '''.format(localBinaryPath, inputFile, read2, outputFile, outputFile2)
     runJob(comm, 'TRIMMING READS')
     
 
 def alignReads(inputFile, outputFile):
     '''Align the fastq reads using bowtie'''
     #	Extract the read 2 filename
-    read2 = re.sub('.R1.fastq.gz', '.R2.fastq.gz', inputFile)
+    read2 = re.sub('.R1.', '.R2.', inputFile)
     sampleName = inputFile[90:162]
     libraryName = inputFile[117:136]
     #   Build the read group information
