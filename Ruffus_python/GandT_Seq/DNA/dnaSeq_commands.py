@@ -69,7 +69,7 @@ def alignReads(inputFileNames, outputFile):
     rgID = "@RG\\tID:{0}\\tSM:{1}\\tPL:ILLUMINA\\tLB:{1}".format(runName, sampleName)
     
     #   Build the command for alignment
-    comm = '''{0}bwa/0.6.2/bwa sampe -P -r {1} \
+    comm = '''{0}bwa/0.6.2/bwa sampe -P -r '{1}' \
     -s {2} {3} {4} {5} {6} \
     | {0}samtools/current/samtools view -bS -o {7} -S \
     '''.format(binaryPath, rgID, refGenome, indexFile, index2, read1, read2, outputFile)
