@@ -50,18 +50,19 @@ def generateSamindex(inputFile, outputFile):
     runJob(comm2, 'GENERATING INDEX 2')
     
     
-def alignReads(indexFile, inputFile, outputFile):
+def alignReads(inputFileNames, outputFile):
     '''Align the fastq reads using bwa'''
+    indexFile, read1 = inputFileNames[0], inputFileNames[1]
     #	Extract the index 2 filename
     index2 = re.sub('.R1.', '.R2.', indexFile)
     #	Extract the read 2 filename
-    read2 = re.sub('.R1.', '.R2.', inputFile)
+    read2 = re.sub('.R1.', '.R2.', read1)
     
     # Extract names for the read group information
-    m = re.search('GC03(.+?)_', inputFile)
+    m = re.search('GC03(.+?)_', read1)
     if m:
         runName = 'GC03' + m.group(1)
-    m = re.search('{0}(.+?).16'.format(runName), inputFile)
+    m = re.search('{0}(.+?).16'.format(runName), read1)
     if m:
         sampleName = m.group(1)
     #   Build the read group information
@@ -71,7 +72,7 @@ def alignReads(indexFile, inputFile, outputFile):
     comm = '''{0}bwa/0.6.2/bwa sampe -P -r {1} \
     -s {2} {3} {4} {5} {6} \
     | {0}samtools/current/samtools view -bS -o {7} -S \    
-    '''.format(binaryPath, rgID, refGenome, indexFile, index2, inputFile, read2, outputFile)
+    '''.format(binaryPath, rgID, refGenome, indexFile, index2, read1, read2, outputFile)
     runJob(comm, 'ALIGNING READS')
     
     

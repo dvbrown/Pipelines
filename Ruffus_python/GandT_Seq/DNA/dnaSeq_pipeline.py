@@ -195,8 +195,8 @@ inputFile1 = inputFile[0]
 alignOutput = inputFile1[:-8] + 'bam'
 
 @merge([runIndexFasta, runTrim], alignOutput)
-def runAlignment(indexFile, inputFile, outputFile):
-    dnaSeq_commands.alignReads(indexFile, inputFile, outputFile)
+def runAlignment(inputFileNames, outputFile):
+    dnaSeq_commands.alignReads(inputFileNames, outputFile)
     
 #@transform(inputFile, suffix('.bam'), '.merge.bam')
 #def runBamMerge(inputFile, outputFile):
