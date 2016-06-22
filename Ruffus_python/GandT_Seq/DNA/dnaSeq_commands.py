@@ -2,9 +2,7 @@ import os, time, re
 
 #################################    GLOBAL PARAMETERS    #####################################
 
-refGenome = '/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/dbrown0/Bioinformatics/Resources/hg19Mt'
-# NEED a reference with the ERCC sequences!!!
-
+refGenome = '/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/humangenome/fasta/hg19Mt'
 binaryPath = '/cm/shared/apps/'
 javaPath = '/cm/shared/apps/jdk/1.7.0/bin/java'
 picardPath = '/cm/shared/apps/picard/current/'
@@ -23,7 +21,7 @@ def runJob(comm, taskName):
     print('\n##############################################    RUNNNG TASK ' + taskName + ' at {0}'.format(started) +   '    ###############################################')
     print(comm + '\n')
     #run the command. Comment out the line below to print only the command and not run it.
-    os.system(comm)
+    #os.system(comm)
     
     
 def trimReads(inputFile, outputFile):
@@ -40,10 +38,11 @@ def generateSamindex(inputFile, outputFile):
     '''Generate the indexes of the reads needed for alignment with bwa'''
     #	Extract the read 2 filename
     read2 = re.sub('.R1.', '.R2.', inputFile)
+    outputFile2 = re.sub('.R1.', '.R2.', outputFile)
     comm1 = '''{0}bwa/0.6.2/bwa aln -l 32 {1} > {2}'''.format(binaryPath, refGenome, inputFile, outputFile)
-    comm2 = '''{0}bwa/0.6.2/bwa aln -l 32 {1} > {2}'''.format(binaryPath, refGenome, read2, outputFile)
+    comm2 = '''{0}bwa/0.6.2/bwa aln -l 32 {1} > {2}'''.format(binaryPath, refGenome, read2, outputFile2)
     runJob(comm1, 'GENERATING INDEX 1')
-    runJob(comm2, 'GENERATING INDEXE 2')
+    runJob(comm2, 'GENERATING INDEX 2')
     
     
 def alignReads(indexFile, inputFile, outputFile):
