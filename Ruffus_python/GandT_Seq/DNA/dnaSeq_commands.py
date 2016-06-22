@@ -2,7 +2,7 @@ import os, time, re
 
 #################################    GLOBAL PARAMETERS    #####################################
 
-refGenome = '/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/humangenome/fasta/hg19Mt.fa'
+refGenome = '/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/dbrown0/Bioinformatics/Resources/hg19Mt.fa'
 binaryPath = '/cm/shared/apps/'
 javaPath = '/cm/shared/apps/jdk/1.7.0/bin/java'
 picardPath = '/cm/shared/apps/picard/current/'
