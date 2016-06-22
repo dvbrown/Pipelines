@@ -23,7 +23,7 @@ def runJob(comm, taskName):
     print('\n##############################################    RUNNNG TASK ' + taskName + ' at {0}'.format(started) +   '    ###############################################')
     print(comm + '\n')
     #run the command. Comment out the line below to print only the command and not run it.
-    #os.system(comm)
+    os.system(comm)
     
     
 def trimReads(inputFile, outputFile):
@@ -66,12 +66,12 @@ def alignReads(inputFileNames, outputFile):
     if m:
         sampleName = m.group(1)
     #   Build the read group information
-    rgID = '@RG\tID:{0}\tSM:{1}\tPL:ILLUMINA\tLB:{1}'.format(runName, sampleName)
+    rgID = "@RG\\tID:{0}\\tSM:{1}\\tPL:ILLUMINA\\tLB:{1}".format(runName, sampleName)
     
     #   Build the command for alignment
     comm = '''{0}bwa/0.6.2/bwa sampe -P -r {1} \
     -s {2} {3} {4} {5} {6} \
-    | {0}samtools/current/samtools view -bS -o {7} -S \    
+    | {0}samtools/current/samtools view -bS -o {7} -S \
     '''.format(binaryPath, rgID, refGenome, indexFile, index2, read1, read2, outputFile)
     runJob(comm, 'ALIGNING READS')
     
