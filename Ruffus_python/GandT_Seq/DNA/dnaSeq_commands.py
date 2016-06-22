@@ -39,8 +39,11 @@ def generateSamindex(inputFile, outputFile):
     #	Extract the read 2 filename
     read2 = re.sub('.R1.', '.R2.', inputFile)
     outputFile2 = re.sub('.R1.', '.R2.', outputFile)
-    comm1 = '''{0}bwa/0.6.2/bwa aln -l 32 {1} > {2}'''.format(binaryPath, refGenome, inputFile, outputFile)
-    comm2 = '''{0}bwa/0.6.2/bwa aln -l 32 {1} > {2}'''.format(binaryPath, refGenome, read2, outputFile2)
+    comm1 = '''{0}bwa/0.6.2/bwa aln -l 32 {1} {2} > {3} \
+    '''.format(binaryPath, refGenome, inputFile, outputFile)
+    
+    comm2 = '''{0}bwa/0.6.2/bwa aln -l 32 {1} {2} > {3} \
+    '''.format(binaryPath, refGenome, read2, outputFile2)
     runJob(comm1, 'GENERATING INDEX 1')
     runJob(comm2, 'GENERATING INDEX 2')
     
