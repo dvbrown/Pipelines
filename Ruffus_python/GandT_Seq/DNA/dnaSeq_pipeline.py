@@ -186,7 +186,7 @@ inputFile = options.input_file
 def runTrim(inputFile, outputFile):
     dnaSeq_commands.trimReads(inputFile, outputFile)
     
-@transform(runTrim, suffix('.R1.tr.fastq.gz'), '.R1.tr.fai')
+@transform(runTrim, suffix('.R1.tr.fastq.gz'), '.R1.tr.sai')
 def runIndexFasta(inputFile, outputFile):
     dnaSeq_commands.generateSamindex(inputFile, outputFile)
     
