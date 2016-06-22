@@ -27,25 +27,47 @@ def runJob(comm, taskName):
     
     
 def trimReads(inputFile, outputFile):
-    'Take the raw sequencing reads and trim off the adpaters'
+    'Take the raw sequencing reads and trim off first 12 bases of sequence'
     read2 = re.sub('.R1.fastq.gz', '.R2.fastq.gz', inputFile)
     outputFile2 = re.sub('.R1.', '.R2.', outputFile)
-    #	Trim the Nextera adapter sequences
-    comm = '''
-    '''.format()
+    comm = '''{0}cutadapt -u 12 \
+    -o {3} -p {4} {1} {2} \
+    '''.format(localBinaryPath, inputFile, read2, outputFile, outputFile2)
     runJob(comm, 'TRIMMING READS')
     
 
-def alignReads(inputFile, outputFile):
-    '''Align the fastq reads using bowtie'''
+def generateSamindex(inputFile, outputFile):
+    '''Generate the indexes of the reads needed for alignment with bwa'''
     #	Extract the read 2 filename
     read2 = re.sub('.R1.', '.R2.', inputFile)
-    sampleName = inputFile[90:162]
-    libraryName = inputFile[117:136]
+    comm1 = '''{0}bwa/0.6.2/bwa aln -l 32 {1} > {2}'''.format(binaryPath, refGenome, inputFile, outputFile)
+    comm2 = '''{0}bwa/0.6.2/bwa aln -l 32 {1} > {2}'''.format(binaryPath, refGenome, read2, outputFile)
+    runJob(comm1, 'GENERATING INDEX 1')
+    runJob(comm2, 'GENERATING INDEXE 2')
+    
+    
+def alignReads(indexFile, inputFile, outputFile):
+    '''Align the fastq reads using bwa'''
+    #	Extract the index 2 filename
+    index2 = re.sub('.R1.', '.R2.', indexFile)
+    #	Extract the read 2 filename
+    read2 = re.sub('.R1.', '.R2.', inputFile)
+    
+    # Extract names for the read group information
+    m = re.search('GC03(.+?)_', inputFile)
+    if m:
+        runName = 'GC03' + m.group(1)
+    m = re.search('{0}(.+?).16'.format(runName), inputFile)
+    if m:
+        sampleName = m.group(1)
     #   Build the read group information
-    rgID = '{0} --rg SM:{1} --rg PL:ILLUMINA --rg LB:{2} '.format(inputFile, libraryName, sampleName)
-    comm = '''
-    '''.format()
+    rgID = '@RG\tID:{0}\tSM:{1}\tPL:ILLUMINA\tLB:{1}'.format(runName, sampleName)
+    
+    #   Build the command for alignment
+    comm = '''{0}bwa/0.6.2/bwa sampe -P -r {1} \
+    -s {2} {3} {4} {5} {6} \
+    | {0}samtools/current/samtools view -bS -o {7} -S \    
+    '''.format(binaryPath, rgID, refGenome, indexFile, index2, inputFile, read2, outputFile)
     runJob(comm, 'ALIGNING READS')
     
     
