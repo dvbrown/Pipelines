@@ -194,7 +194,7 @@ def runIndexFasta(inputFile, outputFile):
 inputFile1 = inputFile[0]
 alignOutput = inputFile1[:-8] + 'bam'
 
-@merge(runIndexFasta, runTrim, alignOutput)
+@merge([runIndexFasta, runTrim], alignOutput)
 def runAlignment(indexFile, inputFile, outputFile):
     dnaSeq_commands.alignReads(indexFile, inputFile, outputFile)
     
