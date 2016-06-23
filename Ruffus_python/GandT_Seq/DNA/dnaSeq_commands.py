@@ -4,7 +4,7 @@ import os, time, re
 
 #refGenome = '/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/dbrown0/Bioinformatics/Resources/hg19Mt.fa'
 refGenome = '/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/humangenome/hg19Mt_indexBWA/hg19MT'
-
+refGenomeGATK = '/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/jhaan0/humangenome/fasta/hg19Mt.fa'
 binaryPath = '/cm/shared/apps/'
 javaPath = '/cm/shared/apps/jdk/1.7.0/bin/java'
 picardPath = '/cm/shared/apps/picard/current/'
@@ -100,6 +100,34 @@ def indexSamtools(inputFile):
     print('\n##############################################    RUNNNG TASK INDEX SAMTOOLS     ###############################################\n')
     os.system(com)
     
+    
+def collectInsertSize(inputFile, outputFile):
+    'Generate a plot of insert size distribution using Picard'
+    comm = '''java -Xmx5g -jar {0}CollectInsertSizeMetrics.jar \
+    I={1} O={2}.txt H={2}.pdf \
+    M=0.5'''.format(picardPath, inputFile, outputFile)
+    runJob(comm, 'GENERATE INSERT SIZE PLOT')
+    
+def calcCoverage(inputFile, outputFile):
+    'Calculate coverage using GATK'
+    comm='''java -Xmx5g -jar {0} -R {1} \
+    -T DepthOfCoverage -o {2} -i {3} \
+    --omitDepthOutputAtEachBase \
+    -ct 1 -ct 2 -ct 3 -ct 4 -ct 5 -ct 6 -ct 7 -ct 8 -ct 9 -ct 10 -ct 12 -ct 15 -ct 20 -ct 25 -ct 100 \
+    '''.format(gatkPath, refGenomeGATK, outputFile, inputFile)
+    runJob(comm, 'CALCULATING COVERAGE')
+    
+    
+def removeDuplicates(inputFile, outputFile):
+    'Remove duplicates using Picard'
+    # I may need a temporary directory
+    comm = '''java -Xmx5g -jar {0}MarkDuplicates.jar \
+    INPUT={1} OUTPUT={2} METRICS_FILE={2}.txt \
+    CREATE_INDEX=true AS=true VALIDATION_STRINGENCY=LENIENT \
+    MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=50 REMOVE_DUPLICATES=true \
+    '''.format(picardPath, inputFile, outputFile)
+    runJob(comm, 'REMOVING DUPLICATES')    
+
     
 def estimateLibComplexity(inputFile, outputFile):
     'Estimate the library size using Picard tools. This should be done before duplicate removal'

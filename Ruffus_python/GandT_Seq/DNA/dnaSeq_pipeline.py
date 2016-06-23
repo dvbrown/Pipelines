@@ -182,21 +182,21 @@ if options.verbose:
 # Assign the input specifed from the command line to a variable
 inputFile = options.input_file
 
-@transform(inputFile, suffix('.R1.fastq.gz'), '.R1.tr.fastq.gz')
-def runTrim(inputFile, outputFile):
-    dnaSeq_commands.trimReads(inputFile, outputFile)
-    
-@transform(runTrim, suffix('.R1.tr.fastq.gz'), '.R1.tr.sai')
-def runIndexFasta(inputFile, outputFile):
-    dnaSeq_commands.generateSamindex(inputFile, outputFile)
-    
-#   Generate the output filename for alignment
-inputFile1 = inputFile[0]
-alignOutput = inputFile1[:-8] + 'bam'
-
-@merge([runIndexFasta, runTrim], alignOutput)
-def runAlignment(inputFileNames, outputFile):
-    dnaSeq_commands.alignReads(inputFileNames, outputFile)
+#@transform(inputFile, suffix('.R1.fastq.gz'), '.R1.tr.fastq.gz')
+#def runTrim(inputFile, outputFile):
+#    dnaSeq_commands.trimReads(inputFile, outputFile)
+#    
+#@transform(runTrim, suffix('.R1.tr.fastq.gz'), '.R1.tr.sai')
+#def runIndexFasta(inputFile, outputFile):
+#    dnaSeq_commands.generateSamindex(inputFile, outputFile)
+#    
+##   Generate the output filename for alignment
+#inputFile1 = inputFile[0]
+#alignOutput = inputFile1[:-8] + 'bam'
+#
+#@merge([runIndexFasta, runTrim], alignOutput)
+#def runAlignment(inputFileNames, outputFile):
+#    dnaSeq_commands.alignReads(inputFileNames, outputFile)
     
 #@transform(inputFile, suffix('.bam'), '.merge.bam')
 #def runBamMerge(inputFile, outputFile):
@@ -235,13 +235,21 @@ def runAlignment(inputFileNames, outputFile):
 #    
 ##-------------------------    POST ALIGNMENT    -----------------------------
 #
-#@transform(runBamMergePipeline, suffix('.bam'), '.exp.txt')
-#def runCalculateExpression(inputFileNames, outputFile):
-#    rnaSeq_commands.calculateExpression(inputFileNames, outputFile)
-#
-#@follows(runBamMergePipeline, suffix('.bam'), '.count.txt')
-#@transform(inputFileNames, outputFile):
-#    rnaSeq_commands.countReadsGenes(inputFileNames, outputFile)
+@transform(inputFileName, suffix('.bam'), '')
+def runInsertSize(inputFileNames, outputFile):
+    dnaSeq_commands.collectInsertSize(inputFileNames, outputFile)
+    
+@transform(inputFileName, suffix('.bam'), '')
+def runCalculateCoverage(inputFileNames, outputFile):
+    dnaSeq_commands.calcCoverage(inputFileNames, outputFile)
+
+@transform(inputFileName, suffix('.bam'), '')
+def runEstimateComplexity(inputFileNames, outputFile):
+    dnaSeq_commands.estimateLibComplexity(inputFileNames, outputFile)
+    
+@transform(inputFileName, suffix('.bam'), 'rmDup.bam')
+def runRemoveDuplicates(inputFileNames, outputFile):
+    dnaSeq_commands.removeDuplicates(inputFileNames, outputFile)
     
 #################################    END PIPELINE    #####################################
 
