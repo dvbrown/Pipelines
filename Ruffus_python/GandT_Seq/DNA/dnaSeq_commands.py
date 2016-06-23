@@ -88,7 +88,8 @@ def mergeBamPipeline(inputFileNames, outputFile):
     INPUT={3} \
     INPUT={4} \
     OUTPUT={5} \
-    VALIDATION_STRINGENCY=LENIENT USE_THREADING=true SORT_ORDER=coordinate CREATE_INDEX=true \
+    VALIDATION_STRINGENCY=LENIENT TMP_DIR=tmp \
+    USE_THREADING=true SORT_ORDER=coordinate CREATE_INDEX=true \
     '''.format(picardPath, bam1, bam2, bam3, bam4, outputFile, tmpDir)
     runJob(comm, 'MERGING BAM FILES')
     
@@ -108,7 +109,7 @@ def indexSamtools(inputFile):
 def collectInsertSize(inputFile, outputFile):
     'Generate a plot of insert size distribution using Picard'
     comm = '''java -Xmx5g -jar {0}CollectInsertSizeMetrics.jar \
-    I={1} O={2}.txt H={2}.pdf \
+    I={1} O={2}.txt H={2}.pdf TMP_DIR=tmp \
     M=0.5'''.format(picardPath, inputFile, outputFile)
     runJob(comm, 'GENERATE INSERT SIZE PLOT')
     
@@ -128,7 +129,7 @@ def removeDuplicates(inputFile, outputFile):
     comm = '''java -Xmx5g -jar {0}MarkDuplicates.jar \
     INPUT={1} OUTPUT={2} METRICS_FILE={2}.txt \
     CREATE_INDEX=true AS=true VALIDATION_STRINGENCY=LENIENT \
-    MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=50 REMOVE_DUPLICATES=true \
+    MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=50 REMOVE_DUPLICATES=true TMP_DIR=tmp \
     '''.format(picardPath, inputFile, outputFile)
     runJob(comm, 'REMOVING DUPLICATES')    
 
@@ -137,6 +138,6 @@ def estimateLibComplexity(inputFile, outputFile):
     'Estimate the library size using Picard tools. This should be done before duplicate removal'
     comm = '''java -Xmx5g -jar {0}EstimateLibraryComplexity.jar \
      I={1} \
-     O={2}'''.format(picardPath, inputFile, outputFile)
+     O={2} TMP_DIR=tmp'''.format(picardPath, inputFile, outputFile)
     runJob(comm, 'ESTIMATING LIBRARY SIZE')
     
