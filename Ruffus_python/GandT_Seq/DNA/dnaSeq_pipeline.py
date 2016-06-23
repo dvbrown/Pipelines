@@ -181,6 +181,8 @@ if options.verbose:
 
 # Assign the input specifed from the command line to a variable
 inputFile = options.input_file
+print inputFile
+
 
  #   Merge all bams from different lanes together into one file
 read1 = inputFile[0]
