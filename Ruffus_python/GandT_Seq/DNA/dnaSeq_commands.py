@@ -88,7 +88,7 @@ def mergeBamPipeline(inputFileNames, outputFile):
     INPUT={3} \
     INPUT={4} \
     OUTPUT={5} \
-    VALIDATION_STRINGENCY=LENIENT SORT_ORDER=coordinate CREATE_INDEX=true \
+    VALIDATION_STRINGENCY=LENIENT USE_THREADING=true SORT_ORDER=coordinate CREATE_INDEX=true \
     '''.format(picardPath, bam1, bam2, bam3, bam4, outputFile, tmpDir)
     runJob(comm, 'MERGING BAM FILES')
     
