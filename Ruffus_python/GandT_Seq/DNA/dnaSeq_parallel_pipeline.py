@@ -230,7 +230,7 @@ alignOutput2 = inputFile2[:-8] + 'bam'
 inputFile3 = inputFile[2]
 alignOutput3 = inputFile3[:-8] + 'bam'
 
-inputFile4 = inputFile[4]
+inputFile4 = inputFile[3]
 alignOutput4 = inputFile4[:-8] + 'bam'
 
 @merge([runIndexFasta1, runTrim], alignOutput1)

@@ -21,6 +21,6 @@ do
   lane4="${f/lane1/lane4}"
   
   # take action on each file. $f stores the current file name
-  sge batch -e $err$filename.txt -o $out$filename.txt python dnaSeq_pipeline.py -i $f -i $lane2 -i $lane3 -i $lane4 -j 4
+  sge batch -e $err$filename.txt -o $out$filename.txt python dnaSeq_parallel_pipeline.py -i $f -i $lane2 -i $lane3 -i $lane4 -j 4
 
 done
