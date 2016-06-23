@@ -233,19 +233,19 @@ alignOutput3 = inputFile3[:-8] + 'bam'
 inputFile4 = inputFile[3]
 alignOutput4 = inputFile4[:-8] + 'bam'
 
-@merge([runIndexFasta1, runTrim], alignOutput1)
+@merge([runIndexFasta1, runTrim1], alignOutput1)
 def runAlignment1(inputFileNames, outputFile):
     dnaSeq_commands.alignReads(inputFileNames, outputFile)
     
-@merge([runIndexFasta2, runTrim], alignOutput2)
+@merge([runIndexFasta2, runTrim2], alignOutput2)
 def runAlignment2(inputFileNames, outputFile):
     dnaSeq_commands.alignReads(inputFileNames, outputFile)
     
-@merge([runIndexFasta3, runTrim], alignOutput3)
+@merge([runIndexFasta3, runTrim3], alignOutput3)
 def runAlignment3(inputFileNames, outputFile):
     dnaSeq_commands.alignReads(inputFileNames, outputFile)
     
-@merge([runIndexFasta4, runTrim], alignOutput4)
+@merge([runIndexFasta4, runTrim4], alignOutput4)
 def runAlignment4(inputFileNames, outputFile):
     dnaSeq_commands.alignReads(inputFileNames, outputFile)
     
