@@ -188,9 +188,10 @@ print inputFile
 read1 = inputFile[0]
 m = re.search('GC032370_(.+?).160601_160601', read1)
 if m:
-    mergeName = 'GC032370_' + m.group(1) + '.merge.bam'
+    mergeName = 'GC032370_' + m.group(1)
  
-@transform(inputFile, suffix('.bam'), mergeName)
+#@transform(inputFile, suffix('.bam'), mergeName)
+@merge(inputFile, '{0}.merge.bam'.format(mergeName))
 def runBamMergePipeline(inputFileNames, outputFile):
     dnaSeq_commands.mergeBamPipeline(inputFileNames, outputFile)
 #    
