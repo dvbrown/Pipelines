@@ -182,72 +182,31 @@ if options.verbose:
 # Assign the input specifed from the command line to a variable
 inputFile = options.input_file
 
-#@transform(inputFile, suffix('.R1.fastq.gz'), '.R1.tr.fastq.gz')
-#def runTrim(inputFile, outputFile):
-#    dnaSeq_commands.trimReads(inputFile, outputFile)
-#    
-#@transform(runTrim, suffix('.R1.tr.fastq.gz'), '.R1.tr.sai')
-#def runIndexFasta(inputFile, outputFile):
-#    dnaSeq_commands.generateSamindex(inputFile, outputFile)
-#    
-##   Generate the output filename for alignment
-#inputFile1 = inputFile[0]
-#alignOutput = inputFile1[:-8] + 'bam'
-#
-#@merge([runIndexFasta, runTrim], alignOutput)
-#def runAlignment(inputFileNames, outputFile):
-#    dnaSeq_commands.alignReads(inputFileNames, outputFile)
-    
-#@transform(inputFile, suffix('.bam'), '.merge.bam')
-#def runBamMerge(inputFile, outputFile):
-#    dnaSeq_commands.mergeBams(inputFile, outputFile)
-#    
-##   Align the fastqs from each lane in a single script
-# @transform(inputFile, suffix('lane1.gcap_dev.R1.fastq.gz'), 'lane1.gcap_dev.R1.bam')
-# def runAligLane1(inputFile, outputFile):
-#     dnaSeq_commands.alignReads(inputFile, outputFile)
-# 
-# # Make this a follows decorator
-# @follows(runAligLane1) 
-# @transform(inputFile, suffix('lane2.gcap_dev.R1.fastq.gz'), 'lane2.gcap_dev.R1.bam')
-# def runAligLane2(inputFile, outputFile):
-#     dnaSeq_commands.alignReads(inputFile, outputFile)
-# 
-# @follows(runAligLane2) 
-# @transform(inputFile, suffix('lane3.gcap_dev.R1.fastq.gz'), 'lane3.gcap_dev.R1.bam')
-# def runAligLane3(inputFile, outputFile):
-#     dnaSeq_commands.alignReads(inputFile, outputFile)
-# 
-# @follows(runAligLane3)
-# @transform(inputFile, suffix('lane4.gcap_dev.R1.fastq.gz'), 'lane4.gcap_dev.R1.bam')
-# def runAligLane4(inputFile, outputFile):
-#     dnaSeq_commands.alignReads(inputFile, outputFile)
-# 
-# #   Merge all bams from different lanes together into one file
-# #   Generate output file name. Make this using grep next time
-# mergeName = inputFile[0]
-# mergeName = mergeName[91:116]
-# 
-# @follows(runAligLane4)  
-# @merge([runAligLane1, runAligLane2, runAligLane3, runAligLane4], '{0}.merge.bam'.format(mergeName))
-# def runBamMergePipeline(inputFileNames, outputFile):
-#     dnaSeq_commands.mergeBamPipeline(inputFileNames, outputFile)
+ #   Merge all bams from different lanes together into one file
+read1 = inputFile[0]
+m = re.search('GC032370_(.+?).160601_160601', read1)
+if m:
+    mergeName = 'GC032370_' + m.group(1) + '.merge.bam'
+ 
+@transform(inputFile, suffix('.bam'), mergeName)
+def runBamMergePipeline(inputFileNames, outputFile):
+    dnaSeq_commands.mergeBamPipeline(inputFileNames, outputFile)
 #    
 ##-------------------------    POST ALIGNMENT    -----------------------------
 #
-@transform(inputFileName, suffix('.bam'), '')
+@transform(runBamMergePipeline, suffix('.bam'), '')
 def runInsertSize(inputFileNames, outputFile):
     dnaSeq_commands.collectInsertSize(inputFileNames, outputFile)
     
-@transform(inputFileName, suffix('.bam'), '')
+@transform(runBamMergePipeline, suffix('.bam'), '')
 def runCalculateCoverage(inputFileNames, outputFile):
     dnaSeq_commands.calcCoverage(inputFileNames, outputFile)
 
-@transform(inputFileName, suffix('.bam'), '')
+@transform(runBamMergePipeline, suffix('.bam'), '')
 def runEstimateComplexity(inputFileNames, outputFile):
     dnaSeq_commands.estimateLibComplexity(inputFileNames, outputFile)
     
-@transform(inputFileName, suffix('.bam'), 'rmDup.bam')
+@transform(runBamMergePipeline, suffix('.bam'), 'rmDup.bam')
 def runRemoveDuplicates(inputFileNames, outputFile):
     dnaSeq_commands.removeDuplicates(inputFileNames, outputFile)
     
