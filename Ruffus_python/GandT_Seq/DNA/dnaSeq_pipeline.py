@@ -181,7 +181,6 @@ if options.verbose:
 
 # Assign the input specifed from the command line to a variable
 inputFile = options.input_file
-print inputFile
 
 
  #   Merge all bams from different lanes together into one file
@@ -197,21 +196,21 @@ def runBamMergePipeline(inputFileNames, outputFile):
 #    
 ##-------------------------    POST ALIGNMENT    -----------------------------
 #
-@transform(runBamMergePipeline, suffix('.bam'), '')
-def runInsertSize(inputFileNames, outputFile):
-    dnaSeq_commands.collectInsertSize(inputFileNames, outputFile)
-    
-@transform(runBamMergePipeline, suffix('.bam'), '')
-def runCalculateCoverage(inputFileNames, outputFile):
-    dnaSeq_commands.calcCoverage(inputFileNames, outputFile)
-
-@transform(runBamMergePipeline, suffix('.bam'), '')
-def runEstimateComplexity(inputFileNames, outputFile):
-    dnaSeq_commands.estimateLibComplexity(inputFileNames, outputFile)
-    
-@transform(runBamMergePipeline, suffix('.bam'), 'rmDup.bam')
-def runRemoveDuplicates(inputFileNames, outputFile):
-    dnaSeq_commands.removeDuplicates(inputFileNames, outputFile)
+#@transform(runBamMergePipeline, suffix('.bam'), '')
+#def runInsertSize(inputFileNames, outputFile):
+#    dnaSeq_commands.collectInsertSize(inputFileNames, outputFile)
+#    
+#@transform(runBamMergePipeline, suffix('.bam'), '')
+#def runCalculateCoverage(inputFileNames, outputFile):
+#    dnaSeq_commands.calcCoverage(inputFileNames, outputFile)
+#
+#@transform(runBamMergePipeline, suffix('.bam'), '')
+#def runEstimateComplexity(inputFileNames, outputFile):
+#    dnaSeq_commands.estimateLibComplexity(inputFileNames, outputFile)
+#    
+#@transform(runBamMergePipeline, suffix('.bam'), 'rmDup.bam')
+#def runRemoveDuplicates(inputFileNames, outputFile):
+#    dnaSeq_commands.removeDuplicates(inputFileNames, outputFile)
     
 #################################    END PIPELINE    #####################################
 
