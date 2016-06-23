@@ -196,7 +196,7 @@ def runTrim2(inputFile, outputFile):
 def runTrim3(inputFile, outputFile):
     dnaSeq_commands.trimReads(inputFile, outputFile)    
     
-@transform(inputFile, suffix('lane4.gcap_dev.R1.fastq.gz'), 'lane4.gcap_dev.R4.tr.fastq.gz')
+@transform(inputFile, suffix('lane4.gcap_dev.R1.fastq.gz'), 'lane4.gcap_dev.R1.tr.fastq.gz')
 def runTrim4(inputFile, outputFile):
     dnaSeq_commands.trimReads(inputFile, outputFile)
     
