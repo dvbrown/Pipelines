@@ -212,6 +212,8 @@ def runRemoveDuplicates(inputFile, outputFile):
     dnaSeq_commands.removeDuplicates(inputFile, outputFile)
     
 @transform(runRemoveDuplicates, suffix('.rmDup.bam'), '.hits.txt')
+def runGenerateHits(inputFile, outputFile):
+    pass
     
 #################################    END PIPELINE    #####################################
 
@@ -220,7 +222,7 @@ def runRemoveDuplicates(inputFile, outputFile):
 #88888888888888888888888888888888888888888888888888888888888888888888888888888888888888888
 if options.just_print:
     pipeline_printout(sys.stdout, options.target_tasks, verbose=options.verbose)
-
+    
 
 #88888888888888888888888888888888888888888888888888888888888888888888888888888888888888888
 
