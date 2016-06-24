@@ -184,33 +184,32 @@ inputFile = options.input_file
 
 
  #   Merge all bams from different lanes together into one file
-read1 = inputFile[0]
-m = re.search('GC032370_(.+?).160601_160601', read1)
-if m:
-    mergeName = 'GC032370_' + m.group(1)
- 
-#@transform(inputFile, suffix('.bam'), mergeName)
-@merge(inputFile, '{0}.merge.bam'.format(mergeName))
-def runBamMergePipeline(inputFileNames, outputFile):
-    dnaSeq_commands.mergeBamPipeline(inputFileNames, outputFile)
+#read1 = inputFile[0]
+#m = re.search('GC032370_(.+?).160601_160601', read1)
+#if m:
+#    mergeName = 'GC032370_' + m.group(1)
+# 
+#@merge(inputFile, '{0}.merge.bam'.format(mergeName))
+#def runBamMergePipeline(inputFileNames, outputFile):
+#    dnaSeq_commands.mergeBamPipeline(inputFileNames, outputFile)
 #    
 ##-------------------------    POST ALIGNMENT    -----------------------------
 #
-#@transform(runBamMergePipeline, suffix('.bam'), '')
-#def runInsertSize(inputFileNames, outputFile):
-#    dnaSeq_commands.collectInsertSize(inputFileNames, outputFile)
-#    
-#@transform(runBamMergePipeline, suffix('.bam'), '')
-#def runCalculateCoverage(inputFileNames, outputFile):
-#    dnaSeq_commands.calcCoverage(inputFileNames, outputFile)
-#
-#@transform(runBamMergePipeline, suffix('.bam'), '')
-#def runEstimateComplexity(inputFileNames, outputFile):
-#    dnaSeq_commands.estimateLibComplexity(inputFileNames, outputFile)
-#    
-#@transform(runBamMergePipeline, suffix('.bam'), 'rmDup.bam')
-#def runRemoveDuplicates(inputFileNames, outputFile):
-#    dnaSeq_commands.removeDuplicates(inputFileNames, outputFile)
+@transform(inputFile, suffix('.bam'), '.insert')
+def runInsertSize(inputFile, outputFile):
+    dnaSeq_commands.collectInsertSize(inputFileNames, outputFile)
+    
+@transform(inputFile, suffix('.bam'), '.coverage')
+def runCalculateCoverage(inputFile, outputFile):
+    dnaSeq_commands.calcCoverage(inputFileNames, outputFile)
+
+@transform(inputFile, suffix('.bam'), '.complexity')
+def runEstimateComplexity(inputFile, outputFile):
+    dnaSeq_commands.estimateLibComplexity(inputFileNames, outputFile)
+ 
+@transform(inputFile, suffix('.bam'), 'rmDup.bam')
+def runRemoveDuplicates(inputFile, outputFile):
+    dnaSeq_commands.removeDuplicates(inputFileNames, outputFile)
     
 #################################    END PIPELINE    #####################################
 

@@ -115,7 +115,7 @@ def collectInsertSize(inputFile, outputFile):
     
 def calcCoverage(inputFile, outputFile):
     'Calculate coverage using GATK'
-    comm='''java -Xmx5g -jar {0} -R {1} \
+    comm='''java -Xmx5g -jar {0}GenomeAnalysisTK.jar -R {1} \
     -T DepthOfCoverage -o {2} -i {3} \
     --omitDepthOutputAtEachBase \
     -ct 1 -ct 2 -ct 3 -ct 4 -ct 5 -ct 6 -ct 7 -ct 8 -ct 9 -ct 10 -ct 12 -ct 15 -ct 20 -ct 25 -ct 100 \
