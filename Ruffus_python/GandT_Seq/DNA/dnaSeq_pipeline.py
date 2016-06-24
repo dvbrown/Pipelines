@@ -217,9 +217,9 @@ def runRemoveDuplicates(inputFile, outputFile):
 def runGenerateHits(inputFile, outputFile):
     dnaSeq_commands.generateHits(inputFile, outputFile)
     
-@transform(runGenerateHits, suffix('.hits.txt'), 'cov.txt', extras=mapBins)
-def runComputeCoverage(inputFile, outputFile, mapBins):
-    dnaSeq_commands.computeCoverage(inputFile, outputFile, mappableBins=mapBins)
+#@transform(runGenerateHits, suffix('.hits.txt'), 'cov.txt', extras=mapBins)
+#def runComputeCoverage(inputFile, outputFile, mapBins):
+#    dnaSeq_commands.computeCoverage(inputFile, outputFile, mappableBins=mapBins)
     
 #################################    END PIPELINE    #####################################
 
