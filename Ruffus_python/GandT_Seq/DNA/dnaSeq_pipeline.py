@@ -211,6 +211,8 @@ def runEstimateComplexity(inputFile, outputFile):
 def runRemoveDuplicates(inputFile, outputFile):
     dnaSeq_commands.removeDuplicates(inputFile, outputFile)
     
+@transform(runRemoveDuplicates, suffix('.rmDup.bam'), '.hits.txt')
+    
 #################################    END PIPELINE    #####################################
 
 #   Print list of tasks
