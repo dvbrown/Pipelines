@@ -220,7 +220,7 @@ def runGenerateHits(inputFile, outputFile):
     
 @transform(runGenerateHits, suffix('.hits.txt'), 'cov.txt', extras=[mapBins])
 def runComputeCoverage(inputFile, outputFile, mapBins):
-    dnaSeq_commands.computeCoverage(inputFile, outputFile, mappableBins==mapBins)
+    dnaSeq_commands.computeCoverage(inputFile, outputFile, mappableBins=mapBins)
     
 #################################    END PIPELINE    #####################################
 
