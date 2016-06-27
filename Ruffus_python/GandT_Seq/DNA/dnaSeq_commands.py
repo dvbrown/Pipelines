@@ -23,7 +23,7 @@ def runJob(comm, taskName):
     print('\n##############################################    RUNNNG TASK ' + taskName + ' at {0}'.format(started) +   '    ###############################################')
     print(comm + '\n')
     #run the command. Comment out the line below to print only the command and not run it.
-    os.system(comm)
+    #os.system(comm)
     
     
 def trimReads(inputFile, outputFile):
@@ -153,10 +153,10 @@ def generateHits(inputFile, outputFile):
     
 
 def computeCoverage(inputFile, outputFile, mappableBins):
-    '''
+    '''Compute coverage across each of the mappable bins according to Parveen's pipeline.
     '''
     comm = '''awk '{print $1"\t"$2"\t"$2}' {1} | \
-    {0}/bedtools/2.17.0/bin//coverageBed -a - {2} \
-    > {3}
-    '''.format(binaryPath, inputFile, mappableBins, outputFile)
+    sed 's/chr//g' |
+    {0}/bedtools/2.17.0/bin/coverageBed -a - -b {2} \
+    > {3} '''.format(binaryPath, inputFile, mappableBins, outputFile)
     runJob(comm, 'COMPUTING COVERAGE OVER BINS')
