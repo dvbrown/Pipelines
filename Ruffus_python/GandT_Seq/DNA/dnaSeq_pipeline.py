@@ -218,9 +218,9 @@ mapBins = '/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/dbrown0/Bioinformat
 def runGenerateHits(inputFile, outputFile):
     dnaSeq_commands.generateHits(inputFile, outputFile)
     
-@transform(runGenerateHits, suffix('.hits.txt'), 'cov.txt', extras={mappableBins:mapBins})
+@transform(runGenerateHits, suffix('.hits.txt'), 'cov.txt', extras=[mapBins])
 def runComputeCoverage(inputFile, outputFile, mapBins):
-    dnaSeq_commands.computeCoverage(inputFile, outputFile, mapBins)
+    dnaSeq_commands.computeCoverage(inputFile, outputFile, mappableBins==mapBins)
     
 #################################    END PIPELINE    #####################################
 
