@@ -155,7 +155,7 @@ def generateHits(inputFile, outputFile):
 def computeCoverage(inputFile, outputFile, mappableBins):
     '''Compute coverage across each of the mappable bins according to Parveen's pipeline.
     '''
-    comm = '''awk '{print $1"\\t"$2"\\t"$2}' {1} | \
+    comm = '''awk '{{print $1"\\t"$2"\\t"$2}}}' {1} | \
     sed 's/chr//g' |
     {0}/bedtools/2.17.0/bin/coverageBed -a - -b {2} \
     > {3}'''.format(binaryPath, inputFile, mappableBins, outputFile)
