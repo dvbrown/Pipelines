@@ -201,14 +201,16 @@ mapBins = ''
 def runInsertSize(inputFile, outputFile):
     dnaSeq_commands.collectInsertSize(inputFile, outputFile)
     
-@transform(inputFile, suffix('.bam'), '.coverage')
-def runCalculateCoverage(inputFile, outputFile):
-    dnaSeq_commands.calcCoverage(inputFile, outputFile)
+#@transform(inputFile, suffix('.bam'), '.coverage')
+#def runCalculateCoverage(inputFile, outputFile):
+#    dnaSeq_commands.calcCoverage(inputFile, outputFile)
 
+@follows(runInsertSize)
 @transform(inputFile, suffix('.bam'), '.complexity')
 def runEstimateComplexity(inputFile, outputFile):
     dnaSeq_commands.estimateLibComplexity(inputFile, outputFile)
- 
+
+@follows(runEstimateComplexity) 
 @transform(inputFile, suffix('.bam'), '.rmDup.bam')
 def runRemoveDuplicates(inputFile, outputFile):
     dnaSeq_commands.removeDuplicates(inputFile, outputFile)
