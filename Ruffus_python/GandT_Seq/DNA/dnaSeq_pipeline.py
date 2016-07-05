@@ -214,13 +214,13 @@ mapBins = '/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/dbrown0/Bioinformat
 #def runRemoveDuplicates(inputFile, outputFile):
 #    dnaSeq_commands.removeDuplicates(inputFile, outputFile)
 #    
-@transform(inputFile, suffix('.rmDup.bam'), '.hits.txt')
-def runGenerateHits(inputFile, outputFile):
-    dnaSeq_commands.generateHits(inputFile, outputFile)
-    
-@transform(runGenerateHits, suffix('.merge.hits.txt'), '.cov.txt', extras=[mapBins])
-def runComputeCoverage(inputFile, outputFile, mapBins):
-    dnaSeq_commands.computeCoverage(inputFile, outputFile, mappableBins=mapBins)
+#@transform(inputFile, suffix('.rmDup.bam'), '.hits.txt')
+#def runGenerateHits(inputFile, outputFile):
+#    dnaSeq_commands.generateHits(inputFile, outputFile)
+#    
+#@transform(runGenerateHits, suffix('.merge.hits.txt'), '.cov.txt', extras=[mapBins])
+#def runComputeCoverage(inputFile, outputFile, mapBins):
+#    dnaSeq_commands.computeCoverage(inputFile, outputFile, mappableBins=mapBins)
     
 #################################    END PIPELINE    #####################################
 

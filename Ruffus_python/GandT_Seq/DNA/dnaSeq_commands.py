@@ -23,8 +23,7 @@ def runJob(comm, taskName):
     print('\n##############################################    RUNNNG TASK ' + taskName + ' at {0}'.format(started) +   '    ###############################################')
     print(comm + '\n')
     #run the command. Comment out the line below to print only the command and not run it.
-    os.system(comm)
-    
+    os.system(comm)  
     
 def trimReads(inputFile, outputFile):
     'Take the raw sequencing reads and trim off first 12 bases of sequence'
