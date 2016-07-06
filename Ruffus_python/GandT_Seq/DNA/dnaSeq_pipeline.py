@@ -197,22 +197,22 @@ mapBins = '/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/dbrown0/Bioinformat
     
 #-------------------------    POST ALIGNMENT    -----------------------------
 
-
-@transform(inputFile, suffix('.bam'), '.insert')
-def runInsertSize(inputFile, outputFile):
-    dnaSeq_commands.collectInsertSize(inputFile, outputFile)
-    
-@transform(inputFile, suffix('.bam'), '.coverage')
-def runCalculateCoverage(inputFile, outputFile):
-    dnaSeq_commands.calcCoverage(inputFile, outputFile)
-
-@transform(inputFile, suffix('.bam'), '.complexity')
-def runEstimateComplexity(inputFile, outputFile):
-    dnaSeq_commands.estimateLibComplexity(inputFile, outputFile)
- 
-@transform(inputFile, suffix('.bam'), '.rmDup.bam')
-def runRemoveDuplicates(inputFile, outputFile):
-    dnaSeq_commands.removeDuplicates(inputFile, outputFile)
+#
+#@transform(inputFile, suffix('.bam'), '.insert')
+#def runInsertSize(inputFile, outputFile):
+#    dnaSeq_commands.collectInsertSize(inputFile, outputFile)
+#    
+#@transform(inputFile, suffix('.bam'), '.coverage')
+#def runCalculateCoverage(inputFile, outputFile):
+#    dnaSeq_commands.calcCoverage(inputFile, outputFile)
+#
+#@transform(inputFile, suffix('.bam'), '.complexity')
+#def runEstimateComplexity(inputFile, outputFile):
+#    dnaSeq_commands.estimateLibComplexity(inputFile, outputFile)
+# 
+#@transform(inputFile, suffix('.bam'), '.rmDup.bam')
+#def runRemoveDuplicates(inputFile, outputFile):
+#    dnaSeq_commands.removeDuplicates(inputFile, outputFile)
     
 @transform(inputFile, suffix('.rmDup.bam'), '.hits.txt')
 def runGenerateHits(inputFile, outputFile):
