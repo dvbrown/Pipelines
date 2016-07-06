@@ -198,17 +198,17 @@ inputFile = options.input_file
 #-------------------------    POST ALIGNMENT    -----------------------------
 
 
-@transform(inputFile, suffix('.bam'), '.insert')
-def runInsertSize(inputFile, outputFile):
-    dnaSeq_commands.collectInsertSize(inputFile, outputFile)
-    
-@transform(inputFile, suffix('.bam'), '.coverage')
-def runCalculateCoverage(inputFile, outputFile):
-    dnaSeq_commands.calcCoverage(inputFile, outputFile)
-
-@transform(inputFile, suffix('.bam'), '.complexity')
-def runEstimateComplexity(inputFile, outputFile):
-    dnaSeq_commands.estimateLibComplexity(inputFile, outputFile)
+#@transform(inputFile, suffix('.bam'), '.insert')
+#def runInsertSize(inputFile, outputFile):
+#    dnaSeq_commands.collectInsertSize(inputFile, outputFile)
+#    
+#@transform(inputFile, suffix('.bam'), '.coverage')
+#def runCalculateCoverage(inputFile, outputFile):
+#    dnaSeq_commands.calcCoverage(inputFile, outputFile)
+#
+#@transform(inputFile, suffix('.bam'), '.complexity')
+#def runEstimateComplexity(inputFile, outputFile):
+#    dnaSeq_commands.estimateLibComplexity(inputFile, outputFile)
  
 @transform(inputFile, suffix('.bam'), '.rmDup.bam')
 def runRemoveDuplicates(inputFile, outputFile):
