@@ -186,18 +186,18 @@ inputFile = options.input_file
 mapBins = '/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/dbrown0/Bioinformatics/Resources/Mappablebins/Combined_Human_NCBI37.2_500K_63bases_mappable_bins.txt '
 
 #    Merge all bams from different lanes together into one file
-#read1 = inputFile[0]
-#m = re.search('GC032370_(.+?).160601_160601', read1)
-#if m:
-#    mergeName = 'GC032370_' + m.group(1)
-# 
-#@merge(inputFile, '{0}.merge.bam'.format(mergeName))
-#def runBamMergePipeline(inputFileNames, outputFile):
-#    dnaSeq_commands.mergeBamPipeline(inputFileNames, outputFile)
+read1 = inputFile[0]
+m = re.search('GC032370_(.+?).160601_160601', read1)
+if m:
+    mergeName = 'GC032370_' + m.group(1)
+ 
+@merge(inputFile, '{0}.merge.bam'.format(mergeName))
+def runBamMergePipeline(inputFileNames, outputFile):
+    dnaSeq_commands.mergeBamPipeline(inputFileNames, outputFile)
     
 #-------------------------    POST ALIGNMENT    -----------------------------
 
-#
+
 #@transform(inputFile, suffix('.bam'), '.insert')
 #def runInsertSize(inputFile, outputFile):
 #    dnaSeq_commands.collectInsertSize(inputFile, outputFile)
@@ -214,13 +214,13 @@ mapBins = '/uz/data/avalok/symbiosys/gcpi_r_kul_thierry_voet/dbrown0/Bioinformat
 #def runRemoveDuplicates(inputFile, outputFile):
 #    dnaSeq_commands.removeDuplicates(inputFile, outputFile)
     
-@transform(inputFile, suffix('.rmDup.bam'), '.hits.txt')
-def runGenerateHits(inputFile, outputFile):
-    dnaSeq_commands.generateHits(inputFile, outputFile)
-    
-@transform(runGenerateHits, suffix('.merge.hits.txt'), '.cov.txt', extras=[mapBins])
-def runComputeCoverage(inputFile, outputFile, mapBins):
-    dnaSeq_commands.computeCoverage(inputFile, outputFile, mappableBins=mapBins)
+#@transform(inputFile, suffix('.rmDup.bam'), '.hits.txt')
+#def runGenerateHits(inputFile, outputFile):
+#    dnaSeq_commands.generateHits(inputFile, outputFile)
+#    
+#@transform(runGenerateHits, suffix('.merge.hits.txt'), '.cov.txt', extras=[mapBins])
+#def runComputeCoverage(inputFile, outputFile, mapBins):
+#    dnaSeq_commands.computeCoverage(inputFile, outputFile, mappableBins=mapBins)
     
 #################################    END PIPELINE    #####################################
 
