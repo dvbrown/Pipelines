@@ -1,0 +1,16 @@
+file:
+  reference_genome: /Users/u0041034/Projects/Resources/human_g1k_v37.fasta.gz
+  sample_file: /Users/u0041034/Projects/dna_pipeline/data/test_sample_file.txt
+
+path:
+  fastq: /Users/u0041034/Projects/dna_pipeline/data/fastq
+  results: /Users/u0041034/Projects/dna_pipeline/results
+  tmp: /Users/u0041034/Projects/dna_pipeline/tmp
+
+exec:
+  bwa: /usr/local/bin/bwa
+  samtools: /usr/local/bin/samtools
+  java: /usr/bin/java
+  picard: /usr/local/share/java/picard.jar
+  python: /Users/u0041034/.pyenv/shims/python
+  rscript: /usr/local/bin/rscript
