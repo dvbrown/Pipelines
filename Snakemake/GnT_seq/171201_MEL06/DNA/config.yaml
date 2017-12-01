@@ -1,0 +1,33 @@
+parameter:
+  #Minimum size of BAM file in MB to consider for analysis
+  min_bam_size: 5
+  readlength: 101
+  binsize: 250
+  gamma: 15
+  #Assumed ploidy of the cell
+  ploidy: 2
+  #Chromosome to use for normalization (e.g. "2" or "ALL")
+  chrom_for_norm: "2"
+  #MAPD threshold for plotting
+  mapd_threshold: 0.3
+
+file:
+  reference_genome: /Users/u0041034/Projects/Resources/human_g1k_v37.fasta.gz
+  bad_bin_file: /Users/u0041034/Projects/cnv_pipeline/data/bad_bins.250K.101bp.txt
+  #Optional:
+  sample_groups: /Users/u0041034/Projects/cnv_pipeline/samples.txt
+
+path:
+  bam_dir: /Users/u0041034/Projects/cnv_pipeline/data/bams
+  results: /Users/u0041034/Projects/cnv_pipeline/results
+  tmp: /Users/u0041034/Projects/cnv_pipeline/tmp
+  mappable_bins: /Users/u0041034/Projects/cnv_pipeline/data/BIN_files
+  script_dir: /Users/u0041034/Projects/cnv_pipeline/src/
+
+
+exec:
+  samtools: /usr/local/bin/samtools
+  coveragebed: /usr/local/bin/coverageBed
+  rscript: /usr/local/bin/rscript
+  perl: /usr/bin/perl
+  python: /Users/u0041034/.pyenv/shims/python
