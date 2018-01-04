@@ -4,3 +4,5 @@
 *.sqlite
 
 .DS_Store
+
+*.yaml

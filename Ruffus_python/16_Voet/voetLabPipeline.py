@@ -13,8 +13,8 @@
 
 """
 import sys, os
-import tasks
-import postAlign
+# import tasks
+# import postAlign
 import mtDNA_deletion
 import indelTools
 
@@ -51,7 +51,7 @@ if __name__ == '__main__':
                         default = list(),
                         metavar="FILE",
                         type="string",
-                        help="""The file(s) to use as input. If there are multiple 
+                        help="""The file(s) to use as input. If there are multiple
                         files use the -i argument multiple times""")
     parser.add_option("-t", "--target_tasks", dest="target_tasks",
                         action="append",
@@ -193,32 +193,32 @@ inputFile = options.input_file
 #def convertFq(inputFile, output):
 #    'Convert the fastq files to unaligned bam'
 #    mtDNA_deletion.convertUnalignedBam(inputFile, output)
-#    
-#@transform(convertFq, suffix(".U.bam"), ['.txt', 'adapters.txt'])
-#def markIlumminaAdapters(inputFile, output):
-#    'Convert the fastq files to unaligned bam'
-#    mtDNA_deletion.markAdapters(inputFile[0], output)
-#    
-#@transform(inputFile, suffix(".fastq.gz"), ['.m.bam', 'mt.txt'])
-#def alignMtDNA(inputFile, output):
-#    'Align the cleaned files to the mitochondira DNA genome'
-#    mtDNA_deletion.alignMtDNA(inputFile, output)
-#    
-#@transform(alignMtDNA, suffix(".bam"), ['.s.bam', ".sort.txt"])
-#def sortBam(inputFile, output):
-#    'Sort reads with samtools'
-#    mtDNA_deletion.sortSamtools(inputFile[0], output)
-#    
-#@transform(sortBam, suffix(".bam"), ["", "index.txt"])
-#def index(inputFile, output):
-#    'Sort reads with samtools'
-#    mtDNA_deletion.indexSamtools(inputFile[0], output) 
-#     
+#
+@transform(inputFile, suffix(".U.bam"), ['.txt', 'adapters.txt'])
+def markIlumminaAdapters(inputFile, output):
+    'Convert the fastq files to unaligned bam'
+    mtDNA_deletion.markAdapters(inputFile[0], output)
+
+@transform(inputFile, suffix(".fastq.gz"), ['.m.bam', 'mt.txt'])
+def alignMtDNA(inputFile, output):
+    'Align the cleaned files to the mitochondira DNA genome'
+    mtDNA_deletion.alignMtDNA(inputFile, output)
+
+@transform(alignMtDNA, suffix(".bam"), ['.s.bam', ".sort.txt"])
+def sortBam(inputFile, output):
+    'Sort reads with samtools'
+    mtDNA_deletion.sortSamtools(inputFile[0], output)
+
+@transform(sortBam, suffix(".bam"), ["", "index.txt"])
+def index(inputFile, output):
+    'Sort reads with samtools'
+    mtDNA_deletion.indexSamtools(inputFile[0], output)
+#
 #@transform(sortBam, suffix(".bam"), ['.bcf', 'del.txt'])
 #def runDelly(inputFile, output):
 #    'Align the cleaned files to the mitochondira DNA genome'
 #    mtDNA_deletion.delly(inputFile[0], output)
-#    
+#
 #@transform(runDelly, suffix(".bcf"), ['.vcf', 'view.txt'])
 #def convertBcf(inputFile, output):
 #    'Convert the bcf file to be human readable'
@@ -228,7 +228,7 @@ inputFile = options.input_file
 #def getSecAlignment(inputFile, outFiles):
 #    'Extract reads with secondary alignment flag in Sam'
 #    mtDNA_deletion.extractSecondaryAlignments(inputFile, outFiles)
-#    
+#
 #@transform(getSecAlignment, suffix(".sam"), ['.bam', ".catHeader.txt"])
 #def catHeader(inputFile, outFiles):
 #    'Extract reads with secondary alignment flag in Sam'
@@ -239,16 +239,16 @@ inputFile = options.input_file
 #def convertBed(inputFile, outFiles):
 #    'Convert bam to Bed'
 #    mtDNA_deletion.convertToBed(inputFile, outFiles)
-    
+
 #@transform(inputFile, suffix(".bed"), ['.split.bed', 'splitRead.txt'])
 #def castSplitReads(inputFile, output):
 #    'Extract the secondary split read from bed file and append as columns next to the first split read entry'
 #    mtDNA_deletion.collapseSplitReads(inputFile, output)
-    
-@transform(inputFile, suffix(".vcf"), ['.csv', "success.txt"])
-def runVcfToTable(inputFile, output):
-    'extract fields from the VCF to a table format that is more convenient to work with in downstream analyses.'
-    indelTools.vcfToTable(inputFile, output)
+
+#@transform(inputFile, suffix(".vcf"), ['.csv', "success.txt"])
+#def runVcfToTable(inputFile, output):
+#    'extract fields from the VCF to a table format that is more convenient to work with in downstream analyses.'
+#    indelTools.vcfToTable(inputFile, output)
 
 #88888888888888888888888888888888888888888888888888888888888888888888888888888888888888888
 
