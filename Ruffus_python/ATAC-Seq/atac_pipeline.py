@@ -190,22 +190,22 @@ if options.verbose:
 inputFile = options.input_file
 #outputDir = options.output_directory
 
-def trimReads(input_file, output_dir):
-    'Take the raw sequencing reads and trim off the adpaters. The output will all be in one directory'
-    #   Get read 2 filename using string subsitiution
-    read2 = re.sub('.R1.fastq.gz', '.R2.fastq.gz', input_file)
-    #   Get the output filename by taking the end of the full path of the input filename
-    output_file = input_file[-92:]
-    # Build the path for the output directory by concatenating the output directory and output file
-    output_file = output_dir + output_file
-    output_file2 = re.sub('.R1.fastq.gz', '.R2.fastq.gz', output_file)
-    comm = '''/home/dbrown0/.local/bin/cutadapt -q 20,20 --minimum-length 35 \
-    -a CTGTCTCTTATA -A CTGTCTCTTATA \
-    -o {2} -p {3} \
-    {0} {1} \
-    '''.format(input_file, read2, output_file, output_file2)
-    print(comm)
-    os.system(comm)
+# def trimReads(input_file, output_dir):
+#     'Take the raw sequencing reads and trim off the adpaters. The output will all be in one directory'
+#     #   Get read 2 filename using string subsitiution
+#     read2 = re.sub('.R1.fastq.gz', '.R2.fastq.gz', input_file)
+#     #   Get the output filename by taking the end of the full path of the input filename
+#     output_file = input_file[-92:]
+#     # Build the path for the output directory by concatenating the output directory and output file
+#     output_file = output_dir + output_file
+#     output_file2 = re.sub('.R1.fastq.gz', '.R2.fastq.gz', output_file)
+#     comm = '''/home/dbrown0/.local/bin/cutadapt -q 20,20 --minimum-length 35 \
+#     -a CTGTCTCTTATA -A CTGTCTCTTATA \
+#     -o {2} -p {3} \
+#     {0} {1} \
+#     '''.format(input_file, read2, output_file, output_file2)
+#     print(comm)
+#     os.system(comm)
     
 #   trimReads(inputFile[0], outputDir[0])
 
@@ -213,9 +213,9 @@ def trimReads(input_file, output_dir):
 #def runAlignment(inputFile, outputFile):
 #    atac_commands.alignReads(inputFile, outputFile)
 #    
-#@transform(inputFile, suffix('.bam'), '.merge.bam')
-#def runBamMerge(inputFile, outputFile):
-#    atac_commands.mergeBams(inputFile, outputFile)
+@transform(inputFile, suffix('Aligned.sortedByCoord.out.bam'), '.merge.bam')
+def runBamMerge(inputFile, outputFile):
+   atac_commands.mergeBams(inputFile, outputFile)
     
 #   Align the fastqs from each lane in a single script
 # @transform(inputFile, suffix('lane1.gcap_dev.R1.fastq.gz'), 'lane1.gcap_dev.R1.bam')
@@ -278,9 +278,9 @@ def trimReads(input_file, output_dir):
 #def runKrisATAC(inputFile, outputFile):
 #    atac_commands.kDavieATAC(inputFile, outputFile)
     
-@transform(inputFile, suffix('.bam'), '')
-def runPicardInsert(inputFile, outputFile):
-    atac_commands.collectInsertSize(inputFile, outputFile)
+# @transform(inputFile, suffix('.bam'), '')
+# def runPicardInsert(inputFile, outputFile):
+#     atac_commands.collectInsertSize(inputFile, outputFile)
     
 #################################    END PIPELINE    #####################################
 
