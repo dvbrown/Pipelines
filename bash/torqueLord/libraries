@@ -1,0 +1,4 @@
+fastqs,sample,library_type
+/stornext/HPCScratch/home/brown.d/Data/CITEseq/,DB_DCs_RNA,Gene Expression
+/stornext/HPCScratch/home/brown.d/Data/CITEseq/,DB_DCs_CITE,Antibody Capture
+/stornext/HPCScratch/home/brown.d/Data/CITEseq/,DB-DCs-ADT_S7,Antibody Capture
