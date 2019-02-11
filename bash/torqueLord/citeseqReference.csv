@@ -1,0 +1,17 @@
+id,name,read,pattern,sequence,feature_type
+CD117_(c_kit),CD117_(c_kit),R2,^(BC),TGCATGTCATCGGTG,Antibody Capture
+Ly_6A_E_(Sca_1),Ly_6A_E_(Sca_1),R2,^(BC),TTCCTTTCCTACGCA,Antibody Capture
+Ly_6C,Ly_6C,R2,^(BC),AAGTCGTGAGGCATG,Antibody Capture
+CD11c,CD11c,R2,^(BC),GTTATGGACGCTTGC,Antibody Capture
+I_A_I_E_(MHCII),I_A_I_E_(MHCII),R2,^(BC),GGTCACCAGTATGAT,Antibody Capture
+HLA_DR,HLA_DR,R2,^(BC),AATAGCGAGCAAGTA,Antibody Capture
+CD24,CD24,R2,^(BC),TATATCTTTGCCGCA,Antibody Capture
+Siglec_H,Siglec_H,R2,^(BC),CCGCACCTACATTAG,Antibody Capture
+Hashtag_1_Human,Hashtag_1_Human,R2,^(BC),GTCAACTCTTTAGCG,Antibody Capture
+Hashtag_2_Human,Hashtag_2_Human,R2,^(BC),TGATGGCCTATTGGG,Antibody Capture
+Hashtag_3_Human,Hashtag_3_Human,R2,^(BC),TTCCGCCTCTCTTTG,Antibody Capture
+Hashtag_4_Human,Hashtag_4_Human,R2,^(BC),AGTAAGTTCAGCGTA,Antibody Capture
+Hashtag_1_Mouse,Hashtag_1_Mouse,R2,^(BC),ACCCACCAGTAAGAC,Antibody Capture
+Hashtag_2_Mouse,Hashtag_2_Mouse,R2,^(BC),GGTCGAGAGCATTCA,Antibody Capture
+Hashtag_3_Mouse,Hashtag_3_Mouse,R2,^(BC),CTTGCCGCATGTCAT,Antibody Capture
+Hashtag_4_Mouse,Hashtag_4_Mouse,R2,^(BC),AAAGCATTCTTCACG,Antibody Capture
