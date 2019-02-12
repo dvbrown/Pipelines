@@ -2,3 +2,5 @@ fastqs,sample,library_type
 /stornext/HPCScratch/home/brown.d/Data/CITEseq/,DB_DCs_RNA,Gene Expression
 /stornext/HPCScratch/home/brown.d/Data/CITEseq/,DB_DCs_CITE,Antibody Capture
 /stornext/HPCScratch/home/brown.d/Data/CITEseq/,DB-DCs-ADT_S7,Antibody Capture
+/wehisan/general/user_managed/grpu_naik.s_2/2019_Sequencing_Runs/NN124/cellranger/HTV3WBGX9/outs/fastq_path/HTV3WBGX9/DB_CellMix_RNA/,DB_CellMix_RNA,Gene Expression
+/stornext/HPCScratch/home/brown.d/src/CITEseq/danCITE_absOnly/outs/fastq_path/HTWHGBGX9,DB_CellMix_HTO,Antibody Capture

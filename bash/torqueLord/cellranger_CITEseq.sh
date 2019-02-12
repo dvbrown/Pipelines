@@ -9,4 +9,4 @@ $cellrangerExec count --id=dan_CITEseq \
                    --transcriptome=$transcriptomeRef \
                    --libraries=$libraries --feature-ref=$featRef \
                    --chemistry=SC3Pv2 \
-                   --expect-cells=30000
+                   --expect-cells=36000

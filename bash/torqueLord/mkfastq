@@ -1,0 +1,8 @@
+#!/bin/bash
+
+samplesheet=/stornext/HPCScratch/home/brown.d/src/CITEseq/sampleSheet_CITE_only.csv
+cellrangerExec=/stornext/HPCScratch/home/brown.d/src/cellranger-3.0.2/cellranger
+
+$cellrangerExec mkfastq --id=danCITE_absOnly \
+                     --run=/wehisan/general/user_managed/grpu_naik.s_2/2019_Sequencing_Runs/NN123/190125_NS500643_0528_AHTWHGBGX9/ \
+                     --csv=$samplesheet
